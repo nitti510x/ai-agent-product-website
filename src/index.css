@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply bg-dark;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-primary hover:shadow-glow text-dark font-semibold px-6 py-2 rounded-lg transition-all duration-300;
+  }
+  
+  .btn-outline {
+    @apply border border-text-muted hover:border-secondary hover:shadow-glow-blue px-6 py-2 rounded-lg transition-all duration-300;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-dark-teal/10 to-transparent;
+  }
+}
