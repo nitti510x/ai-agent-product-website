@@ -103,6 +103,16 @@ export default function AuthUI() {
                 loading_button_label: 'Signing in ...',
                 social_provider_text: "Continue with {{provider}}",
                 link_text: "Already have an account? Sign in"
+              },
+              sign_up: {
+                email_label: 'Email address',
+                password_label: 'Password',
+                email_input_placeholder: 'name@example.com',
+                password_input_placeholder: 'Your secure password',
+                button_label: 'Sign up',
+                loading_button_label: 'Signing up ...',
+                social_provider_text: "Sign up with {{provider}}",
+                link_text: "Don't have an account? Sign up"
               }
             },
             translations: {

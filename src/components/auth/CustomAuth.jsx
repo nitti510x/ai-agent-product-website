@@ -199,7 +199,7 @@ export default function CustomAuth() {
                 button_label: 'Sign up',
                 loading_button_label: 'Signing up ...',
                 social_provider_text: "Sign up with {{provider}}",
-                link_text: "Already have an account? Sign in"
+                link_text: "Don't have an account? Sign up"
               }
             }
           }}
