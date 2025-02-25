@@ -88,7 +88,7 @@ function LandingPage() {
             <div className="text-left">
               <div className="flex items-center mb-4">
                 <RiSlackFill className="w-12 h-12 text-primary mr-4" />
-                <span className="text-xl text-secondary">Marketing Assistant for Slack</span>
+                <span className="text-xl text-secondary">Marketing AI Agents for Slack</span>
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-text bg-clip-text text-transparent">
                 AI-Powered <span className="text-secondary">Marketing</span> Right in Slack
@@ -607,7 +607,7 @@ function LandingPage() {
 
           <div className="border-t border-dark-card mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-text-muted text-sm mb-4 md:mb-0">
-              © 2025 IntellAgents. All rights reserved.
+              &copy; 2025 IntellAgents. All rights reserved.
             </p>
             <div className="flex space-x-8">
               <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
