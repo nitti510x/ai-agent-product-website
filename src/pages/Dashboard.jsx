@@ -15,12 +15,41 @@ import { FiUser, FiLogOut } from 'react-icons/fi';
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [loginProvider, setLoginProvider] = useState(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log('User data:', user);
       setUser(user);
+      
+      // Determine login provider
+      const loginProvider = getLoginProvider(user);
+      setLoginProvider(loginProvider);
+      console.log('User logged in via:', loginProvider);
     });
   }, []);
+
+  // Function to determine login provider
+  const getLoginProvider = (user) => {
+    if (!user) return null;
+    
+    // Check app_metadata.provider
+    const provider = user.app_metadata?.provider;
+    
+    if (provider === 'google') return 'Google';
+    if (provider === 'slack' || provider === 'slack_oidc') return 'Slack';
+    if (provider === 'email') return 'Email/Password';
+    
+    // Fallback to checking identities
+    if (user.identities?.length > 0) {
+      const identity = user.identities[0];
+      if (identity.provider === 'google') return 'Google';
+      if (identity.provider === 'slack' || identity.provider === 'slack_oidc') return 'Slack';
+      if (identity.provider === 'email') return 'Email/Password';
+    }
+    
+    return 'Unknown';
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -43,11 +72,14 @@ function Dashboard() {
               )}
               <Link 
                 to="/dashboard/profile" 
-                className="flex items-center text-gray-400 hover:text-secondary transition-colors"
+                className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
               >
-                <FiUser className="w-5 h-5 mr-2" />
-                <span>Profile</span>
+                <FiUser className="w-6 h-6 mr-1" />
+                <span className="text-sm">
+                  {user?.user_metadata?.full_name || user?.email || 'Profile'}
+                </span>
               </Link>
+              {/* Removed login provider display from navigation */}
               <button
                 onClick={handleSignOut}
                 className="flex items-center text-gray-400 hover:text-secondary transition-colors"
