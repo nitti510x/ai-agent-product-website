@@ -18,6 +18,7 @@ function Dashboard() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
+      console.log('User data:', user);
       setUser(user);
     });
   }, []);
@@ -46,7 +47,9 @@ function Dashboard() {
                 className="flex items-center text-gray-400 hover:text-secondary transition-colors"
               >
                 <FiUser className="w-5 h-5 mr-2" />
-                <span>Profile</span>
+                <span>
+                  {user?.user_metadata?.full_name || user?.email || 'Profile'}
+                </span>
               </Link>
               <button
                 onClick={handleSignOut}

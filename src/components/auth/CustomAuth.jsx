@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { supabase } from '../../config/supabase';
+import { useEffect, useState } from 'react'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { supabase } from '../../config/supabase'
 
 export default function CustomAuth() {
   const [view, setView] = useState('sign_in')
@@ -24,8 +24,158 @@ export default function CustomAuth() {
         setView('forgot_password')
       } else if (signUpButton) {
         setView('sign_up')
+        // Add name field for sign up
+        setTimeout(addNameField, 100)
       } else {
         setView('sign_in')
+        // Add sign in handler
+        setTimeout(addSignInHandler, 100)
+      }
+    }
+
+    // Function to add name field to sign up form
+    const addNameField = () => {
+      // Only proceed if we're on sign up view
+      if (view !== 'sign_up') return
+      
+      // Check if name field already exists
+      if (document.getElementById('name-field-container')) return
+      
+      // Get the email field container
+      const emailContainer = document.querySelector('form > div:first-child')
+      if (!emailContainer) return
+      
+      // Create name field container
+      const nameContainer = document.createElement('div')
+      nameContainer.id = 'name-field-container'
+      nameContainer.style.marginBottom = '16px'
+      
+      // Create label
+      const nameLabel = document.createElement('label')
+      nameLabel.textContent = 'Name'
+      nameLabel.style.display = 'block'
+      nameLabel.style.color = '#94a3b8'
+      nameLabel.style.fontSize = '14px'
+      nameLabel.style.marginBottom = '4px'
+      nameLabel.htmlFor = 'name-field'
+      
+      // Create input
+      const nameInput = document.createElement('input')
+      nameInput.id = 'name-field'
+      nameInput.type = 'text'
+      nameInput.placeholder = 'Your full name'
+      nameInput.style.width = '100%'
+      nameInput.style.padding = '12px 16px'
+      nameInput.style.borderRadius = '12px'
+      nameInput.style.backgroundColor = 'transparent'
+      nameInput.style.border = '2px solid #2f3946'
+      nameInput.style.color = 'white'
+      nameInput.style.fontSize = '16px'
+      
+      // Append elements
+      nameContainer.appendChild(nameLabel)
+      nameContainer.appendChild(nameInput)
+      
+      // Insert before email container
+      emailContainer.parentNode.insertBefore(nameContainer, emailContainer)
+      
+      // Find the form and add submit event listener
+      const form = document.querySelector('form')
+      if (form && !form.dataset.hasCustomListener) {
+        form.dataset.hasCustomListener = 'true'
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          
+          const nameValue = nameInput.value.trim()
+          const emailValue = form.querySelector('input[type="email"]').value.trim()
+          const passwordValue = form.querySelector('input[type="password"]').value.trim()
+          
+          if (!nameValue || !emailValue || !passwordValue) {
+            return // Let the default validation handle this
+          }
+          
+          try {
+            // Sign up the user
+            const { data, error } = await supabase.auth.signUp({
+              email: emailValue,
+              password: passwordValue,
+              options: {
+                data: {
+                  full_name: nameValue
+                }
+              }
+            })
+            
+            if (error) throw error
+            
+            // Redirect to dashboard on success
+            if (data?.user) {
+              window.location.href = '/dashboard'
+            }
+          } catch (error) {
+            console.error('Error signing up:', error.message)
+            // Display error message
+            const errorDiv = document.createElement('div')
+            errorDiv.textContent = error.message
+            errorDiv.style.color = 'red'
+            errorDiv.style.marginTop = '8px'
+            form.appendChild(errorDiv)
+          }
+        })
+      }
+    }
+
+    // Function to add sign in handler
+    const addSignInHandler = () => {
+      // Only proceed if we're on sign in view
+      if (view !== 'sign_in') return
+      
+      // Find the form and add submit event listener
+      const form = document.querySelector('form')
+      if (form && !form.dataset.hasSignInListener) {
+        form.dataset.hasSignInListener = 'true'
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          
+          const emailValue = form.querySelector('input[type="email"]').value.trim()
+          const passwordValue = form.querySelector('input[type="password"]').value.trim()
+          
+          if (!emailValue || !passwordValue) {
+            return // Let the default validation handle this
+          }
+          
+          try {
+            console.log('Attempting to sign in with:', { email: emailValue });
+            // Sign in the user
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email: emailValue,
+              password: passwordValue
+            })
+            
+            console.log('Sign in response:', { data, error });
+            
+            if (error) throw error
+            
+            // Redirect to dashboard on success
+            if (data?.user) {
+              console.log('Sign in successful, redirecting to dashboard');
+              window.location.href = '/dashboard'
+            }
+          } catch (error) {
+            console.error('Error signing in:', error.message)
+            // Display error message
+            let errorDiv = document.querySelector('#auth-sign-in-error')
+            if (!errorDiv) {
+              errorDiv = document.createElement('div')
+              errorDiv.id = 'auth-sign-in-error'
+              errorDiv.style.color = 'red'
+              errorDiv.style.marginTop = '8px'
+              errorDiv.style.textAlign = 'center'
+              form.appendChild(errorDiv)
+            }
+            errorDiv.textContent = error.message
+          }
+        })
       }
     }
 

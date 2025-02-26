@@ -1,16 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiSave, FiArrowLeft, FiCreditCard } from 'react-icons/fi';
+import { supabase } from '../../config/supabase';
 
 function Profile() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: 'Demo User',
-    email: 'demo@example.com',
+    name: '',
+    email: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        setLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setFormData({
+            ...formData,
+            name: user.user_metadata?.full_name || '',
+            email: user.email || ''
+          });
+        }
+      } catch (error) {
+        console.error('Error loading user profile:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadUserProfile();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,10 +44,21 @@ function Profile() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { full_name: formData.name }
+      });
+      
+      if (error) throw error;
+      
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error.message);
+      alert('Error updating profile: ' + error.message);
+    }
   };
 
   return (
