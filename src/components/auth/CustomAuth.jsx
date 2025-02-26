@@ -179,15 +179,122 @@ export default function CustomAuth() {
       }
     }
 
+    // Function to add reset password handler
+    const addResetPasswordHandler = () => {
+      // Only proceed if we're on forgot password view
+      if (view !== 'forgot_password') return
+      
+      // Find the form and add submit event listener
+      const form = document.querySelector('form')
+      if (form && !form.dataset.hasResetPasswordListener) {
+        form.dataset.hasResetPasswordListener = 'true'
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          
+          const emailValue = form.querySelector('input[type="email"]').value.trim()
+          
+          if (!emailValue) {
+            return // Let the default validation handle this
+          }
+          
+          try {
+            // Create a status message element
+            let statusDiv = document.querySelector('#auth-reset-status')
+            if (!statusDiv) {
+              statusDiv = document.createElement('div')
+              statusDiv.id = 'auth-reset-status'
+              statusDiv.style.marginTop = '16px'
+              statusDiv.style.padding = '12px'
+              statusDiv.style.borderRadius = '8px'
+              statusDiv.style.textAlign = 'center'
+              form.appendChild(statusDiv)
+            }
+            
+            statusDiv.textContent = 'Sending reset instructions...'
+            statusDiv.style.backgroundColor = '#2f3946'
+            statusDiv.style.color = 'white'
+            
+            console.log('Attempting to reset password for:', emailValue);
+            
+            // Send password reset email
+            const { error } = await supabase.auth.resetPasswordForEmail(emailValue, {
+              redirectTo: `${window.location.origin}/auth/reset-password`,
+            })
+            
+            if (error) throw error
+            
+            // Show success message
+            statusDiv.textContent = 'Password reset instructions sent to your email!'
+            statusDiv.style.backgroundColor = 'rgba(50, 255, 159, 0.2)'
+            statusDiv.style.color = '#32FF9F'
+            
+            // Disable the form
+            const submitButton = form.querySelector('button[type="submit"]')
+            if (submitButton) {
+              submitButton.disabled = true
+              submitButton.textContent = 'Email Sent'
+              submitButton.style.opacity = '0.7'
+            }
+            
+            // Add a button to go back to sign in
+            const backButton = document.createElement('button')
+            backButton.textContent = 'Back to Sign In'
+            backButton.className = 'w-full flex items-center justify-center bg-[#2E2E2E] text-white py-3 px-4 rounded-xl mt-4 font-bold hover:bg-[#3d3d3d] transition-colors'
+            backButton.onclick = () => {
+              window.location.href = '/auth/sign-in'
+            }
+            form.appendChild(backButton)
+            
+          } catch (error) {
+            console.error('Error resetting password:', error.message)
+            
+            // Display error message
+            let errorDiv = document.querySelector('#auth-reset-error')
+            if (!errorDiv) {
+              errorDiv = document.createElement('div')
+              errorDiv.id = 'auth-reset-error'
+              errorDiv.style.color = 'red'
+              errorDiv.style.marginTop = '16px'
+              errorDiv.style.textAlign = 'center'
+              form.appendChild(errorDiv)
+            }
+            errorDiv.textContent = error.message
+          }
+        })
+      }
+    }
+
     // Run the check initially
     checkForCurrentView()
     
     // Set up an interval to check periodically
-    const intervalId = setInterval(checkForCurrentView, 300)
+    const intervalId = setInterval(() => {
+      checkForCurrentView()
+      
+      // Add the appropriate handlers based on the current view
+      if (view === 'sign_in') {
+        addSignInHandler()
+      } else if (view === 'sign_up') {
+        addNameField()
+      } else if (view === 'forgot_password') {
+        addResetPasswordHandler()
+      }
+    }, 300)
     
     // Also check on clicks
     const handleClick = () => {
-      setTimeout(checkForCurrentView, 100)
+      setTimeout(() => {
+        checkForCurrentView()
+        
+        // Add the appropriate handlers based on the current view
+        if (view === 'sign_in') {
+          addSignInHandler()
+        } else if (view === 'sign_up') {
+          addNameField()
+        } else if (view === 'forgot_password') {
+          addResetPasswordHandler()
+        }
+      }, 100)
     }
     document.addEventListener('click', handleClick)
     
