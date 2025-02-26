@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiAlertTriangle, FiCreditCard } from 'react-icons/fi';
+import { useNavigate, Link } from 'react-router-dom';
+import { FiArrowLeft, FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import { supabase } from '../../config/supabase.js';
 import { subscriptionService } from '../../config/postgres.js';
 
@@ -117,16 +117,45 @@ function Subscription() {
     
     try {
       setLoading(true);
+      setError(null);
       
-      // Use the subscription service to cancel the subscription
-      const updatedSubscription = await subscriptionService.cancelSubscription(subscription.id);
+      // Call the subscription service to cancel the subscription
+      await subscriptionService.cancelSubscription(subscription.id);
       
-      setSubscription(updatedSubscription);
-      alert('Your subscription will be canceled at the end of the billing period.');
+      // Update the local subscription state
+      setSubscription({
+        ...subscription,
+        cancel_at_period_end: true
+      });
+      
+      setLoading(false);
     } catch (error) {
       console.error('Error canceling subscription:', error);
-      setError('Failed to cancel subscription. Please try again.');
-    } finally {
+      setError('Failed to cancel subscription');
+      setLoading(false);
+    }
+  };
+
+  const reactivateSubscription = async () => {
+    if (!subscription) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Call the subscription service to reactivate the subscription
+      const updatedSubscription = await subscriptionService.reactivateSubscription(subscription.id);
+      
+      // Update the local subscription state
+      setSubscription({
+        ...subscription,
+        cancel_at_period_end: false
+      });
+      
+      setLoading(false);
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
+      setError('Failed to reactivate subscription');
       setLoading(false);
     }
   };
@@ -192,15 +221,51 @@ function Subscription() {
               </div>
             </div>
             
-            {!subscription.cancel_at_period_end && (
-              <button
-                onClick={cancelSubscription}
-                disabled={loading}
-                className="mt-4 px-4 py-2 border border-red-500/50 text-red-500 rounded-lg hover:bg-red-900/20 transition-colors"
+            <div className="mb-6">
+              <p className="text-gray-300 mb-2">
+                <span className="font-semibold">Current Plan:</span> {subscription.plan_id}
+              </p>
+              <p className="text-gray-300 mb-2">
+                <span className="font-semibold">Status:</span> {subscription.status}
+              </p>
+              <p className="text-gray-300 mb-2">
+                <span className="font-semibold">Renewal Date:</span> {new Date(subscription.current_period_end).toLocaleDateString()}
+              </p>
+              {subscription.cancel_at_period_end && (
+                <p className="text-yellow-500 flex items-center mt-4">
+                  <FiAlertTriangle className="mr-2" />
+                  Your subscription will not renew after the current period ends.
+                </p>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-4">
+              <Link
+                to="/dashboard/tokens"
+                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover rounded-lg transition-colors flex items-center"
               >
-                Cancel Subscription
-              </button>
-            )}
+                <FiDollarSign className="mr-2" />
+                Manage Tokens
+              </Link>
+              
+              {!subscription.cancel_at_period_end ? (
+                <button
+                  onClick={cancelSubscription}
+                  disabled={loading}
+                  className="px-4 py-2 bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 rounded-lg transition-colors"
+                >
+                  Cancel Subscription
+                </button>
+              ) : (
+                <button
+                  onClick={reactivateSubscription}
+                  disabled={loading}
+                  className="px-4 py-2 bg-green-900/20 hover:bg-green-900/30 text-green-400 hover:text-green-300 rounded-lg transition-colors"
+                >
+                  Reactivate Subscription
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-gray-400">

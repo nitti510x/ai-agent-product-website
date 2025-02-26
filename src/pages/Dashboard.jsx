@@ -8,6 +8,7 @@ import AgentUsage from '../components/dashboard/AgentUsage';
 import OverallUsage from '../components/dashboard/OverallUsage';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
+import TokenManagement from '../components/dashboard/TokenManagement';
 import SetupGuide from '../components/dashboard/SetupGuide';
 import Logo from '../components/Logo';
 import { FiUser, FiLogOut } from 'react-icons/fi';
@@ -101,6 +102,7 @@ function Dashboard() {
           <Route path="usage" element={<OverallUsage />} />
           <Route path="profile" element={<Profile />} />
           <Route path="subscription" element={<Subscription />} />
+          <Route path="tokens" element={<TokenManagement />} />
           <Route path="setup/:agentId" element={<SetupGuide />} />
         </Routes>
       </div>

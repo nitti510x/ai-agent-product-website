@@ -51,6 +51,46 @@ CREATE TABLE IF NOT EXISTS subscription_events (
 -- Create index for subscription events
 CREATE INDEX IF NOT EXISTS idx_subscription_events_subscription_id ON subscription_events(subscription_id);
 
+-- Create user_tokens table to track token balances
+CREATE TABLE IF NOT EXISTS user_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  balance INTEGER NOT NULL DEFAULT 0,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create token_transactions table to track token purchases and usage
+CREATE TABLE IF NOT EXISTS token_transactions (
+  id SERIAL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  amount INTEGER NOT NULL,
+  transaction_type VARCHAR(20) NOT NULL, -- 'purchase', 'usage', 'refund', 'subscription_grant'
+  description TEXT,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create token_packages table for purchasable token packages
+CREATE TABLE IF NOT EXISTS token_packages (
+  id VARCHAR(50) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  token_amount INTEGER NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Insert default token packages
+INSERT INTO token_packages (id, name, description, token_amount, price)
+VALUES
+  ('small', 'Small Token Pack', '1,000 additional tokens', 1000, 4.99),
+  ('medium', 'Medium Token Pack', '5,000 additional tokens', 5000, 19.99),
+  ('large', 'Large Token Pack', '15,000 additional tokens', 15000, 49.99)
+ON CONFLICT (id) DO NOTHING;
+
 -- Create function to update the updated_at timestamp
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
