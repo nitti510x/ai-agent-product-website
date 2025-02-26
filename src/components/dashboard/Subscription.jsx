@@ -1,148 +1,285 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiCheck } from 'react-icons/fi';
-import CancellationModal from './CancellationModal';
-import PlanChangeModal from './PlanChangeModal';
+import { FiArrowLeft, FiCheck, FiAlertTriangle, FiCreditCard } from 'react-icons/fi';
+import { supabase } from '../../config/supabase.js';
+import { subscriptionService } from '../../config/postgres.js';
 
 function Subscription() {
   const navigate = useNavigate();
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [isPlanChangeModalOpen, setIsPlanChangeModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const currentPlan = {
-    name: 'Pro',
-    price: '49',
-    billingCycle: 'monthly',
-    nextBilling: '2025-03-20',
-  };
+  useEffect(() => {
+    // Get the current user
+    const getCurrentUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        
+        if (user) {
+          await getSubscription(user.id);
+          await getPlans();
+        }
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        setError('Failed to load user information');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const plans = [
-    {
-      name: "Starter",
-      price: "29",
-      features: [
-        "Basic AI assistance",
-        "Up to 10 channels",
-        "Standard response time",
-        "Email support"
-      ]
-    },
-    {
-      name: "Pro",
-      price: "49",
-      features: [
-        "Advanced AI features",
-        "Unlimited channels",
-        "Priority AI processing",
-        "24/7 support",
-        "Custom integrations"
-      ]
-    },
-    {
-      name: "Enterprise",
-      price: "99",
-      features: [
-        "Custom AI models",
-        "Advanced security",
-        "Dedicated AI resources",
-        "SLA guarantee",
-        "Dedicated account manager",
-        "Custom training"
-      ]
+    getCurrentUser();
+  }, []);
+
+  const getSubscription = async (userId) => {
+    try {
+      // Use the subscription service to get the user's subscription
+      const userSubscription = await subscriptionService.getUserSubscription(userId);
+      setSubscription(userSubscription);
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      // No subscription is not an error
     }
-  ];
-
-  const handlePlanChange = (plan) => {
-    setSelectedPlan(plan);
-    setIsPlanChangeModalOpen(true);
   };
+
+  const getPlans = async () => {
+    try {
+      // Use the subscription service to get available plans
+      const availablePlans = await subscriptionService.getPlans();
+      setPlans(availablePlans);
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      setError('Failed to load subscription plans');
+    }
+  };
+
+  const subscribeToPlan = async (planId) => {
+    if (!user) return;
+    
+    // Log the user ID to ensure we're using the correct one
+    console.log('User ID for subscription:', user.id);
+    
+    setSelectedPlan(plans.find(p => p.id === planId));
+    setShowConfirmation(true);
+  };
+
+  const confirmSubscription = async () => {
+    if (!user || !selectedPlan) return;
+    
+    try {
+      setLoading(true);
+      
+      // In a real application, you would integrate with a payment processor here
+      // For this example, we'll simulate a successful subscription
+      
+      const now = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1); // 1 month subscription
+      
+      // Ensure we're using the main Supabase user ID (not from identities)
+      const subscriptionData = {
+        user_id: user.id, // This is the main Supabase user ID
+        plan_id: selectedPlan.id,
+        status: 'active',
+        current_period_start: now,
+        current_period_end: endDate,
+        cancel_at_period_end: false,
+        metadata: {
+          user_email: user.email,
+          user_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+          subscription_created_at: now.toISOString()
+        }
+      };
+      
+      console.log('Creating subscription with data:', subscriptionData);
+      
+      // Use the subscription service to create a subscription
+      const newSubscription = await subscriptionService.createSubscription(subscriptionData);
+      
+      setSubscription(newSubscription);
+      setShowConfirmation(false);
+      alert('Successfully subscribed to plan!');
+    } catch (error) {
+      console.error('Error subscribing to plan:', error);
+      setError('Failed to subscribe to plan. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelSubscription = async () => {
+    if (!subscription) return;
+    
+    try {
+      setLoading(true);
+      
+      // Use the subscription service to cancel the subscription
+      const updatedSubscription = await subscriptionService.cancelSubscription(subscription.id);
+      
+      setSubscription(updatedSubscription);
+      alert('Your subscription will be canceled at the end of the billing period.');
+    } catch (error) {
+      console.error('Error canceling subscription:', error);
+      setError('Failed to cancel subscription. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex items-center mb-8">
-        <button
-          onClick={() => navigate('/dashboard/profile')}
-          className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
-        >
-          <FiArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-3xl font-bold text-gray-100">Subscription Management</h1>
-      </div>
-
-      {/* Current Plan Info */}
-      <div className="bg-dark-lighter p-6 rounded-xl border border-dark-card mb-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-2">Current Plan: {currentPlan.name}</h2>
-            <p className="text-gray-400">
-              Billing cycle: {currentPlan.billingCycle}
-              <br />
-              Next billing date: {currentPlan.nextBilling}
-            </p>
-          </div>
-          <button 
-            onClick={() => setIsCancelModalOpen(true)}
-            className="text-red-500 hover:text-red-400 transition-colors"
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-400 hover:text-white transition-colors"
           >
-            Cancel Subscription
+            <FiArrowLeft className="mr-2" />
+            <span>Back</span>
           </button>
+          <h1 className="text-3xl font-bold mt-4 bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-transparent bg-clip-text">
+            Subscription Management
+          </h1>
         </div>
       </div>
 
-      {/* Available Plans */}
-      <div className="grid md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
-          <div 
-            key={plan.name}
-            className={`p-8 rounded-xl border transition-all duration-300 ${
-              plan.name === currentPlan.name 
-                ? 'bg-dark-lighter border-primary' 
-                : 'bg-dark-lighter border-dark-card hover:border-secondary'
-            }`}
-          >
-            <h3 className="text-2xl font-bold mb-4 text-gray-100">{plan.name}</h3>
-            <div className="text-4xl font-bold mb-6 text-gray-100">
-              ${plan.price}<span className="text-text-muted text-lg">/mo</span>
+      {error && (
+        <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <FiAlertTriangle className="mr-2" size={20} />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Current Subscription */}
+      <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <h2 className="text-2xl font-bold text-white mb-4">Current Subscription</h2>
+        
+        {subscription ? (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-lg font-semibold text-white">
+                  {plans.find(p => p.id === subscription.plan_id)?.name || subscription.plan_id}
+                </span>
+                <span className="ml-3 px-2 py-1 text-xs rounded-full bg-green-900/20 text-green-500">
+                  {subscription.status}
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-400 text-sm">
+                  Current period ends on {new Date(subscription.current_period_end).toLocaleDateString()}
+                </p>
+                {subscription.cancel_at_period_end && (
+                  <p className="text-yellow-500 text-sm mt-1">
+                    Your subscription will be canceled at the end of the billing period
+                  </p>
+                )}
+              </div>
             </div>
-            <ul className="space-y-4 mb-8">
-              {plan.features.map((feature, index) => (
-                <li key={index} className="flex items-center text-gray-400">
-                  <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-            {plan.name === currentPlan.name ? (
+            
+            {!subscription.cancel_at_period_end && (
               <button
-                className="w-full px-6 py-2 rounded-lg bg-dark-card text-gray-400 cursor-not-allowed"
-                disabled
+                onClick={cancelSubscription}
+                disabled={loading}
+                className="mt-4 px-4 py-2 border border-red-500/50 text-red-500 rounded-lg hover:bg-red-900/20 transition-colors"
               >
-                Current Plan
-              </button>
-            ) : (
-              <button
-                className="w-full bg-primary hover:bg-primary-hover text-dark font-semibold px-6 py-2 rounded-lg transition-all duration-300 hover:shadow-glow"
-                onClick={() => handlePlanChange(plan)}
-              >
-                {plan.price > currentPlan.price ? 'Upgrade' : 'Downgrade'}
+                Cancel Subscription
               </button>
             )}
+          </div>
+        ) : (
+          <p className="text-gray-400">
+            You don't have an active subscription. Choose a plan below to get started.
+          </p>
+        )}
+      </div>
+
+      {/* Available Plans */}
+      <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {plans.map((plan) => (
+          <div key={plan.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
+            <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+            <p className="text-gray-400 mb-4">{plan.description}</p>
+            
+            <div className="mb-4">
+              <span className="text-3xl font-bold text-white">${typeof plan.price === 'number' ? plan.price.toFixed(2) : plan.price}</span>
+              <span className="text-gray-400">/{plan.interval}</span>
+            </div>
+            
+            <div className="flex-grow mb-6">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2">Features:</h4>
+              <ul className="space-y-2">
+                {plan.features && Object.entries(plan.features.feature_limits || {}).map(([key, value]) => (
+                  <li key={key} className="flex items-center text-gray-400">
+                    <FiCheck className="mr-2 text-primary" />
+                    <span className="capitalize">{key.replace('_', ' ')}: {value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <button
+              onClick={() => subscribeToPlan(plan.id)}
+              disabled={loading || (subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end)}
+              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center ${
+                subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end
+                  ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
+                  : 'bg-primary hover:bg-primary-hover text-dark hover:shadow-glow transition-all duration-300'
+              }`}
+            >
+              <FiCreditCard className="mr-2" />
+              {subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end
+                ? 'Current Plan'
+                : 'Subscribe'}
+            </button>
           </div>
         ))}
       </div>
 
-      <CancellationModal 
-        isOpen={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-      />
-
-      <PlanChangeModal
-        isOpen={isPlanChangeModalOpen}
-        onClose={() => setIsPlanChangeModalOpen(false)}
-        selectedPlan={selectedPlan}
-        currentPlan={currentPlan}
-      />
+      {/* Subscription Confirmation Modal */}
+      {showConfirmation && selectedPlan && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-white mb-4">Confirm Subscription</h3>
+            <p className="text-gray-400 mb-6">
+              You are about to subscribe to the <span className="text-white font-semibold">{selectedPlan.name}</span> plan for ${typeof selectedPlan.price === 'number' ? selectedPlan.price.toFixed(2) : selectedPlan.price}/{selectedPlan.interval}.
+            </p>
+            
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="px-4 py-2 border border-gray-500 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSubscription}
+                disabled={loading}
+                className="px-4 py-2 bg-primary hover:bg-primary-hover text-dark rounded-lg transition-colors"
+              >
+                {loading ? 'Processing...' : 'Confirm Subscription'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
