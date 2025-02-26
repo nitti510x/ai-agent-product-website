@@ -88,7 +88,7 @@ function LandingPage() {
             <div className="text-left">
               <div className="flex items-center mb-4">
                 <RiSlackFill className="w-12 h-12 text-primary mr-4" />
-                <span className="text-xl text-secondary">Marketing AI Agents for Slack</span>
+                <span className="text-xl text-secondary">AI Agents for Marketing in Slack</span>
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-text bg-clip-text text-transparent">
                 AI-Powered <span className="text-secondary">Marketing</span> Right in Slack
