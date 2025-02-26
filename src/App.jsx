@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
-import CustomAuth from './components/auth/CustomAuth';
+import AuthUI from './components/auth/Auth';
 import UpdatePassword from './components/auth/UpdatePassword';
 import ChatBot from './components/chat/ChatBot';
 
@@ -11,11 +11,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<CustomAuth />} />
+        <Route path="/login" element={<AuthUI />} />
         <Route path="/auth">
-          <Route path="sign-in" element={<CustomAuth />} />
-          <Route path="sign-up" element={<CustomAuth />} />
-          <Route path="forgot-password" element={<CustomAuth />} />
+          <Route path="sign-in" element={<AuthUI />} />
+          <Route path="sign-up" element={<AuthUI />} />
+          <Route path="forgot-password" element={<AuthUI />} />
           <Route path="update-password" element={<UpdatePassword />} />
           <Route path="reset-password" element={<UpdatePassword />} />
         </Route>
