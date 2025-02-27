@@ -2,25 +2,33 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "rm -rf node_modules/.cache && npm cache clean --force && npm install && npm run build",
+    "buildCommand": "npm ci && npm run build",
     "nixpacksPlan": {
       "phases": {
+        "setup": {
+          "nixPkgs": ["nodejs", "npm"]
+        },
         "install": {
           "cmds": [
-            "rm -rf node_modules/.cache",
-            "npm cache clean --force", 
-            "npm install --no-audit --no-fund"
+            "npm ci --no-audit --no-fund"
           ]
         },
         "build": {
           "cmds": ["npm run build"]
         }
+      },
+      "variables": {
+        "NODE_ENV": "production",
+        "CI": "true"
       }
     }
   },
   "deploy": {
     "startCommand": "npm start",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 10,
+    "healthcheckInterval": 30
   }
 }
