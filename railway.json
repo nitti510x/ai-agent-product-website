@@ -2,14 +2,14 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm install && npm run build",
+    "buildCommand": "npm cache clean --force && npm install && ng build",
     "nixpacksPlan": {
       "phases": {
         "install": {
-          "cmds": ["npm install --no-audit --no-fund"]
+          "cmds": ["npm cache clean --force", "npm install --no-audit --no-fund"]
         },
         "build": {
-          "cmds": ["npm run build"]
+          "cmds": ["npx ng build"]
         }
       }
     }
