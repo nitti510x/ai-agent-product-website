@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm ci && npm run build",
+    "buildCommand": "npm install && npm run build",
     "nixpacksPlan": {
       "phases": {
         "setup": {
@@ -10,16 +10,17 @@
         },
         "install": {
           "cmds": [
-            "npm ci --no-audit --no-fund"
+            "npm cache clean --force",
+            "rm -rf node_modules",
+            "npm install --no-audit --no-fund"
           ]
         },
         "build": {
-          "cmds": ["npm run build"]
+          "cmds": ["CI=false npm run build"]
         }
       },
       "variables": {
-        "NODE_ENV": "production",
-        "CI": "true"
+        "NODE_ENV": "production"
       }
     }
   },
