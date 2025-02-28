@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiDollarSign, FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
+import { FiDollarSign, FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
 import { supabase } from '../../config/supabase';
 import { subscriptionService } from '../../config/postgres';
 import { formatDistanceToNow } from 'date-fns';
@@ -122,19 +122,9 @@ const TokenManagement = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-400 hover:text-white transition-colors"
-          >
-            <FiArrowLeft className="mr-2" />
-            <span>Back</span>
-          </button>
-          <h1 className="text-3xl font-bold mt-4 bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-transparent bg-clip-text">
-            Token Management
-          </h1>
-        </div>
+      <div className="flex items-center mb-8">
+        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
+        <h1 className="text-3xl font-bold text-white">Token Management</h1>
       </div>
 
       {error && (
@@ -212,48 +202,6 @@ const TokenManagement = () => {
         ))}
       </div>
 
-      {/* Transaction History */}
-      <h2 className="text-2xl font-bold text-white mb-6">Transaction History</h2>
-      
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
-        {tokenData?.transactions?.length > 0 ? (
-          <div className="space-y-4">
-            {tokenData.transactions.map((transaction) => (
-              <div key={transaction.id} className="border-b border-dark-lighter pb-4 last:border-0">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="text-white font-medium">{transaction.description}</div>
-                    <div className="flex items-center mt-1">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        transaction.transaction_type === 'purchase' 
-                          ? 'bg-blue-900/20 text-blue-400' 
-                          : transaction.transaction_type === 'usage'
-                            ? 'bg-red-900/20 text-red-400'
-                            : transaction.transaction_type === 'subscription_grant'
-                              ? 'bg-green-900/20 text-green-400'
-                              : 'bg-purple-900/20 text-purple-400'
-                      }`}>
-                        {transaction.transaction_type}
-                      </span>
-                      <div className="flex items-center text-gray-400 text-sm ml-4">
-                        <FiClock className="mr-1" size={14} />
-                        {formatDistanceToNow(new Date(transaction.created_at), { addSuffix: true })}
-                      </div>
-                    </div>
-                  </div>
-                  <div className={`text-lg font-bold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {transaction.amount > 0 ? '+' : ''}{transaction.amount} tokens
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-400">
-            No transactions found
-          </div>
-        )}
-      </div>
 
       {/* Purchase Confirmation Modal */}
       {showConfirmation && selectedPackage && (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiArrowLeft, FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
+import { FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import { supabase } from '../../config/supabase.js';
 import { subscriptionService } from '../../config/postgres.js';
 
@@ -170,19 +170,9 @@ function Subscription() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-400 hover:text-white transition-colors"
-          >
-            <FiArrowLeft className="mr-2" />
-            <span>Back</span>
-          </button>
-          <h1 className="text-3xl font-bold mt-4 bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-transparent bg-clip-text">
-            Subscription Management
-          </h1>
-        </div>
+      <div className="flex items-center mb-8">
+        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
+        <h1 className="text-3xl font-bold text-white">Subscription Management</h1>
       </div>
 
       {error && (
@@ -268,16 +258,57 @@ function Subscription() {
             </div>
           </div>
         ) : (
-          <p className="text-gray-400">
-            You don't have an active subscription. Choose a plan below to get started.
-          </p>
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <span className="text-lg font-semibold text-white">
+                  Free Trial Plan
+                </span>
+                <span className="ml-3 px-2 py-1 text-xs rounded-full bg-blue-900/20 text-blue-500">
+                  active
+                </span>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-400 text-sm">
+                  14-day trial period
+                </p>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-300 mb-2">
+                <span className="font-semibold">Current Plan:</span> Free Trial
+              </p>
+              <p className="text-gray-300 mb-2">
+                <span className="font-semibold">Features:</span>
+              </p>
+              <ul className="ml-6 space-y-1">
+                <li className="text-gray-400 flex items-center">
+                  <FiCheck className="mr-2 text-primary" />
+                  50 credits
+                </li>
+                <li className="text-gray-400 flex items-center">
+                  <FiCheck className="mr-2 text-primary" />
+                  1 AI Agent
+                </li>
+                <li className="text-gray-400 flex items-center">
+                  <FiCheck className="mr-2 text-primary" />
+                  Slack Access
+                </li>
+              </ul>
+            </div>
+            
+            <p className="text-gray-400">
+              Upgrade to a paid plan below to get more features and credits.
+            </p>
+          </div>
         )}
       </div>
 
       {/* Available Plans */}
       <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {plans.map((plan) => (
           <div key={plan.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
             <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>

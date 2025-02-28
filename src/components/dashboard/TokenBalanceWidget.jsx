@@ -4,7 +4,7 @@ import { FiDollarSign, FiAlertTriangle } from 'react-icons/fi';
 import { supabase } from '../../config/supabase';
 import { subscriptionService } from '../../config/postgres';
 
-const TokenBalanceWidget = () => {
+const TokenBalanceWidget = ({ compact = false }) => {
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState(null);
   const [tokenLimit, setTokenLimit] = useState(0);
@@ -41,14 +41,19 @@ const TokenBalanceWidget = () => {
   }, []);
 
   if (loading) {
-    return (
+    return compact ? (
+      <div className="flex items-center">
+        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary mr-2"></div>
+        <span className="text-gray-400 text-sm">Loading...</span>
+      </div>
+    ) : (
       <div className="mb-6 p-4 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 flex justify-center items-center h-24">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !compact) {
     return (
       <div className="mb-6 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
         <div className="flex items-center">
@@ -59,12 +64,29 @@ const TokenBalanceWidget = () => {
     );
   }
 
-  if (!tokens) {
+  if (!tokens && !compact) {
     return null;
   }
 
   const isLowBalance = tokens?.balance < tokenLimit * 0.1; // Less than 10% of the limit
 
+  // Compact version for navigation bar
+  if (compact) {
+    return (
+      <Link 
+        to="/dashboard/tokens" 
+        className={`flex items-center px-3 py-1.5 rounded-lg ${
+          isLowBalance ? 'bg-red-900/20 text-red-400 hover:bg-red-900/30 hover:text-red-300' : 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary-hover'
+        } transition-colors`}
+      >
+        <FiDollarSign className="mr-1.5" />
+        <span className="font-medium">{tokens?.balance || 0}</span>
+        {isLowBalance && <FiAlertTriangle className="ml-1.5 text-yellow-500" size={14} />}
+      </Link>
+    );
+  }
+
+  // Full widget version
   return (
     <div className="mb-6 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
       <div className="flex justify-between items-center">

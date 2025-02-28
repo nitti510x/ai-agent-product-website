@@ -10,8 +10,12 @@ import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import TokenManagement from '../components/dashboard/TokenManagement';
 import SetupGuide from '../components/dashboard/SetupGuide';
+import BillingLayout from '../components/billing/BillingLayout';
+import TransactionHistory from '../components/billing/TransactionHistory';
+import PaymentMethods from '../components/billing/PaymentMethods';
 import Logo from '../components/Logo';
-import { FiUser, FiLogOut } from 'react-icons/fi';
+import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
+import { FiUser, FiLogOut, FiCreditCard } from 'react-icons/fi';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -67,17 +71,21 @@ function Dashboard() {
             </Link>
             <div className="flex items-center space-x-6">
               {user && (
-                <span className="text-text-light">
-                  {user.email}
-                </span>
+                <Link to="/dashboard" className="text-text-light hover:text-primary transition-colors">
+                  Dashboard
+                </Link>
               )}
+              {/* Token Balance Widget */}
+              <div className="mr-4">
+                <TokenBalanceWidget compact={true} />
+              </div>
               <Link 
-                to="/dashboard/profile" 
+                to="/dashboard/billing/profile" 
                 className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
               >
                 <FiUser className="w-6 h-6 mr-1" />
                 <span className="text-sm">
-                  {user?.user_metadata?.full_name || user?.email || 'Profile'}
+                  My Account
                 </span>
               </Link>
               {/* Removed login provider display from navigation */}
@@ -102,8 +110,15 @@ function Dashboard() {
           <Route path="usage" element={<OverallUsage />} />
           <Route path="profile" element={<Profile />} />
           <Route path="subscription" element={<Subscription />} />
-          <Route path="tokens" element={<TokenManagement />} />
+          <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
           <Route path="setup/:agentId" element={<SetupGuide />} />
+          
+          {/* Billing Section Routes */}
+          <Route path="billing" element={<BillingLayout><Profile /></BillingLayout>} />
+          <Route path="billing/profile" element={<BillingLayout><Profile /></BillingLayout>} />
+          <Route path="billing/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
+          <Route path="billing/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
+          <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
         </Routes>
       </div>
     </div>

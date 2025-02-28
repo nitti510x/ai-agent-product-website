@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiSave, FiArrowLeft, FiCreditCard } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiSave, FiCreditCard } from 'react-icons/fi';
 import { supabase } from '../../config/supabase';
 
 function Profile() {
@@ -128,13 +128,8 @@ function Profile() {
   return (
     <div>
       <div className="flex items-center mb-8">
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
-        >
-          <FiArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-3xl font-bold text-gray-100">Profile Settings</h1>
+        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
+        <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
       </div>
       
       <div className="grid md:grid-cols-2 gap-8">
@@ -246,16 +241,6 @@ function Profile() {
         )}
       </div>
 
-      {/* Subscription Management Link */}
-      <div className="mt-8">
-        <Link
-          to="/dashboard/subscription"
-          className="flex items-center text-gray-400 hover:text-secondary transition-colors"
-        >
-          <FiCreditCard className="mr-2" />
-          Manage Subscription
-        </Link>
-      </div>
     </div>
   );
 }

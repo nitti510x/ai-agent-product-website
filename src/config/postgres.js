@@ -142,7 +142,7 @@ export const subscriptionService = {
           id: "basic",
           name: "Basic Plan",
           description: "Essential features for individuals",
-          price: 9.99,
+          price: 15,
           interval: "month",
           features: {
             feature_limits: {
@@ -157,7 +157,7 @@ export const subscriptionService = {
           id: "pro",
           name: "Professional Plan",
           description: "Advanced features for professionals",
-          price: 19.99,
+          price: 30,
           interval: "month",
           features: {
             feature_limits: {
@@ -169,10 +169,10 @@ export const subscriptionService = {
           }
         },
         {
-          id: "enterprise",
-          name: "Enterprise Plan",
+          id: "business",
+          name: "Business Plan",
           description: "Full access for teams",
-          price: 49.99,
+          price: 79,
           interval: "month",
           features: {
             feature_limits: {
@@ -180,6 +180,21 @@ export const subscriptionService = {
               requests: 2000,
               channels: "Unlimited",
               tokens: 20000
+            }
+          }
+        },
+        {
+          id: "enterprise",
+          name: "Enterprise Plan",
+          description: "Custom solutions for large organizations",
+          price: null, // Custom pricing
+          interval: "month",
+          features: {
+            feature_limits: {
+              agents: "Unlimited",
+              requests: "Unlimited",
+              channels: "Unlimited",
+              tokens: "Unlimited"
             }
           }
         }
@@ -362,51 +377,255 @@ export const subscriptionService = {
         throw new Error('Invalid user ID format');
       }
 
-      if (!amount || amount <= 0) {
-        throw new Error('Invalid token amount');
+      if (!amount || isNaN(amount) || amount <= 0) {
+        console.error('Invalid amount:', amount);
+        throw new Error('Amount must be a positive number');
       }
 
-      console.log('Using tokens for user:', userId, 'amount:', amount);
+      console.log(`Using ${amount} tokens for user ${userId} with description: ${description}`);
       
       // In a real implementation with API ready, uncomment this:
       // const response = await fetch(`${API_URL}/tokens/use`, {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     user_id: userId,
-      //     amount: amount,
-      //     description: description
-      //   })
+      //   body: JSON.stringify({ user_id: userId, amount, description })
       // });
       // if (!response.ok) throw new Error('Failed to use tokens');
       // return await response.json();
       
-      // For now, simulate token usage with validation
-      const userTokens = await subscriptionService.getUserTokens(userId);
+      // For now, simulate a successful token usage
+      const mockUserTokens = await this.getUserTokens(userId);
       
-      if (userTokens.tokens.balance < amount) {
-        throw new Error('Insufficient tokens');
+      if (!mockUserTokens || mockUserTokens.balance < amount) {
+        throw new Error('Insufficient token balance');
       }
       
+      // Update the mock balance
+      mockUserTokens.balance -= amount;
+      
+      // Add a transaction record
+      mockUserTokens.transactions.unshift({
+        id: `txn_${Date.now()}`,
+        user_id: userId,
+        amount: -amount,
+        description: description || 'Token usage',
+        created_at: new Date().toISOString(),
+        type: 'usage'
+      });
+      
       return {
-        transaction: {
-          id: Math.floor(Math.random() * 1000),
-          user_id: userId,
-          amount: -amount,
-          transaction_type: 'usage',
-          description: description || 'Token usage',
-          created_at: new Date()
-        },
-        tokens: {
-          id: userTokens.tokens.id,
-          user_id: userId,
-          balance: userTokens.tokens.balance - amount,
-          last_updated: new Date(),
-          created_at: userTokens.tokens.created_at
-        }
+        success: true,
+        balance: mockUserTokens.balance,
+        amount: amount,
+        description: description
       };
     } catch (error) {
       console.error('Error using tokens:', error);
+      throw error;
+    }
+  },
+
+  // Get user transaction history
+  getUserTransactions: async (userId) => {
+    try {
+      // Validate that we have a valid UUID for user_id
+      if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        console.error('Invalid user_id format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+
+      console.log('Getting transaction history for user:', userId);
+      
+      // In a real implementation with API ready, uncomment this:
+      // const response = await fetch(`${API_URL}/transactions/user/${userId}`);
+      // if (!response.ok) throw new Error('Failed to fetch transactions');
+      // return await response.json();
+      
+      // For now, return mock transaction data
+      return [
+        {
+          id: 'txn_1',
+          user_id: userId,
+          amount: 1500, // $15.00
+          description: 'Monthly subscription - Basic Plan',
+          created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
+          status: 'succeeded',
+          type: 'subscription'
+        },
+        {
+          id: 'txn_2',
+          user_id: userId,
+          amount: 2000, // $20.00
+          description: 'Token purchase - 100 tokens',
+          created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
+          status: 'succeeded',
+          type: 'token_purchase'
+        },
+        {
+          id: 'txn_3',
+          user_id: userId,
+          amount: 1000, // $10.00
+          description: 'Token purchase - 50 tokens',
+          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
+          status: 'succeeded',
+          type: 'token_purchase'
+        },
+        {
+          id: 'txn_4',
+          user_id: userId,
+          amount: 500, // $5.00
+          description: 'Failed payment attempt',
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+          status: 'failed',
+          type: 'token_purchase'
+        }
+      ];
+    } catch (error) {
+      console.error('Error getting user transactions:', error);
+      return [];
+    }
+  },
+
+  // Get user payment methods
+  getUserPaymentMethods: async (userId) => {
+    try {
+      // Validate that we have a valid UUID for user_id
+      if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        console.error('Invalid user_id format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+
+      console.log('Getting payment methods for user:', userId);
+      
+      // In a real implementation with API ready, uncomment this:
+      // const response = await fetch(`${API_URL}/payment-methods/user/${userId}`);
+      // if (!response.ok) throw new Error('Failed to fetch payment methods');
+      // return await response.json();
+      
+      // For now, return mock payment method data
+      return [
+        {
+          id: 'pm_1',
+          user_id: userId,
+          last4: '4242',
+          brand: 'Visa',
+          expMonth: '12',
+          expYear: '2025',
+          isDefault: true
+        },
+        {
+          id: 'pm_2',
+          user_id: userId,
+          last4: '1234',
+          brand: 'Mastercard',
+          expMonth: '08',
+          expYear: '2026',
+          isDefault: false
+        }
+      ];
+    } catch (error) {
+      console.error('Error getting user payment methods:', error);
+      return [];
+    }
+  },
+
+  // Add a payment method
+  addPaymentMethod: async (userId, paymentMethodData) => {
+    try {
+      // Validate that we have a valid UUID for user_id
+      if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        console.error('Invalid user_id format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+
+      console.log('Adding payment method for user:', userId);
+      
+      // In a real implementation with API ready, uncomment this:
+      // const response = await fetch(`${API_URL}/payment-methods`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ user_id: userId, ...paymentMethodData })
+      // });
+      // if (!response.ok) throw new Error('Failed to add payment method');
+      // return await response.json();
+      
+      // For now, simulate a successful payment method addition
+      return {
+        success: true,
+        paymentMethod: {
+          id: `pm_${Date.now()}`,
+          user_id: userId,
+          last4: paymentMethodData.cardNumber.slice(-4),
+          brand: 'Visa', // In a real implementation, this would be determined by the card number
+          expMonth: paymentMethodData.expiryDate.split('/')[0],
+          expYear: `20${paymentMethodData.expiryDate.split('/')[1]}`,
+          isDefault: paymentMethodData.isDefault
+        }
+      };
+    } catch (error) {
+      console.error('Error adding payment method:', error);
+      throw error;
+    }
+  },
+
+  // Delete a payment method
+  deletePaymentMethod: async (userId, paymentMethodId) => {
+    try {
+      // Validate that we have a valid UUID for user_id
+      if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        console.error('Invalid user_id format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+
+      console.log(`Deleting payment method ${paymentMethodId} for user ${userId}`);
+      
+      // In a real implementation with API ready, uncomment this:
+      // const response = await fetch(`${API_URL}/payment-methods/${paymentMethodId}`, {
+      //   method: 'DELETE',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ user_id: userId })
+      // });
+      // if (!response.ok) throw new Error('Failed to delete payment method');
+      // return await response.json();
+      
+      // For now, simulate a successful payment method deletion
+      return {
+        success: true,
+        message: 'Payment method deleted successfully'
+      };
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      throw error;
+    }
+  },
+
+  // Set default payment method
+  setDefaultPaymentMethod: async (userId, paymentMethodId) => {
+    try {
+      // Validate that we have a valid UUID for user_id
+      if (!userId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+        console.error('Invalid user_id format:', userId);
+        throw new Error('Invalid user ID format');
+      }
+
+      console.log(`Setting payment method ${paymentMethodId} as default for user ${userId}`);
+      
+      // In a real implementation with API ready, uncomment this:
+      // const response = await fetch(`${API_URL}/payment-methods/${paymentMethodId}/default`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ user_id: userId })
+      // });
+      // if (!response.ok) throw new Error('Failed to set default payment method');
+      // return await response.json();
+      
+      // For now, simulate a successful default payment method update
+      return {
+        success: true,
+        message: 'Default payment method updated successfully'
+      };
+    } catch (error) {
+      console.error('Error setting default payment method:', error);
       throw error;
     }
   }

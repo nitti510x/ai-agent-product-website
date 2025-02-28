@@ -263,13 +263,49 @@ function LandingPage() {
             Choose the perfect plan for your team. All plans include a 14-day free trial.
           </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* Free Trial Section */}
+          <div className="mb-12 max-w-3xl mx-auto p-8 rounded-xl border-2 border-primary bg-dark shadow-glow-strong relative overflow-hidden">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-dark px-6 py-1 rounded-full text-sm font-bold">
+              Limited Time Offer
+            </div>
+            <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
+            <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
+            
+            <div className="text-center mb-8 relative z-10">
+              <h3 className="text-3xl font-bold mb-3 text-gray-100">Free Trial (14 Days)</h3>
+              <p className="text-text-muted text-lg">👥 Ideal For: Testing AI-powered content & social posting</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-4 mb-8 relative z-10">
+              {[
+                "50 credits (Enough for multiple posts)",
+                "1 AI Agent (Link 1 social account)",
+                "Slack Access (For your workspace)",
+                "Content Generation AI Agents",
+                "Social Media AI Agents",
+                "No credit card required"
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center text-gray-300 bg-dark-lighter p-3 rounded-lg">
+                  <div className="bg-primary/20 p-1.5 rounded-full mr-3">
+                    <FiCheck className="text-primary w-5 h-5" />
+                  </div>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+            
+            <button className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300 font-bold text-lg relative z-10">
+              Start Your Free Trial Today
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
             {/* Starter Plan */}
             <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-100">Starter</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
-                  $29<span className="text-lg text-text-muted">/mo</span>
+                  $15<span className="text-lg text-text-muted">/mo</span>
                 </div>
                 <p className="text-text-muted">Perfect for small teams getting started with AI marketing</p>
               </div>
@@ -301,7 +337,7 @@ function LandingPage() {
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-100">Pro</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
-                  $79<span className="text-lg text-text-muted">/mo</span>
+                  $30<span className="text-lg text-text-muted">/mo</span>
                 </div>
                 <p className="text-text-muted">Ideal for growing businesses scaling their marketing</p>
               </div>
@@ -327,12 +363,12 @@ function LandingPage() {
               </button>
             </div>
 
-            {/* Enterprise Plan */}
+            {/* Business Plan */}
             <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2 text-gray-100">Enterprise</h3>
+                <h3 className="text-2xl font-bold mb-2 text-gray-100">Business</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
-                  Custom
+                  $79<span className="text-lg text-text-muted">/mo</span>
                 </div>
                 <p className="text-text-muted">Custom solutions for large organizations</p>
               </div>
@@ -354,6 +390,18 @@ function LandingPage() {
                 ))}
               </ul>
               <button className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
+                Contact Sales
+              </button>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="mt-10 max-w-2xl mx-auto p-8 rounded-xl border border-dark-card bg-dark-lighter hover:border-secondary transition-all duration-300 text-center">
+              <h3 className="text-2xl font-bold mb-2 text-gray-100">Enterprise</h3>
+              <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
+                Custom Pricing
+              </div>
+              <p className="text-text-muted mb-6">Tailored solutions for large organizations with custom requirements</p>
+              <button className="bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
                 Contact Sales
               </button>
             </div>
