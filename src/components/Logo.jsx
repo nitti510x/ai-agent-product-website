@@ -10,7 +10,7 @@ function Logo({ className = "h-8" }) {
           className="h-10 w-auto"
         />
         <div className="ml-3 text-2xl flex items-center tracking-wide">
-          <span className="font-normal text-[#53D3FF]">intell</span>
+          <span className="font-normal text-[#53D3FF]">Intell</span>
           <span className="font-bold tracking-[0.03em] bg-gradient-to-r from-[#53FFCB] to-[#53D3FF] bg-clip-text text-transparent uppercase">AGENTS</span>
         </div>
       </div>

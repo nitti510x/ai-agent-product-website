@@ -3,9 +3,21 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { supabase } from '../../config/supabase'
 import { useEffect, useState } from 'react'
 import SlackLogo from '../icons/SlackLogo'
+import { useSubscription } from '../../contexts/SubscriptionContext'
+import { useNavigate } from 'react-router-dom'
 
 export default function AuthUI() {
   const [authView, setAuthView] = useState('sign_in')
+  const { selectedPlan, isFreeTrialSelected } = useSubscription();
+  const navigate = useNavigate();
+  
+  // Determine redirect URL based on plan selection
+  const getRedirectUrl = () => {
+    if (selectedPlan || isFreeTrialSelected) {
+      return `${window.location.origin}/dashboard/billing`;
+    }
+    return `${window.location.origin}/dashboard`;
+  };
   
   // Track the current auth view
   useEffect(() => {
@@ -351,7 +363,7 @@ export default function AuthUI() {
           theme="dark"
           providers={['slack_oidc', 'google']}
           socialLayout="vertical"
-          redirectTo={`${window.location.origin}/dashboard`}
+          redirectTo={getRedirectUrl()}
         />
       </div>
     </div>

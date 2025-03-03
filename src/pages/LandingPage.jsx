@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
 import { 
   FiArrowRight, 
@@ -45,9 +45,29 @@ import {
   RiWordpressFill
 } from 'react-icons/ri';
 import Logo from '../components/Logo';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 function LandingPage() {
   const navItems = ['Features', 'Pricing', 'Integration', 'Support'];
+  const navigate = useNavigate();
+  const { selectPlan, selectFreeTrial } = useSubscription();
+
+  // Function to handle plan selection and redirect to checkout
+  const handlePlanSelection = (plan) => {
+    selectPlan({
+      name: plan.name,
+      price: plan.price,
+      interval: plan.interval || 'month',
+      features: plan.features
+    });
+    navigate('/checkout');
+  };
+
+  // Function to handle free trial selection
+  const handleFreeTrialSelection = () => {
+    selectFreeTrial();
+    navigate('/checkout');
+  };
 
   return (
     <div className="bg-dark text-text-light">
@@ -116,7 +136,7 @@ function LandingPage() {
                     alt="Slack Interface"
                     className="w-full rounded-xl"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark/20 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent"></div>
                 </div>
 
                 {/* Floating Cards */}
@@ -169,9 +189,11 @@ function LandingPage() {
             Create, manage, and analyze your social media content without leaving Slack. Our AI assistant handles everything from content creation to performance tracking.
           </p>
           <div className="grid md:grid-cols-3 gap-12">
-            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-primary transition-all duration-300 group">
+            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-primary/30 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">📝</div>
               <div className="flex items-start mb-6">
-                <div className="bg-gradient-primary bg-clip-text text-transparent transform group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-primary bg-clip-text text-transparent transform hover:scale-110 transition-transform duration-300">
                   <RiFileTextLine className="w-12 h-12" />
                 </div>
                 <div className="ml-6">
@@ -181,24 +203,28 @@ function LandingPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  "Multi-platform content",
-                  "Brand voice matching",
-                  "Viral potential analysis",
-                  "Audience targeting",
-                  "SEO optimization",
-                  "Performance tracking"
+                  { icon: "✨", text: "Multi-platform content" },
+                  { icon: "🤖", text: "Brand voice matching" },
+                  { icon: "💬", text: "Viral potential analysis" },
+                  { icon: "📝", text: "Audience targeting" },
+                  { icon: "📱", text: "SEO optimization" },
+                  { icon: "💳", text: "Performance tracking" }
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center text-text-muted group-hover:text-text-light transition-colors">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span className="text-sm">{feature}</span>
+                  <div key={index} className="flex items-center text-text-muted hover:text-text-light transition-colors">
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-primary transition-all duration-300 group">
+            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-secondary/20 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">📱</div>
               <div className="flex items-start mb-6">
-                <div className="bg-gradient-primary bg-clip-text text-transparent transform group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-primary bg-clip-text text-transparent transform hover:scale-110 transition-transform duration-300">
                   <RiMegaphoneLine className="w-12 h-12" />
                 </div>
                 <div className="ml-6">
@@ -208,24 +234,28 @@ function LandingPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  "Cross-platform posting",
-                  "Campaign scheduling",
-                  "ROI tracking",
-                  "A/B testing",
-                  "Audience insights",
-                  "Performance analytics"
+                  { icon: "✨", text: "Cross-platform posting" },
+                  { icon: "🤖", text: "Campaign scheduling" },
+                  { icon: "💬", text: "ROI tracking" },
+                  { icon: "📝", text: "A/B testing" },
+                  { icon: "📱", text: "Audience insights" },
+                  { icon: "💳", text: "Performance analytics" }
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center text-text-muted group-hover:text-text-light transition-colors">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span className="text-sm">{feature}</span>
+                  <div key={index} className="flex items-center text-text-muted hover:text-text-light transition-colors">
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-primary transition-all duration-300 group">
+            <div className="p-8 rounded-xl bg-dark border border-dark-card hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-500/20 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">📊</div>
               <div className="flex items-start mb-6">
-                <div className="bg-gradient-primary bg-clip-text text-transparent transform group-hover:scale-110 transition-transform duration-300">
+                <div className="bg-gradient-primary bg-clip-text text-transparent transform hover:scale-110 transition-transform duration-300">
                   <RiHashtag className="w-12 h-12" />
                 </div>
                 <div className="ml-6">
@@ -235,16 +265,18 @@ function LandingPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  "Engagement metrics",
-                  "Trend analysis",
-                  "Competitor tracking",
-                  "Content performance",
-                  "Audience growth",
-                  "ROI reporting"
+                  { icon: "✨", text: "Engagement metrics" },
+                  { icon: "🤖", text: "Trend analysis" },
+                  { icon: "💬", text: "Competitor tracking" },
+                  { icon: "📝", text: "Content performance" },
+                  { icon: "📱", text: "Audience growth" },
+                  { icon: "💳", text: "ROI reporting" }
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center text-text-muted group-hover:text-text-light transition-colors">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span className="text-sm">{feature}</span>
+                  <div key={index} className="flex items-center text-text-muted hover:text-text-light transition-colors">
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </div>
                 ))}
               </div>
@@ -259,49 +291,63 @@ function LandingPage() {
           <h2 className="text-4xl font-bold text-center mb-4 bg-gradient-text bg-clip-text text-transparent">
             Simple, Transparent Pricing
           </h2>
-          <p className="text-text-muted text-center mb-16 max-w-2xl mx-auto">
-            Choose the perfect plan for your team. All plans include a 14-day free trial.
-          </p>
+          <div className="text-center mb-12">
+            <p className="text-text-muted text-lg max-w-2xl mx-auto">
+              Choose the perfect plan for your team. Select the option that best fits your needs and start transforming your social media strategy today.
+            </p>
+          </div>
 
           {/* Free Trial Section */}
-          <div className="mb-12 max-w-3xl mx-auto p-8 rounded-xl border-2 border-primary bg-dark shadow-glow-strong relative overflow-hidden">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-dark px-6 py-1 rounded-full text-sm font-bold">
+          <div className="mb-12 max-w-3xl mx-auto p-8 rounded-xl border-2 border-primary bg-dark shadow-glow-strong relative overflow-visible mt-8">
+            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-dark px-6 py-1 rounded-full text-sm font-bold z-20">
               Limited Time Offer
             </div>
             <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
             <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
-            
+            <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-primary/30 to-transparent rounded-br-3xl z-0"></div>
+            <div className="absolute top-4 left-4 text-xl z-10">✨</div>
             <div className="text-center mb-8 relative z-10">
-              <h3 className="text-3xl font-bold mb-3 text-gray-100">Free Trial (14 Days)</h3>
-              <p className="text-text-muted text-lg">👥 Ideal For: Testing AI-powered content & social posting</p>
+              <h3 className="text-3xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">Unleash Your AI Potential</h3>
+              <div className="text-4xl font-bold mb-3 text-white flex items-center justify-center">
+                <span className="mr-3">14-Day Free Trial</span>
+                <span className="bg-primary text-dark text-sm px-3 py-1 rounded-full">No Credit Card</span>
+              </div>
+              <p className="text-text-muted text-lg">
+                <span className="inline-block bg-dark-lighter px-3 py-1 rounded-lg mb-2">✨ Perfect for teams ready to revolutionize their social media strategy</span>
+              </p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-4 mb-8 relative z-10">
               {[
-                "50 credits (Enough for multiple posts)",
-                "1 AI Agent (Link 1 social account)",
-                "Slack Access (For your workspace)",
-                "Content Generation AI Agents",
-                "Social Media AI Agents",
-                "No credit card required"
+                { icon: "✨", text: "50 credits (Enough for multiple posts)" },
+                { icon: "🤖", text: "1 AI Agent (Link 1 social account)" },
+                { icon: "💬", text: "Slack Access (For your workspace)" },
+                { icon: "📝", text: "Content Generation AI Agents" },
+                { icon: "📱", text: "Social Media AI Agents" },
+                { icon: "💳", text: "No credit card required" }
               ].map((feature, index) => (
-                <div key={index} className="flex items-center text-gray-300 bg-dark-lighter p-3 rounded-lg">
-                  <div className="bg-primary/20 p-1.5 rounded-full mr-3">
-                    <FiCheck className="text-primary w-5 h-5" />
+                <div key={index} className="flex items-center text-gray-300 bg-dark-lighter p-3 rounded-lg hover:bg-dark-card transition-all duration-200">
+                  <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                    <span className="text-lg">{feature.icon}</span>
                   </div>
-                  <span>{feature}</span>
+                  <span>{feature.text}</span>
                 </div>
               ))}
             </div>
             
-            <button className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300 font-bold text-lg relative z-10">
-              Start Your Free Trial Today
+            <button 
+              onClick={handleFreeTrialSelection}
+              className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300 font-bold text-lg relative z-10 flex items-center justify-center">
+              <span>Start Your Free Trial</span>
+              <span className="ml-2 bg-dark-lighter text-white text-xs px-2 py-1 rounded-full">Takes 30 Seconds</span>
             </button>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Starter Plan */}
-            <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300">
+            <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-primary/30 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">🚀</div>
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-100">Starter</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
@@ -311,29 +357,46 @@ function LandingPage() {
               </div>
               <ul className="space-y-4 mb-8">
                 {[
-                  "1 AI Marketing Assistant",
-                  "3 Social Media Platforms",
-                  "Basic Analytics",
-                  "5 Team Members",
-                  "Standard Support",
-                  "1,000 AI Generations/mo"
+                  { icon: "✨", text: "1 AI Marketing Assistant" },
+                  { icon: "🤖", text: "3 Social Media Platforms" },
+                  { icon: "💬", text: "Basic Analytics" },
+                  { icon: "📝", text: "5 Team Members" },
+                  { icon: "📱", text: "Standard Support" },
+                  { icon: "💳", text: "1,000 AI Generations/mo" }
                 ].map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-400">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span>{feature}</span>
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </li>
                 ))}
               </ul>
-              <button className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
+              <button 
+                onClick={() => handlePlanSelection({
+                  name: 'Starter',
+                  price: 15,
+                  features: [
+                    "1 AI Marketing Assistant",
+                    "3 Social Media Platforms",
+                    "Basic Analytics",
+                    "5 Team Members",
+                    "Standard Support",
+                    "1,000 AI Generations/mo"
+                  ]
+                })}
+                className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
                 Get Started
               </button>
             </div>
 
             {/* Pro Plan */}
-            <div className="p-8 rounded-xl border border-primary bg-dark shadow-glow relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-dark px-4 py-1 rounded-full text-sm font-semibold">
+            <div className="p-8 rounded-xl border border-primary bg-dark shadow-glow relative overflow-visible">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-dark px-4 py-1 rounded-full text-sm font-bold z-20 shadow-glow-sm">
                 Most Popular
               </div>
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-secondary/30 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">⚡</div>
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-100">Pro</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
@@ -343,28 +406,47 @@ function LandingPage() {
               </div>
               <ul className="space-y-4 mb-8">
                 {[
-                  "3 AI Marketing Assistants",
-                  "All Social Platforms",
-                  "Advanced Analytics",
-                  "15 Team Members",
-                  "Priority Support",
-                  "5,000 AI Generations/mo",
-                  "Custom Templates",
-                  "API Access"
+                  { icon: "✨", text: "3 AI Marketing Assistants" },
+                  { icon: "🤖", text: "All Social Platforms" },
+                  { icon: "💬", text: "Advanced Analytics" },
+                  { icon: "📝", text: "15 Team Members" },
+                  { icon: "📱", text: "Priority Support" },
+                  { icon: "💳", text: "5,000 AI Generations/mo" },
+                  { icon: "📈", text: "Custom Templates" },
+                  { icon: "🔒", text: "API Access" }
                 ].map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-400">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span>{feature}</span>
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </li>
                 ))}
               </ul>
-              <button className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-2 px-6 rounded-lg transition-all duration-300">
+              <button 
+                onClick={() => handlePlanSelection({
+                  name: 'Pro',
+                  price: 30,
+                  features: [
+                    "3 AI Marketing Assistants",
+                    "All Social Platforms",
+                    "Advanced Analytics",
+                    "15 Team Members",
+                    "Priority Support",
+                    "5,000 AI Generations/mo",
+                    "Custom Templates",
+                    "API Access"
+                  ]
+                })}
+                className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-2 px-6 rounded-lg transition-all duration-300">
                 Get Started
               </button>
             </div>
 
             {/* Business Plan */}
-            <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300">
+            <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-blue-500/30 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">💼</div>
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold mb-2 text-gray-100">Business</h3>
                 <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
@@ -374,34 +456,76 @@ function LandingPage() {
               </div>
               <ul className="space-y-4 mb-8">
                 {[
-                  "Unlimited AI Assistants",
-                  "All Social Platforms",
-                  "Enterprise Analytics",
-                  "Unlimited Team Members",
-                  "24/7 Dedicated Support",
-                  "Unlimited AI Generations",
-                  "Custom Integration",
-                  "SLA Guarantee"
+                  { icon: "✨", text: "Unlimited AI Assistants" },
+                  { icon: "🤖", text: "All Social Platforms" },
+                  { icon: "💬", text: "Enterprise Analytics" },
+                  { icon: "📝", text: "Unlimited Team Members" },
+                  { icon: "📱", text: "24/7 Dedicated Support" },
+                  { icon: "💳", text: "Unlimited AI Generations" },
+                  { icon: "📈", text: "Custom Integration" },
+                  { icon: "🔒", text: "SLA Guarantee" }
                 ].map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-400">
-                    <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                    <span>{feature}</span>
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
                   </li>
                 ))}
               </ul>
-              <button className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
-                Contact Sales
+              <button 
+                onClick={() => handlePlanSelection({
+                  name: 'Business',
+                  price: 79,
+                  features: [
+                    "Unlimited AI Assistants",
+                    "All Social Platforms",
+                    "Enterprise Analytics",
+                    "Unlimited Team Members",
+                    "24/7 Dedicated Support",
+                    "Unlimited AI Generations",
+                    "Custom Integration",
+                    "SLA Guarantee"
+                  ]
+                })}
+                className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
+                Get Started
               </button>
             </div>
 
             {/* Enterprise Plan */}
-            <div className="mt-10 max-w-2xl mx-auto p-8 rounded-xl border border-dark-card bg-dark-lighter hover:border-secondary transition-all duration-300 text-center">
-              <h3 className="text-2xl font-bold mb-2 text-gray-100">Enterprise</h3>
-              <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
-                Custom Pricing
+            <div className="p-8 rounded-xl border border-dark-card bg-dark hover:border-secondary transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-purple-500/30 to-transparent rounded-br-3xl z-0"></div>
+              <div className="absolute top-4 left-4 text-lg z-10">🏢</div>
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2 text-gray-100">Enterprise</h3>
+                <div className="text-4xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
+                  Custom Pricing
+                </div>
+                <p className="text-text-muted">Tailored solutions for large organizations with custom requirements</p>
               </div>
-              <p className="text-text-muted mb-6">Tailored solutions for large organizations with custom requirements</p>
-              <button className="bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
+              <ul className="space-y-4 mb-8">
+                {[
+                  { icon: "✨", text: "Unlimited AI Assistants" },
+                  { icon: "🤖", text: "All Social Platforms" },
+                  { icon: "💬", text: "Enterprise Analytics" },
+                  { icon: "📝", text: "Custom Integrations" },
+                  { icon: "📱", text: "Dedicated Account Manager" },
+                  { icon: "💳", text: "Unlimited AI Generations" },
+                  { icon: "📈", text: "Priority Feature Access" },
+                  { icon: "🔒", text: "Custom SLA" }
+                ].map((feature, index) => (
+                  <li key={index} className="flex items-center text-gray-400">
+                    <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                      <span className="text-lg">{feature.icon}</span>
+                    </div>
+                    <span>{feature.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <button 
+                onClick={() => window.location.href = 'mailto:sales@geniusos.co?subject=Enterprise%20Plan%20Inquiry'}
+                className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
                 Contact Sales
               </button>
             </div>
@@ -434,16 +558,18 @@ function LandingPage() {
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      "AI content creation",
-                      "Multi-platform publishing",
-                      "Campaign automation",
-                      "Performance tracking",
-                      "Team collaboration",
-                      "Real-time analytics"
+                      { icon: "✨", text: "AI content creation" },
+                      { icon: "🤖", text: "Multi-platform publishing" },
+                      { icon: "💬", text: "Campaign automation" },
+                      { icon: "📝", text: "Performance tracking" },
+                      { icon: "📱", text: "Team collaboration" },
+                      { icon: "💳", text: "Real-time analytics" }
                     ].map((feature, index) => (
                       <div key={index} className="flex items-center text-text-muted group-hover:text-text-light transition-colors">
-                        <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                        <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                          <span className="text-lg">{feature.icon}</span>
+                        </div>
+                        <span>{feature.text}</span>
                       </div>
                     ))}
                   </div>
@@ -467,50 +593,50 @@ function LandingPage() {
                 name: "Facebook",
                 icon: <RiFacebookBoxFill className="w-16 h-16" />,
                 features: [
-                  "Viral content generation",
-                  "Engagement analytics",
-                  "Audience targeting",
-                  "Campaign automation"
+                  { icon: "✨", text: "Viral content generation" },
+                  { icon: "🤖", text: "Engagement analytics" },
+                  { icon: "💬", text: "Audience targeting" },
+                  { icon: "📝", text: "Campaign automation" }
                 ]
               },
               {
                 name: "LinkedIn",
                 icon: <RiLinkedinBoxFill className="w-16 h-16" />,
                 features: [
-                  "B2B content strategy",
-                  "Lead generation",
-                  "Industry insights",
-                  "Professional networking"
+                  { icon: "✨", text: "B2B content strategy" },
+                  { icon: "🤖", text: "Lead generation" },
+                  { icon: "💬", text: "Industry insights" },
+                  { icon: "📝", text: "Professional networking" }
                 ]
               },
               {
                 name: "X (Twitter)",
                 icon: <RiTwitterXFill className="w-16 h-16" />,
                 features: [
-                  "Trend monitoring",
-                  "Viral tweet creation",
-                  "Audience growth",
-                  "Real-time engagement"
+                  { icon: "✨", text: "Trend monitoring" },
+                  { icon: "🤖", text: "Viral tweet creation" },
+                  { icon: "💬", text: "Audience growth" },
+                  { icon: "📝", text: "Real-time engagement" }
                 ]
               },
               {
                 name: "Instagram",
                 icon: <RiInstagramLine className="w-16 h-16" />,
                 features: [
-                  "Visual storytelling",
-                  "Content curation",
-                  "Growth strategies",
-                  "Engagement boosting"
+                  { icon: "✨", text: "Visual storytelling" },
+                  { icon: "🤖", text: "Content curation" },
+                  { icon: "💬", text: "Growth strategies" },
+                  { icon: "📝", text: "Engagement boosting" }
                 ]
               },
               {
                 name: "WordPress",
                 icon: <RiWordpressFill className="w-16 h-16" />,
                 features: [
-                  "Blog automation",
-                  "SEO optimization",
-                  "Content scheduling",
-                  "Analytics tracking"
+                  { icon: "✨", text: "Blog automation" },
+                  { icon: "🤖", text: "SEO optimization" },
+                  { icon: "💬", text: "Content scheduling" },
+                  { icon: "📝", text: "Analytics tracking" }
                 ]
               }
             ].map((platform, index) => (
@@ -526,8 +652,10 @@ function LandingPage() {
                 <ul className="space-y-2">
                   {platform.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center text-text-muted group-hover:text-text-light transition-colors">
-                      <FiCheck className="text-primary mr-2 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
+                      <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
+                        <span className="text-lg">{feature.icon}</span>
+                      </div>
+                      <span>{feature.text}</span>
                     </li>
                   ))}
                 </ul>

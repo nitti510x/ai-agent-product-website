@@ -4,6 +4,149 @@ import { FiDollarSign, FiAlertTriangle, FiCreditCard, FiClock } from 'react-icon
 import { supabase } from '../../config/supabase';
 import { subscriptionService } from '../../config/postgres';
 import { formatDistanceToNow } from 'date-fns';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import stripePromise from '../../config/stripe';
+
+// Stripe payment form component
+const StripePaymentForm = ({ amount, tokenAmount, onSuccess, onCancel }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Check if user already has a Stripe customer ID
+      let customerResponse = await fetch(`/api/stripe/customers?userId=${user.id}`);
+      let customerData = await customerResponse.json();
+      
+      // If not, create a new customer
+      if (!customerData || !customerData.customerId) {
+        const createResponse = await fetch('/api/stripe/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email,
+            metadata: { user_id: user.id }
+          })
+        });
+        customerData = await createResponse.json();
+      }
+
+      // Create a payment intent
+      const paymentResponse = await fetch('/api/stripe/payment-intents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: customerData.customerId,
+          amount: amount * 100, // Convert to cents
+          metadata: {
+            type: 'token_purchase',
+            user_id: user.id,
+            token_amount: tokenAmount
+          }
+        })
+      });
+
+      const paymentData = await paymentResponse.json();
+
+      // Confirm the payment
+      const { error: paymentError } = await stripe.confirmCardPayment(paymentData.clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: user.user_metadata?.full_name || user.email,
+          },
+        },
+      });
+
+      if (paymentError) {
+        throw new Error(paymentError.message);
+      }
+
+      // Payment succeeded
+      onSuccess();
+    } catch (err) {
+      console.error('Payment error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Card input styles for Stripe Elements
+  const cardElementOptions = {
+    style: {
+      base: {
+        color: '#ffffff',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    },
+    hidePostalCode: true
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="mb-4">
+        <label className="block text-gray-300 mb-2">Card Details</label>
+        <div className="p-3 bg-gray-700 border border-gray-600 rounded">
+          <CardElement options={cardElementOptions} />
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-3 bg-red-900/50 border border-red-500 rounded flex items-center">
+          <FiAlertTriangle className="text-red-500 mr-2" />
+          <span className="text-red-100">{error}</span>
+        </div>
+      )}
+
+      <div className="flex justify-end space-x-3 mt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 border border-gray-500 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+          disabled={loading}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-primary hover:bg-primary-hover text-dark rounded-lg transition-colors flex items-center"
+          disabled={loading || !stripe}
+        >
+          {loading ? 'Processing...' : 'Complete Purchase'}
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const TokenManagement = () => {
   const navigate = useNavigate();
@@ -57,17 +200,9 @@ const TokenManagement = () => {
     }
   };
 
-  const confirmPurchase = async () => {
-    if (!selectedPackage || !user) return;
-    
+  const handlePaymentSuccess = async () => {
     try {
-      setPurchasing(true);
-      setError(null);
-      
-      // Purchase tokens
-      const result = await subscriptionService.purchaseTokens(user.id, selectedPackage.id);
-      
-      // Update token data
+      // Refresh token data
       const updatedTokens = await subscriptionService.getUserTokens(user.id);
       setTokenData(updatedTokens);
       
@@ -79,10 +214,7 @@ const TokenManagement = () => {
         setSuccess(null);
       }, 5000);
     } catch (error) {
-      console.error('Error purchasing tokens:', error);
-      setError('Failed to purchase tokens. Please try again.');
-    } finally {
-      setPurchasing(false);
+      console.error('Error updating token data:', error);
     }
   };
 
@@ -202,31 +334,23 @@ const TokenManagement = () => {
         ))}
       </div>
 
-
       {/* Purchase Confirmation Modal */}
       {showConfirmation && selectedPackage && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-white mb-4">Confirm Purchase</h3>
+            <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
-              You are about to purchase <span className="text-white font-semibold">{selectedPackage.token_amount} tokens</span> for ${selectedPackage.price}.
+              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} tokens</span> for ${selectedPackage.price}.
             </p>
             
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => setShowConfirmation(false)}
-                className="px-4 py-2 border border-gray-500 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmPurchase}
-                disabled={purchasing}
-                className="px-4 py-2 bg-primary hover:bg-primary-hover text-dark rounded-lg transition-colors"
-              >
-                {purchasing ? 'Processing...' : 'Confirm Purchase'}
-              </button>
-            </div>
+            <Elements stripe={stripePromise}>
+              <StripePaymentForm 
+                amount={selectedPackage.price}
+                tokenAmount={selectedPackage.token_amount}
+                onSuccess={handlePaymentSuccess}
+                onCancel={() => setShowConfirmation(false)}
+              />
+            </Elements>
           </div>
         </div>
       )}

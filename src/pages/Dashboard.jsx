@@ -13,6 +13,7 @@ import SetupGuide from '../components/dashboard/SetupGuide';
 import BillingLayout from '../components/billing/BillingLayout';
 import TransactionHistory from '../components/billing/TransactionHistory';
 import PaymentMethods from '../components/billing/PaymentMethods';
+import SubscriptionCheckout from '../components/subscription/SubscriptionCheckout';
 import Logo from '../components/Logo';
 import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import { FiUser, FiLogOut, FiCreditCard } from 'react-icons/fi';
@@ -114,7 +115,7 @@ function Dashboard() {
           <Route path="setup/:agentId" element={<SetupGuide />} />
           
           {/* Billing Section Routes */}
-          <Route path="billing" element={<BillingLayout><Profile /></BillingLayout>} />
+          <Route path="billing" element={<BillingLayout><SubscriptionCheckout /></BillingLayout>} />
           <Route path="billing/profile" element={<BillingLayout><Profile /></BillingLayout>} />
           <Route path="billing/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />

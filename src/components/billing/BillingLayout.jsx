@@ -1,9 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiCreditCard, FiDollarSign, FiUser, FiFileText, FiList } from 'react-icons/fi';
+import { FiCreditCard, FiDollarSign, FiUser, FiFileText, FiList, FiShoppingCart } from 'react-icons/fi';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 
 function BillingLayout({ children }) {
   const location = useLocation();
+  const { selectedPlan, isFreeTrialSelected } = useSubscription();
+  
+  // Check if we're on the checkout page (main billing route)
+  const isCheckoutPage = location.pathname === '/dashboard/billing';
   
   const menuItems = [
     {
@@ -39,32 +44,38 @@ function BillingLayout({ children }) {
         <div className="mb-10">
           <div className="flex items-center mb-8">
             <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-            <h1 className="text-3xl font-bold text-white">My Account</h1>
+            <h1 className="text-3xl font-bold text-white">
+              {isCheckoutPage ? 'Complete Your Order' : 'My Account'}
+            </h1>
           </div>
           
-          <div className="bg-dark-lighter rounded-xl p-1 mb-8">
-            <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-dark-card scrollbar-track-transparent">
-              <div className="flex w-full">
-                {menuItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`whitespace-nowrap px-6 py-3 rounded-lg flex items-center transition-all duration-200 flex-1 justify-center ${
-                      location.pathname === item.path
-                        ? 'bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-dark font-medium shadow-lg'
-                        : 'hover:bg-dark-card text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    {item.icon}
-                    <span className="ml-2">{item.label}</span>
-                  </Link>
-                ))}
+          {!isCheckoutPage && (
+            <div className="bg-dark-lighter rounded-xl p-1 mb-8">
+              <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-dark-card scrollbar-track-transparent">
+                <div className="flex w-full">
+                  {menuItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`px-4 py-2 rounded-lg whitespace-nowrap flex items-center ${
+                        location.pathname === item.path
+                          ? 'bg-dark text-primary'
+                          : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                    >
+                      {item.icon}
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
-        
-        {children}
+
+        <div className="bg-dark-lighter rounded-xl p-6">
+          {children}
+        </div>
       </div>
     </div>
   );
