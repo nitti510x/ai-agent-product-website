@@ -17,6 +17,13 @@ function AgentSettings() {
     { value: 'claude-instant', label: 'Claude Instant' }
   ];
 
+  // Token options with descriptions
+  const tokenOptions = [
+    { value: 1024, label: 'Standard (1024)', description: 'Balanced option for most tasks with good results and lower cost' },
+    { value: 2048, label: 'Enhanced (2048)', description: 'Better for complex responses with moderate cost increase' },
+    { value: 4096, label: 'Maximum (4096)', description: 'Best for detailed, comprehensive responses where quality is critical' }
+  ];
+
   // Get agent name based on ID
   const getAgentName = () => {
     const agents = {
@@ -321,15 +328,22 @@ function AgentSettings() {
                     <label className="block text-sm font-medium text-gray-400 mb-2">
                       Max Tokens
                     </label>
-                    <input
-                      type="number"
+                    <select
                       name="maxTokens"
                       value={settings.maxTokens}
                       onChange={handleChange}
-                      min="1"
-                      max="8192"
                       className="w-full bg-dark-card border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                    />
+                    >
+                      {tokenOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-2 text-xs text-gray-500">
+                      {tokenOptions.find(option => option.value === parseInt(settings.maxTokens))?.description || 
+                      'Controls the maximum length of the AI response'}
+                    </p>
                   </div>
                 </div>
               </div>
