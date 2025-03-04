@@ -95,7 +95,7 @@ function LandingPage() {
               </RouterLink>
               <a 
                 href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
-                className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white transition-all duration-300"
+                className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white/70 hover:border-white transition-all duration-300 hover:shadow-glow-light"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="20" height="20" style={{ marginRight: '8px' }} alt="Slack Logo">
                   <title>Slack Logo</title>
@@ -136,7 +136,7 @@ function LandingPage() {
               <div className="flex gap-4">
                 <a 
                   href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
-                  className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white transition-all duration-300"
+                  className="flex items-center px-6 py-3 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white/70 hover:border-white transition-all duration-300 hover:shadow-glow-light"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="24" height="24" style={{ marginRight: '8px' }} alt="Slack Logo">
                     <title>Slack Logo</title>
@@ -147,7 +147,7 @@ function LandingPage() {
                   </svg>
                   <b>Add to Slack</b>
                 </a>
-                <button className="border border-text-muted hover:border-secondary hover:shadow-glow-blue px-6 py-2 rounded-lg transition-all duration-300 text-white font-medium">
+                <button className="px-6 py-3 rounded-lg bg-gradient-to-r from-secondary/90 to-secondary hover:from-secondary hover:to-secondary-light text-white font-bold transition-all duration-300 hover:shadow-glow-blue">
                   Watch Demo
                 </button>
               </div>
