@@ -255,29 +255,6 @@ const TokenManagement = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center mb-8">
-        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Credit Management</h1>
-      </div>
-
-      {error && (
-        <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
-          <div className="flex items-center">
-            <FiAlertTriangle className="mr-2" size={20} />
-            <span>{error}</span>
-          </div>
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">
-          <div className="flex items-center">
-            <IoDiamond className="mr-2 text-primary" />
-            <span>{success}</span>
-          </div>
-        </div>
-      )}
-
       {/* Current Token Balance */}
       <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Your Credit Balance</h2>
@@ -419,35 +396,42 @@ const TokenManagement = () => {
       </div>
 
       {/* Available Token Packages */}
-      <h2 id="token-packages" className="text-2xl font-bold text-white mb-6">Purchase Additional <IoDiamond className="inline mx-1" /> Credits</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {packages.map((pkg) => (
-          <div key={pkg.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col hover:border-primary/50 transition-all duration-300">
-            <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
-            <p className="text-gray-400 mb-4">{pkg.description}</p>
-            
-            <div className="mb-4">
-              <span className="text-3xl font-bold text-white">${pkg.price}</span>
-            </div>
-            
-            <div className="flex-grow mb-6">
-              <div className="flex items-center text-gray-300 mb-2">
-                <IoDiamond className="mr-2 text-primary" />
-                <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> credits</span>
+      <div className="bg-dark-card rounded-xl shadow-lg border border-dark-card/30 overflow-hidden">
+        {/* Slim header to match parent component style */}
+        <div className="px-6 pt-6 pb-4">
+          <h3 className="text-xl font-bold text-white mb-2">Token Packages</h3>
+          <p className="text-gray-400 text-sm">
+            Purchase additional token packs to extend your usage beyond your plan limits
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 p-6">
+          {packages.map((pkg) => (
+            <div key={pkg.id} className="bg-dark-card/50 rounded-2xl shadow-lg border border-dark-card/30 p-6 flex flex-col hover:border-primary/50 transition-all duration-300">
+              <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
+              <p className="text-gray-400 mb-4">{pkg.description}</p>
+              
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-white">${pkg.price}</span>
               </div>
+              
+              <div className="flex-grow mb-6">
+                <div className="flex items-center text-gray-300 mb-2">
+                  <IoDiamond className="mr-2 text-primary" />
+                  <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> credits</span>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => handlePurchaseTokens(pkg.id)}
+                disabled={purchasing}
+                className="w-full py-3 rounded-lg font-semibold flex items-center justify-center bg-primary hover:bg-primary-hover text-dark hover:shadow-glow transition-all duration-300"
+              >
+                <FiCreditCard className="mr-2" />
+                {purchasing ? 'Processing...' : 'Purchase'}
+              </button>
             </div>
-            
-            <button
-              onClick={() => handlePurchaseTokens(pkg.id)}
-              disabled={purchasing}
-              className="w-full py-3 rounded-lg font-semibold flex items-center justify-center bg-primary hover:bg-primary-hover text-dark hover:shadow-glow transition-all duration-300"
-            >
-              <FiCreditCard className="mr-2" />
-              {purchasing ? 'Processing...' : 'Purchase'}
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Purchase Confirmation Modal */}

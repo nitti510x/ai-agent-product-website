@@ -12,6 +12,9 @@ function MyAccount() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('');
   
+  // Define a consistent gradient matching the screenshot (teal/green to blue)
+  const mainGradient = 'from-emerald-400 to-blue-500';
+  
   useEffect(() => {
     // Set the active tab based on the current path
     const currentPath = location.pathname;
@@ -30,32 +33,27 @@ function MyAccount() {
     {
       path: '/dashboard/my-account/profile',
       label: 'Profile',
-      icon: <FiUser />,
-      color: 'from-blue-500 to-indigo-600'
+      icon: <FiUser />
     },
     {
       path: '/dashboard/my-account/subscription',
       label: 'Subscription',
-      icon: <FiList />,
-      color: 'from-emerald-500 to-green-600'
+      icon: <FiList />
     },
     {
       path: '/dashboard/my-account/payment-methods',
       label: 'Payments',
-      icon: <FiCreditCard />,
-      color: 'from-purple-500 to-indigo-600'
+      icon: <FiCreditCard />
     },
     {
       path: '/dashboard/my-account/transactions',
       label: 'Transactions',
-      icon: <FiFileText />,
-      color: 'from-amber-500 to-orange-600'
+      icon: <FiFileText />
     },
     {
       path: '/dashboard/my-account/tokens',
       label: 'Credits',
-      icon: <IoDiamond />,
-      color: 'from-primary to-blue-600'
+      icon: <IoDiamond />
     }
   ];
 
@@ -65,8 +63,8 @@ function MyAccount() {
   return (
     <div className="relative">
       {/* Subtle background elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -mr-48 -mt-48 blur-3xl -z-10"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/5 rounded-full -ml-48 -mb-48 blur-3xl -z-10"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full -mr-48 -mt-48 blur-3xl -z-10"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full -ml-48 -mb-48 blur-3xl -z-10"></div>
       
       <div className="container mx-auto px-4 py-6">
         {/* Sleek header with inline elements */}
@@ -76,7 +74,7 @@ function MyAccount() {
               My Account
             </h1>
             <div className="ml-4 bg-dark-card/70 px-3 py-1 rounded-full border border-white/10 hidden md:flex items-center">
-              <FiSettings className="text-primary mr-2" size={14} />
+              <FiSettings className="text-emerald-400 mr-2" size={14} />
               <span className="text-xs text-gray-300">Settings</span>
             </div>
           </div>
@@ -92,11 +90,11 @@ function MyAccount() {
                     to={tab.path}
                     className={`flex items-center px-3 py-1.5 mr-2 rounded-full transition-all duration-300 text-sm ${
                       isActive
-                        ? `bg-gradient-to-r ${tab.color} text-white shadow-md`
+                        ? `bg-dark-card/80 text-emerald-400 font-medium border border-emerald-400/30`
                         : 'bg-dark-card/50 hover:bg-dark-card text-gray-400 hover:text-gray-200'
                     }`}
                   >
-                    <div className={`flex items-center justify-center ${isActive ? 'text-white' : 'text-gray-400'}`}>
+                    <div className={`flex items-center justify-center ${isActive ? 'text-emerald-400' : 'text-gray-400'}`}>
                       {tab.icon}
                     </div>
                     <span className="ml-1.5 whitespace-nowrap">{tab.label}</span>
@@ -107,18 +105,18 @@ function MyAccount() {
           </div>
         </div>
         
-        {/* Content Area with subtle header based on active tab */}
+        {/* Content Area with consistent header gradient */}
         <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl shadow-lg overflow-hidden">
-          {/* Section header - more compact */}
-          <div className={`bg-gradient-to-r ${currentTab.color} px-4 py-2.5 flex items-center`}>
-            <div className="bg-white/20 p-1.5 rounded-lg mr-2">
+          {/* Section header - subtle and professional */}
+          <div className="bg-dark-card/90 border-b border-white/5 px-4 py-2 flex items-center">
+            <div className="text-emerald-400 mr-2.5 flex items-center justify-center">
               {currentTab.icon}
             </div>
-            <h2 className="text-lg font-bold text-white">{currentTab.label}</h2>
+            <h2 className="text-sm font-medium text-white/90">{currentTab.label}</h2>
           </div>
           
-          {/* Section content */}
-          <div className="p-4">
+          {/* Section content - with slightly more padding to compensate for smaller header */}
+          <div className="p-5">
             <Routes>
               <Route path="profile" element={<Profile />} />
               <Route path="subscription" element={<Subscription />} />

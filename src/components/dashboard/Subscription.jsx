@@ -73,10 +73,17 @@ function Subscription() {
   const subscribeToPlan = async (planId) => {
     if (!user) return;
     
+    // Prevent subscribing to free trial if user already has a subscription history
+    const selectedPlan = plans.find(p => p.id === planId);
+    if (selectedPlan && selectedPlan.name.toLowerCase() === 'free trial' && subscription) {
+      setError('Free trial is only available for new users. Please select a different plan.');
+      return;
+    }
+    
     // Log the user ID to ensure we're using the correct one
     console.log('User ID for subscription:', user.id);
     
-    setSelectedPlan(plans.find(p => p.id === planId));
+    setSelectedPlan(selectedPlan);
     setShowConfirmation(true);
   };
 
@@ -176,6 +183,17 @@ function Subscription() {
     subscribeToPlan(planId);
   };
 
+  const getFilteredPlans = () => {
+    // Only show paid plans (Starter, Pro, Business)
+    // Exclude free trial and enterprise (enterprise is shown separately below)
+    return plans.filter(plan => 
+      plan.name.toLowerCase() !== 'free trial' && 
+      plan.name.toLowerCase() !== 'enterprise' &&
+      plan.price !== null && 
+      plan.price > 0
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -183,12 +201,6 @@ function Subscription() {
       </div>
     );
   }
-
-  // Filter plans to exclude free and enterprise plans
-  const filteredPlans = plans.filter(plan => 
-    plan.name.toLowerCase() !== 'free' && 
-    plan.name.toLowerCase() !== 'enterprise'
-  );
 
   return (
     <div className="space-y-8">
@@ -307,7 +319,7 @@ function Subscription() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {filteredPlans.map((plan) => (
+        {getFilteredPlans().map((plan) => (
           <div 
             key={plan.id} 
             className={`bg-dark-lighter p-6 rounded-xl flex flex-col transition-all duration-300 ${
@@ -408,7 +420,7 @@ function Subscription() {
               <button
                 onClick={() => handleSelectPlan(plan.id)}
                 disabled={loading}
-                className="w-full py-2 px-4 bg-primary hover:bg-primary-hover text-dark font-medium rounded-lg transition-colors flex items-center justify-center"
+                className="w-full py-2 px-4 bg-primary hover:bg-primary-hover text-black font-medium rounded-lg transition-colors flex items-center justify-center"
               >
                 <FiCreditCard className="mr-2" />
                 {loading && selectedPlan === plan.id ? 'Processing...' : 'Select Plan'}
@@ -426,7 +438,7 @@ function Subscription() {
         </p>
         <a 
           href="mailto:sales@geniusos.co" 
-          className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
+          className="inline-flex items-center px-6 py-3 bg-primary text-black font-medium rounded-lg hover:bg-primary-dark transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
@@ -455,7 +467,7 @@ function Subscription() {
               <button
                 onClick={confirmSubscription}
                 disabled={loading}
-                className="px-4 py-2 bg-primary hover:bg-primary-hover text-dark rounded-lg transition-colors"
+                className="px-4 py-2 bg-primary hover:bg-primary-hover text-black rounded-lg transition-colors"
               >
                 {loading ? 'Processing...' : 'Confirm Subscription'}
               </button>
