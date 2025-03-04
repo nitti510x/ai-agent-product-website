@@ -169,25 +169,41 @@ export const initializeUserPaymentMethods = () => {
   };
   
   // Check for the current user
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (!session || !session.user) {
-      return;
-    }
-    
-    const userId = session.user.id;
-    console.log('Checking for test user:', userId);
-    
-    // If this is a test user, initialize their payment methods
-    if (testUsers[userId]) {
-      const storageKey = `payment_methods_${userId}`;
-      
-      // Only initialize if they don't already have payment methods
-      if (!localStorage.getItem(storageKey)) {
-        console.log('Initializing test payment methods for user:', userId);
-        localStorage.setItem(storageKey, JSON.stringify(testUsers[userId]));
+  try {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      try {
+        if (!session || !session.user) {
+          console.log('No authenticated user found for payment method initialization');
+          return;
+        }
+        
+        const userId = session.user.id;
+        console.log('Checking for test user:', userId);
+        
+        // If this is a test user, initialize their payment methods
+        if (testUsers[userId]) {
+          const storageKey = `payment_methods_${userId}`;
+          
+          try {
+            // Only initialize if they don't already have payment methods
+            if (!localStorage.getItem(storageKey)) {
+              console.log('Initializing test payment methods for user:', userId);
+              localStorage.setItem(storageKey, JSON.stringify(testUsers[userId]));
+            }
+          } catch (storageError) {
+            console.error('Error accessing localStorage for payment methods:', storageError);
+            // Continue without initializing payment methods
+          }
+        }
+      } catch (sessionError) {
+        console.error('Error processing user session for payment methods:', sessionError);
       }
-    }
-  });
+    }).catch(authError => {
+      console.error('Error getting session for payment methods:', authError);
+    });
+  } catch (error) {
+    console.error('Error in initializeUserPaymentMethods:', error);
+  }
 };
 
 // Stripe Customers API

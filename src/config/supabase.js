@@ -45,6 +45,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         throw error;
       });
     }
+  },
+  // Disable storage features to prevent errors
+  storageOptions: {
+    skipStorageAccess: true
   }
 });
 
