@@ -27,7 +27,9 @@ GeniusOS AI Agents Platform provides a subscription-based service for accessing 
 The application uses a modern serverless architecture:
 
 - **Frontend**: React application with Vite
-- **Backend**: Supabase Edge Functions for serverless API endpoints and Express.js API server
+- **Backend**: 
+  - Supabase Edge Functions for serverless API endpoints
+  - Express.js API server for database operations
 - **Database**: 
   - Railway PostgreSQL for plans and subscription data
   - Supabase PostgreSQL for user authentication and other app data
@@ -43,11 +45,14 @@ The application uses a modern serverless architecture:
 - Token-based usage system
 - Secure payment processing with Stripe
 - Dashboard for managing subscriptions and tokens
+- RESTful API for accessing subscription plans and managing user subscriptions
 
 ## Tech Stack
 
 - **Frontend**: React, Tailwind CSS
-- **Backend**: Supabase Edge Functions
+- **Backend**: 
+  - Supabase Edge Functions
+  - Express.js API server
 - **Database**: PostgreSQL (via Supabase and Railway)
 - **Authentication**: Supabase Auth
 - **Payment Processing**: Stripe
@@ -243,6 +248,92 @@ The frontend is built with React and Vite. To start the frontend development ser
 npm run dev
 ```
 
+## API Documentation
+
+The application includes a RESTful API for accessing subscription plans and managing user subscriptions. The API is documented using Swagger UI.
+
+### Accessing the API Documentation
+
+When running the development server, you can access the API documentation at:
+
+```
+http://localhost:3001/api-docs
+```
+
+### Available Endpoints
+
+- `GET /api/plans` - Get all active subscription plans
+- `GET /api/plans/{id}` - Get a specific plan by ID
+- `GET /api/subscriptions` - Get the user's active subscription (requires authentication)
+- `POST /api/subscriptions` - Create a new subscription (requires authentication)
+- `POST /api/subscriptions/{id}/cancel` - Cancel a subscription (requires authentication)
+- `POST /api/subscriptions/{id}/reactivate` - Reactivate a subscription (requires authentication)
+
+### Authentication
+
+Authenticated endpoints require a JWT token in the Authorization header:
+
+```
+Authorization: Bearer <jwt_token>
+```
+
+The JWT token is obtained from Supabase authentication.
+
+## Railway PostgreSQL Integration
+
+The application uses Railway PostgreSQL for storing subscription plans and user subscriptions. The database schema includes:
+
+### Plans Table
+
+```sql
+CREATE TABLE plans (
+  id VARCHAR(50) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  stripe_product_id VARCHAR(100),
+  stripe_price_id VARCHAR(100),
+  price DECIMAL(10, 2) NOT NULL,
+  interval VARCHAR(20) NOT NULL,
+  features JSONB,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Subscriptions Table
+
+```sql
+CREATE TABLE subscriptions (
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
+  plan_id VARCHAR(50) NOT NULL REFERENCES plans(id),
+  status VARCHAR(20) NOT NULL,
+  current_period_start TIMESTAMP WITH TIME ZONE,
+  current_period_end TIMESTAMP WITH TIME ZONE,
+  cancel_at_period_end BOOLEAN DEFAULT false,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Database Setup
+
+The database tables and initial data are set up using the `setup-database.js` script:
+
+```bash
+npm run setup-db
+```
+
+### Updating Plans
+
+You can update the subscription plans in the database using the `update_railway_plans_direct.js` script:
+
+```bash
+node scripts/update_railway_plans_direct.js
+```
+
 ## Deployment
 
 ### Railway Deployment
@@ -260,28 +351,3 @@ For production deployment, make sure to:
 1. Use production Stripe API keys
 2. Update the webhook secret to the production value
 3. Configure the correct API URL
-
-## API Documentation
-
-### Authentication Endpoints
-
-- `POST /api/auth/login`: Login with email and password
-- `POST /api/auth/register`: Register a new user
-- `POST /api/auth/logout`: Logout the current user
-
-### Stripe Endpoints
-
-- `GET /api/stripe/customers`: Get a customer by user ID
-- `POST /api/stripe/customers`: Create a new Stripe customer
-- `GET /api/stripe/payment-methods`: Get payment methods for a customer
-- `POST /api/stripe/payment-methods`: Add a payment method to a customer
-- `DELETE /api/stripe/payment-methods/:id`: Delete a payment method
-- `POST /api/stripe/subscriptions`: Create a subscription
-- `POST /api/stripe/payment-intents`: Create a payment intent for token purchase
-- `POST /api/stripe/webhook`: Handle Stripe webhook events
-
-### Token Endpoints
-
-- `GET /api/tokens/user/:userId`: Get token balance for a user
-- `GET /api/tokens/packages`: Get available token packages
-- `POST /api/tokens/purchase`: Purchase tokens

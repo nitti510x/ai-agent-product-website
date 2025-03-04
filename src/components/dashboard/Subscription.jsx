@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import { supabase } from '../../config/supabase.js';
-import { subscriptionService } from '../../config/postgres.js';
+import { postgresService } from '../../services/postgresService.js';
 
 function Subscription() {
   const navigate = useNavigate();
@@ -18,16 +18,27 @@ function Subscription() {
     // Get the current user
     const getCurrentUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        // Get plans first to ensure something displays even if auth fails
+        await getPlans();
         
-        if (user) {
-          await getSubscription(user.id);
-          await getPlans();
+        const { data, error } = await supabase.auth.getUser();
+        
+        if (error) {
+          console.error('Error getting current user:', error);
+          setError('Authentication error. Please try logging in again.');
+          setLoading(false);
+          return;
+        }
+        
+        if (data && data.user) {
+          setUser(data.user);
+          await getSubscription(data.user.id);
+        } else {
+          setError('No authenticated user found. Please log in.');
         }
       } catch (error) {
-        console.error('Error getting current user:', error);
-        setError('Failed to load user information');
+        console.error('Error in getCurrentUser:', error);
+        setError('Failed to load user information. Please refresh the page.');
       } finally {
         setLoading(false);
       }
@@ -38,8 +49,8 @@ function Subscription() {
 
   const getSubscription = async (userId) => {
     try {
-      // Use the subscription service to get the user's subscription
-      const userSubscription = await subscriptionService.getUserSubscription(userId);
+      // Use the PostgreSQL service to get the user's subscription
+      const userSubscription = await postgresService.getUserSubscription(userId);
       setSubscription(userSubscription);
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -49,8 +60,8 @@ function Subscription() {
 
   const getPlans = async () => {
     try {
-      // Use the subscription service to get available plans
-      const availablePlans = await subscriptionService.getPlans();
+      // Use the PostgreSQL service to get available plans
+      const availablePlans = await postgresService.getPlans();
       setPlans(availablePlans);
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -98,8 +109,8 @@ function Subscription() {
       
       console.log('Creating subscription with data:', subscriptionData);
       
-      // Use the subscription service to create a subscription
-      const newSubscription = await subscriptionService.createSubscription(subscriptionData);
+      // Use the PostgreSQL service to create a subscription
+      const newSubscription = await postgresService.createSubscription(subscriptionData);
       
       setSubscription(newSubscription);
       setShowConfirmation(false);
@@ -119,8 +130,8 @@ function Subscription() {
       setLoading(true);
       setError(null);
       
-      // Call the subscription service to cancel the subscription
-      await subscriptionService.cancelSubscription(subscription.id);
+      // Call the PostgreSQL service to cancel the subscription
+      await postgresService.cancelSubscription(subscription.id);
       
       // Update the local subscription state
       setSubscription({
@@ -143,8 +154,8 @@ function Subscription() {
       setLoading(true);
       setError(null);
       
-      // Call the subscription service to reactivate the subscription
-      const updatedSubscription = await subscriptionService.reactivateSubscription(subscription.id);
+      // Call the PostgreSQL service to reactivate the subscription
+      const updatedSubscription = await postgresService.reactivateSubscription(subscription.id);
       
       // Update the local subscription state
       setSubscription({
@@ -325,29 +336,45 @@ function Subscription() {
             <div className="flex-grow mb-6">
               <h4 className="text-sm font-medium text-gray-400 mb-2">Features:</h4>
               <ul className="space-y-2">
-                {plan.features && plan.features.feature_limits ? 
-                  Object.entries(plan.features.feature_limits).map(([key, value], index) => (
-                    <li key={index} className="flex items-start">
+                {plan.features ? (
+                  typeof plan.features === 'object' ? (
+                    // Handle feature_limits object if it exists
+                    plan.features.feature_limits ? (
+                      Object.entries(plan.features.feature_limits).map(([key, value], index) => (
+                        <li key={index} className="flex items-start">
+                          <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                          <span className="text-gray-300">
+                            <span className="capitalize">{key.replace(/_/g, ' ') === 'tokens' ? 'credits' : key.replace(/_/g, ' ')}:</span> {value}
+                          </span>
+                        </li>
+                      ))
+                    ) : (
+                      // Handle features as a flat object
+                      Object.entries(plan.features).map(([key, value], index) => (
+                        <li key={index} className="flex items-start">
+                          <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                          <span className="text-gray-300">
+                            <span className="capitalize">{key.replace(/_/g, ' ') === 'tokens' ? 'credits' : key.replace(/_/g, ' ')}:</span> {' '}
+                            {typeof value === 'object' ? JSON.stringify(value) : value}
+                          </span>
+                        </li>
+                      ))
+                    )
+                  ) : Array.isArray(plan.features) ? (
+                    // Handle features as an array
+                    plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                        <span className="text-gray-300">{feature}</span>
+                      </li>
+                    ))
+                  ) : (
+                    // Handle features as a string
+                    <li className="flex items-start">
                       <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-300">
-                        <span className="capitalize">{key.replace(/_/g, ' ') === 'tokens' ? 'credits' : key.replace(/_/g, ' ')}:</span> {value}
-                      </span>
+                      <span className="text-gray-300">{plan.features}</span>
                     </li>
-                  ))
-                : plan.features && Array.isArray(plan.features) ? plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-gray-300">{feature}</span>
-                  </li>
-                )) : plan.features && typeof plan.features === 'object' ? (
-                  Object.entries(plan.features).map(([key, value], index) => (
-                    <li key={index} className="flex items-start">
-                      <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
-                      <span className="text-gray-300">
-                        {key}: {typeof value === 'object' ? JSON.stringify(value) : value}
-                      </span>
-                    </li>
-                  ))
+                  )
                 ) : (
                   <li className="text-gray-400">No features listed</li>
                 )}
