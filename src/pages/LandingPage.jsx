@@ -95,15 +95,16 @@ function LandingPage() {
               </RouterLink>
               <a 
                 href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
-                className="flex items-center"
+                className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white transition-all duration-300"
               >
-                <img 
-                  alt="Add to Slack" 
-                  height="40" 
-                  width="139" 
-                  src="https://platform.slack-edge.com/img/add_to_slack.png" 
-                  srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" 
-                />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="20" height="20" style={{ marginRight: '8px' }} alt="Slack Logo">
+                  <title>Slack Logo</title>
+                  <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+                  <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+                  <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+                  <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+                </svg>
+                <b>Add to Slack</b>
               </a>
             </div>
           </div>
@@ -116,7 +117,13 @@ function LandingPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-left">
               <div className="flex items-center mb-4">
-                <RiSlackFill className="w-12 h-12 text-primary mr-4" />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="24" height="24" style={{ marginRight: '8px' }} alt="Slack Logo">
+                  <title>Slack Logo</title>
+                  <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+                  <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+                  <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+                  <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+                </svg>
                 <span className="text-xl text-secondary">AI Agents for Marketing in Slack</span>
               </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-8 bg-gradient-text bg-clip-text text-transparent">
@@ -129,17 +136,18 @@ function LandingPage() {
               <div className="flex gap-4">
                 <a 
                   href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
-                  className="flex items-center"
+                  className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white transition-all duration-300"
                 >
-                  <img 
-                    alt="Add to Slack" 
-                    height="40" 
-                    width="139" 
-                    src="https://platform.slack-edge.com/img/add_to_slack.png" 
-                    srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" 
-                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="24" height="24" style={{ marginRight: '8px' }} alt="Slack Logo">
+                    <title>Slack Logo</title>
+                    <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+                    <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+                    <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+                    <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+                  </svg>
+                  <b>Add to Slack</b>
                 </a>
-                <button className="btn-outline hover:shadow-glow-blue-strong transition-all duration-300">
+                <button className="border border-text-muted hover:border-secondary hover:shadow-glow-blue px-6 py-2 rounded-lg transition-all duration-300 text-white font-medium">
                   Watch Demo
                 </button>
               </div>
@@ -354,8 +362,8 @@ function LandingPage() {
             
             <button 
               onClick={handleFreeTrialSelection}
-              className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300 font-bold text-lg relative z-10 flex items-center justify-center">
-              <span>Start Your Free Trial</span>
+              className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300">
+              <b>Start Your Free Trial</b>
               <span className="ml-2 bg-dark-lighter text-white text-xs px-2 py-1 rounded-full">Takes 30 Seconds</span>
             </button>
           </div>
@@ -566,7 +574,13 @@ function LandingPage() {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <div className="flex items-center mb-4">
-                    <RiSlackFill className="w-12 h-12 text-primary" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="24" height="24" style={{ marginRight: '8px' }} alt="Slack Logo">
+                      <title>Slack Logo</title>
+                      <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+                      <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+                      <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+                      <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+                    </svg>
                     <h4 className="text-2xl font-bold ml-4 text-gray-100">Your Marketing Hub</h4>
                   </div>
                   <p className="text-text-muted mb-6">
