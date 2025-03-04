@@ -151,6 +151,77 @@
   color: var(--text-secondary, #999);
 }
 
+/* Enterprise contact section */
+.enterprise-contact {
+  margin-top: 4rem;
+  padding: 1rem;
+}
+
+.enterprise-card {
+  background-color: var(--card-bg, #1a1a1a);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid var(--border-color, #333);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.enterprise-icon {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.enterprise-icon svg {
+  color: white;
+  font-size: 1.75rem;
+}
+
+.enterprise-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-color, #fff);
+}
+
+.enterprise-header p {
+  color: var(--text-secondary, #aaa);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.enterprise-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 2px solid var(--accent-color, #6366f1);
+  color: var(--accent-color, #6366f1);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.enterprise-btn:hover {
+  background-color: var(--accent-color, #6366f1);
+  color: white;
+}
+
+.mail-icon {
+  font-size: 1.25rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .pricing-plans {

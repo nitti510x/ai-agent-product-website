@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiDollarSign, FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
+import { FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
+import { IoDiamond } from 'react-icons/io5';
 import { supabase } from '../../config/supabase';
 import { subscriptionService } from '../../config/postgres';
 import { formatDistanceToNow } from 'date-fns';
@@ -271,7 +272,7 @@ const TokenManagement = () => {
       {success && (
         <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">
           <div className="flex items-center">
-            <FiDollarSign className="mr-2" />
+            <IoDiamond className="mr-2 text-primary" />
             <span>{success}</span>
           </div>
         </div>
@@ -285,25 +286,140 @@ const TokenManagement = () => {
           <span className="text-4xl font-bold text-primary mr-3">
             {tokenData?.tokens?.balance || 0}
           </span>
-          <span className="text-gray-400">credits remaining</span>
+          <span className="text-gray-400"><IoDiamond className="inline mr-1" /> credits remaining</span>
+        </div>
+        
+        {/* Credit panels in 50/50 layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Plan Credits Panel */}
+          <div className="bg-dark-card/50 rounded-xl p-4">
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-gray-300 font-medium">Plan Credits</div>
+              <div className="text-gray-400 text-sm">
+                {tokenData?.subscription?.features?.feature_limits?.tokens || 0} credits per billing cycle
+              </div>
+            </div>
+            
+            {/* Calculate used plan credits */}
+            {(() => {
+              const planLimit = tokenData?.subscription?.features?.feature_limits?.tokens || 0;
+              
+              // Get total token usage from transactions
+              const totalUsed = tokenData?.transactions
+                ? tokenData.transactions
+                    .filter(t => t.transaction_type === 'usage')
+                    .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+                : 0;
+                
+              // Calculate plan usage
+              const planUsed = Math.min(totalUsed, planLimit);
+              const planRemaining = Math.max(0, planLimit - planUsed);
+              const planPercentage = planLimit > 0 ? Math.min(100, (planUsed / planLimit) * 100) : 0;
+              
+              return (
+                <>
+                  <div className="flex justify-between items-center mb-1 text-sm">
+                    <span className="text-gray-400">{planRemaining} of {planLimit} remaining</span>
+                    <span className="text-gray-400">{planPercentage.toFixed(0)}% used</span>
+                  </div>
+                  <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all duration-500 ease-in-out"
+                      style={{ width: `${planPercentage}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Resets at the end of your billing cycle on {new Date(tokenData?.subscription?.current_period_end).toLocaleDateString()}
+                  </p>
+                </>
+              );
+            })()}
+          </div>
+          
+          {/* Token Pack Credits Panel */}
+          <div className="bg-dark-card/50 rounded-xl p-4">
+            {(() => {
+              // Get total tokens from packs
+              const totalFromPacks = tokenData?.transactions
+                ? tokenData.transactions
+                    .filter(t => t.transaction_type === 'purchase')
+                    .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+                : 0;
+                
+              if (totalFromPacks > 0) {
+                const planLimit = tokenData?.subscription?.features?.feature_limits?.tokens || 0;
+                
+                // Get total token usage from transactions
+                const totalUsed = tokenData?.transactions
+                  ? tokenData.transactions
+                      .filter(t => t.transaction_type === 'usage')
+                      .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+                  : 0;
+                  
+                // Calculate pack usage
+                const packUsed = Math.max(0, totalUsed - planLimit);
+                const packRemaining = Math.max(0, totalFromPacks - packUsed);
+                const packPercentage = totalFromPacks > 0 ? Math.min(100, (packUsed / totalFromPacks) * 100) : 0;
+                
+                return (
+                  <>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-gray-300 font-medium">Token Pack Credits</div>
+                      <div className="text-gray-400 text-sm">
+                        {totalFromPacks} additional credits purchased
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mb-1 text-sm">
+                      <span className="text-gray-400">{packRemaining} of {totalFromPacks} remaining</span>
+                      <span className="text-gray-400">{packPercentage.toFixed(0)}% used</span>
+                    </div>
+                    <div className="h-3 bg-gray-700 rounded-full overflow-hidden mb-2">
+                      <div 
+                        className="h-full bg-yellow-500 rounded-full transition-all duration-500 ease-in-out"
+                        style={{ width: `${packPercentage}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                      These credits do not expire with your billing cycle
+                    </p>
+                  </>
+                );
+              }
+              return (
+                <div className="flex flex-col justify-center items-center h-full text-center">
+                  <div className="text-gray-300 font-medium mb-2">Token Pack Credits</div>
+                  <p className="text-gray-400 text-sm mb-2">
+                    You haven't purchased any additional token packs yet
+                  </p>
+                  <button
+                    onClick={() => document.getElementById('token-packages').scrollIntoView({ behavior: 'smooth' })}
+                    className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm transition-colors"
+                  >
+                    Purchase Token Packs
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
         </div>
         
         <p className="text-gray-300 mb-4">
-          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} credits per billing cycle.
+          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} <IoDiamond className="inline mx-1" /> credits per billing cycle.
         </p>
         
         {tokenData?.tokens?.balance < 100 && (
-          <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg mt-4">
+          <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-3 rounded-lg">
             <div className="flex items-center">
               <FiAlertTriangle className="mr-2" size={20} />
-              <span>Your credit balance is running low! Consider purchasing more credits below.</span>
+              <span>Your <IoDiamond className="inline mx-1" /> credit balance is running low! Consider purchasing more <IoDiamond className="inline mx-1" /> credits below.</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Available Token Packages */}
-      <h2 className="text-2xl font-bold text-white mb-6">Purchase Additional Credits</h2>
+      <h2 id="token-packages" className="text-2xl font-bold text-white mb-6">Purchase Additional <IoDiamond className="inline mx-1" /> Credits</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {packages.map((pkg) => (
@@ -317,8 +433,8 @@ const TokenManagement = () => {
             
             <div className="flex-grow mb-6">
               <div className="flex items-center text-gray-300 mb-2">
-                <FiDollarSign className="mr-2 text-primary" />
-                <span>{pkg.token_amount} credits</span>
+                <IoDiamond className="mr-2 text-primary" />
+                <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> credits</span>
               </div>
             </div>
             
@@ -340,7 +456,7 @@ const TokenManagement = () => {
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
-              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} credits</span> for ${selectedPackage.price}.
+              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <IoDiamond className="inline mx-1" /> credits</span> for ${selectedPackage.price}.
             </p>
             
             <Elements stripe={stripePromise}>

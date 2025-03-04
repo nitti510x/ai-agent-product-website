@@ -8,7 +8,15 @@ const getEdgeFunctionUrl = (functionName) => {
   
   if (import.meta.env.DEV && useLocalApi) {
     console.log(`Using local API for ${functionName}`);
-    return `http://localhost:3001/api/${functionName.replace('stripe-', '')}`;
+    // Map Supabase function names to local API endpoints
+    const endpointMap = {
+      'stripe-customers': 'customers',
+      'stripe-payment-methods': 'payment-methods',
+      'stripe-subscriptions': 'subscriptions'
+    };
+    
+    const endpoint = endpointMap[functionName] || functionName.replace('stripe-', '');
+    return `http://localhost:3001/api/${endpoint}`;
   }
   
   // Default to Supabase Edge Functions
@@ -231,7 +239,16 @@ export const stripeCustomers = {
 export const stripePaymentMethods = {
   list: async () => {
     try {
-      return await callEdgeFunction('stripe-payment-methods');
+      const response = await callEdgeFunction('stripe-payment-methods');
+      console.log('Payment methods response:', response);
+      
+      // For local API, the response is already in the correct format
+      if (import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_API === 'true') {
+        return response;
+      }
+      
+      // For Supabase Edge Functions, the response format might be different
+      return response;
     } catch (error) {
       console.error('Error in stripePaymentMethods.list:', error);
       
@@ -243,7 +260,7 @@ export const stripePaymentMethods = {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session || !session.user) {
           console.error('No authenticated user found');
-          return [];
+          return { payment_methods: [], default_payment_method: null };
         }
         
         const userId = session.user.id;
@@ -264,7 +281,7 @@ export const stripePaymentMethods = {
         }
         
         // Return empty array if no stored methods found
-        return [];
+        return { payment_methods: [], default_payment_method: null };
       }
       
       throw error;
@@ -279,6 +296,12 @@ export const stripePaymentMethods = {
         body: { paymentMethodId } 
       });
       console.log('Payment method attached successfully:', response);
+      
+      // For local API, the response includes the payment_method object
+      if (import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_API === 'true' && response.payment_method) {
+        return response.payment_method;
+      }
+      
       return response;
     } catch (error) {
       console.error('Error in stripePaymentMethods.attach:', error);

@@ -36,7 +36,7 @@ function PlanChangeModal({ isOpen, onClose, selectedPlan, currentPlan, action })
                 <h3 className="text-lg font-semibold text-gray-100 mb-2">Plan Summary</h3>
                 <div className="space-y-2 text-gray-400">
                   <p>New Plan: {selectedPlan.name}</p>
-                  <p>Price: ${selectedPlan.price}/mo</p>
+                  <p>Price: ${selectedPlan.price === "0.00" ? "500" : selectedPlan.price}/mo</p>
                   <p>Prorated Amount: ${((priceDifference / 30) * prorateDays).toFixed(2)}</p>
                 </div>
               </div>

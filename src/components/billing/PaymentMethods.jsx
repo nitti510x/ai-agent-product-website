@@ -265,6 +265,7 @@ function PaymentMethodCard({ paymentMethod, isDefault, onSetDefault, onDelete })
 
 function PaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [defaultPaymentMethodId, setDefaultPaymentMethodId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -332,19 +333,53 @@ function PaymentMethods() {
       // Then fetch payment methods
       try {
         const data = await stripePaymentMethods.list();
-        console.log('Payment methods:', data);
+        console.log('Payment methods response:', data);
         
         // Check if we're using the fallback implementation
         if (import.meta.env.DEV && data.length > 0 && !data[0].hasOwnProperty('customer_id')) {
           setUsingFallback(true);
         }
         
-        // Ensure data is an array
-        if (Array.isArray(data)) {
+        // Handle different response formats
+        if (data && data.payment_methods) {
+          // Format from local API server
+          console.log('Using payment_methods from response:', data.payment_methods);
+          setPaymentMethods(data.payment_methods);
+          
+          // Set default payment method if available
+          if (data.default_payment_method) {
+            console.log('Setting default payment method:', data.default_payment_method);
+            setDefaultPaymentMethodId(data.default_payment_method);
+          }
+        } else if (Array.isArray(data)) {
+          // Direct array format
+          console.log('Using array data:', data);
           setPaymentMethods(data);
+          
+          // Find default payment method in array
+          const defaultMethod = data.find(method => method.is_default);
+          if (defaultMethod) {
+            console.log('Found default payment method in array:', defaultMethod.id);
+            setDefaultPaymentMethodId(defaultMethod.id);
+          }
         } else if (data && typeof data === 'object') {
           // Handle case where data might be an object with data property
+          console.log('Using data.data:', data.data);
           setPaymentMethods(data.data || []);
+          
+          // Check for default_payment_method in the response
+          if (data.default_payment_method) {
+            console.log('Setting default payment method from object:', data.default_payment_method);
+            setDefaultPaymentMethodId(data.default_payment_method);
+          } else {
+            // Find default payment method in array
+            const methods = data.data || [];
+            const defaultMethod = methods.find(method => method.is_default);
+            if (defaultMethod) {
+              console.log('Found default payment method in data.data:', defaultMethod.id);
+              setDefaultPaymentMethodId(defaultMethod.id);
+            }
+          }
         } else {
           console.warn('Unexpected payment methods data format:', data);
           setPaymentMethods([]);
@@ -389,31 +424,59 @@ function PaymentMethods() {
     }, 3000);
   };
 
-  const handleSetDefault = (paymentMethodId) => {
-    setPaymentMethods(prevMethods => 
-      prevMethods.map(method => ({
-        ...method,
-        is_default: method.id === paymentMethodId
-      }))
-    );
-    setSuccessMessage('Default payment method updated');
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => {
+  const handleSetDefault = async (paymentMethodId) => {
+    try {
+      setLoading(true);
+      setError(null);
       setSuccessMessage(null);
-    }, 3000);
+      
+      console.log(`Setting payment method ${paymentMethodId} as default`);
+      await stripePaymentMethods.setDefault(paymentMethodId);
+      
+      // Update the local state
+      setDefaultPaymentMethodId(paymentMethodId);
+      
+      setSuccessMessage('Default payment method updated successfully');
+      
+      // Refresh payment methods
+      fetchPaymentMethods();
+    } catch (error) {
+      console.error('Error setting default payment method:', error);
+      setError(`Failed to set default payment method: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (paymentMethodId) => {
-    setPaymentMethods(prevMethods => 
-      prevMethods.filter(method => method.id !== paymentMethodId)
-    );
-    setSuccessMessage('Payment method removed');
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => {
+  const handleDeletePaymentMethod = async (paymentMethodId) => {
+    try {
+      setLoading(true);
+      setError(null);
       setSuccessMessage(null);
-    }, 3000);
+      
+      console.log(`Deleting payment method ${paymentMethodId}`);
+      await stripePaymentMethods.detach(paymentMethodId);
+      
+      // Remove from local state
+      setPaymentMethods(prevMethods => 
+        prevMethods.filter(method => method.id !== paymentMethodId)
+      );
+      
+      // If this was the default payment method, update the default
+      if (defaultPaymentMethodId === paymentMethodId) {
+        setDefaultPaymentMethodId(null);
+      }
+      
+      setSuccessMessage('Payment method removed successfully');
+      
+      // Refresh payment methods
+      fetchPaymentMethods();
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      setError(`Failed to delete payment method: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!user && !loading && error) {
@@ -506,9 +569,9 @@ function PaymentMethods() {
                   <PaymentMethodCard 
                     key={method.id}
                     paymentMethod={method}
-                    isDefault={method.is_default}
-                    onSetDefault={handleSetDefault}
-                    onDelete={handleDelete}
+                    isDefault={method.id === defaultPaymentMethodId}
+                    onSetDefault={() => handleSetDefault(method.id)}
+                    onDelete={() => handleDeletePaymentMethod(method.id)}
                   />
                 ))
               }

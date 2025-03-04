@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiGlobe, FiBarChart2, FiUsers, FiHeadphones, FiCpu, 
-         FiFileText, FiCode, FiLink, FiShield, FiUserCheck, FiStar, FiCheck } from 'react-icons/fi';
+         FiFileText, FiCode, FiLink, FiShield, FiUserCheck, FiStar, FiCheck, FiMail } from 'react-icons/fi';
+import { IoDiamond } from 'react-icons/io5';
 import { fetchSubscriptionPlans, formatPrice } from '../../utils/planUtils';
 import { useAuth } from '../../context/AuthContext';
 
@@ -26,6 +27,7 @@ const DefaultIcon = FiCheck;
 
 const PricingPlans = () => {
   const [plans, setPlans] = useState([]);
+  const [filteredPlans, setFilteredPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -35,6 +37,14 @@ const PricingPlans = () => {
       setLoading(true);
       const plansData = await fetchSubscriptionPlans();
       setPlans(plansData);
+      
+      // Filter out free and enterprise plans
+      const filtered = plansData.filter(plan => 
+        plan.name.toLowerCase() !== 'free' && 
+        plan.name.toLowerCase() !== 'enterprise'
+      );
+      setFilteredPlans(filtered);
+      
       setLoading(false);
     };
 
@@ -63,7 +73,7 @@ const PricingPlans = () => {
   return (
     <div className="pricing-container">
       <div className="pricing-plans">
-        {plans.map((plan) => (
+        {filteredPlans.map((plan) => (
           <div 
             key={plan.id} 
             className={`pricing-card ${plan.name === 'Pro' ? 'popular' : ''}`}
@@ -75,13 +85,12 @@ const PricingPlans = () => {
                 {plan.name === 'Starter' && <FiUser />}
                 {plan.name === 'Pro' && <FiStar />}
                 {plan.name === 'Business' && <FiUsers />}
-                {plan.name === 'Enterprise' && <FiShield />}
               </div>
               <h3 className="plan-name">{plan.name}</h3>
               <div className="plan-price">
                 {plan.amount > 0 ? (
                   <>
-                    <span className="price">{formatPrice(plan.amount)}</span>
+                    <span className="price">${plan.amount === 0 ? "500" : formatPrice(plan.amount)}</span>
                     <span className="period">/{plan.interval}</span>
                   </>
                 ) : (
@@ -92,27 +101,53 @@ const PricingPlans = () => {
             </div>
             
             <div className="plan-features">
-              {plan.features && plan.features.map((feature, index) => (
-                <div key={index} className="feature-item">
-                  {renderFeatureIcon(feature.icon)}
-                  <span>{feature.text}</span>
-                </div>
-              ))}
+              <h4>Features</h4>
+              <ul>
+                {plan.features && Object.entries(plan.features).map(([key, value]) => (
+                  <li key={key}>
+                    <FiCheck className="check-icon" />
+                    {typeof value === 'object' ? (
+                      <span>{key}: {JSON.stringify(value)}</span>
+                    ) : (
+                      <span>{key.toLowerCase().includes('token') || key.toLowerCase().includes('credit') ? 
+                        <>{value} <IoDiamond className="inline text-primary" /> {key}</> : 
+                        value}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
             
-            <div className="plan-action">
-              <button 
-                className={`btn ${plan.name === 'Enterprise' ? 'btn-outline' : 'btn-primary'}`}
-                onClick={() => plan.name === 'Enterprise' 
-                  ? window.location.href = 'mailto:sales@yourdomain.com?subject=Enterprise Plan Inquiry' 
-                  : handleSelectPlan(plan)
-                }
-              >
-                {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
-              </button>
-            </div>
+            <button 
+              onClick={() => handleSelectPlan(plan)} 
+              className={`btn ${plan.name === 'Enterprise' ? 'btn-outline' : 'btn-primary'}`}
+            >
+              {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
+            </button>
           </div>
         ))}
+      </div>
+      
+      {/* Contact for custom plans */}
+      <div className="enterprise-contact">
+        <div className="enterprise-card">
+          <div className="enterprise-header">
+            <div className="enterprise-icon">
+              <FiShield />
+            </div>
+            <h3>Need a Custom Solution?</h3>
+            <p>Looking for Enterprise features or have specific requirements? Contact our team to discuss custom plans tailored to your needs.</p>
+          </div>
+          
+          <a 
+            href="mailto:sales@geniusos.co" 
+            className="btn btn-outline enterprise-btn"
+          >
+            <FiMail className="mail-icon" />
+            Contact Sales
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -251,12 +251,28 @@ export const subscriptionService = {
             amount: 1000,
             transaction_type: 'subscription_grant',
             description: 'Initial tokens from Basic Plan subscription',
-            created_at: new Date(new Date().setDate(new Date().getDate() - 5))
+            created_at: new Date(new Date().setDate(new Date().getDate() - 15))
           },
           {
             id: 2,
             user_id: userId,
             amount: -500,
+            transaction_type: 'usage',
+            description: 'Token usage for AI requests',
+            created_at: new Date(new Date().setDate(new Date().getDate() - 10))
+          },
+          {
+            id: 3,
+            user_id: userId,
+            amount: 5000,
+            transaction_type: 'purchase',
+            description: 'Medium Token Pack purchase',
+            created_at: new Date(new Date().setDate(new Date().getDate() - 5))
+          },
+          {
+            id: 4,
+            user_id: userId,
+            amount: -4000,
             transaction_type: 'usage',
             description: 'Token usage for AI requests',
             created_at: new Date(new Date().setDate(new Date().getDate() - 2))

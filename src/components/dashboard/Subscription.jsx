@@ -184,6 +184,12 @@ function Subscription() {
     );
   }
 
+  // Filter plans to exclude free and enterprise plans
+  const filteredPlans = plans.filter(plan => 
+    plan.name.toLowerCase() !== 'free' && 
+    plan.name.toLowerCase() !== 'enterprise'
+  );
+
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-white mb-8">Subscription Plans</h1>
@@ -303,7 +309,7 @@ function Subscription() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {plans.map((plan) => (
+        {filteredPlans.map((plan) => (
           <div 
             key={plan.id} 
             className={`bg-dark-lighter p-6 rounded-xl flex flex-col transition-all duration-300 ${
@@ -412,6 +418,24 @@ function Subscription() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Contact for custom plans */}
+      <div className="mt-12 p-6 bg-dark-card rounded-xl border border-gray-700 text-center">
+        <h3 className="text-xl font-bold text-white mb-3">Need a Custom Solution?</h3>
+        <p className="text-gray-300 mb-4">
+          Looking for Enterprise features or have specific requirements? Contact our team to discuss custom plans tailored to your needs.
+        </p>
+        <a 
+          href="mailto:sales@geniusos.co" 
+          className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+          </svg>
+          Contact Sales
+        </a>
       </div>
 
       {/* Subscription Confirmation Modal */}

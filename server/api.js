@@ -116,6 +116,197 @@ app.get('/api/plans/:id', async (req, res) => {
   }
 });
 
+// In-memory storage for payment methods during development
+const paymentMethodsStore = {
+  // userId -> { payment_methods: [], default_payment_method: null }
+};
+
+// Payment Methods API routes
+app.get('/api/payment-methods', (req, res) => {
+  // Mock implementation for development
+  console.log('GET /api/payment-methods called');
+  
+  // Extract user ID from auth header (in production this would verify the JWT)
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Extract token and use it as user ID for simplicity in development
+  const token = authHeader.split(' ')[1];
+  const userId = token.split('.')[0]; // Use first part of token as mock user ID
+  
+  console.log('Getting payment methods for user:', userId);
+  
+  // Return stored payment methods or empty array
+  const userStore = paymentMethodsStore[userId] || { 
+    payment_methods: [],
+    default_payment_method: null
+  };
+  
+  res.json(userStore);
+});
+
+app.post('/api/payment-methods', (req, res) => {
+  // Mock implementation for development
+  console.log('POST /api/payment-methods called');
+  
+  // Extract user ID from auth header (in production this would verify the JWT)
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Extract token and use it as user ID for simplicity in development
+  const token = authHeader.split(' ')[1];
+  const userId = token.split('.')[0]; // Use first part of token as mock user ID
+  
+  const { paymentMethodId } = req.body;
+  if (!paymentMethodId) {
+    return res.status(400).json({ error: 'Payment method ID is required' });
+  }
+  
+  console.log(`Adding payment method ${paymentMethodId} for user ${userId}`);
+  
+  // Initialize user store if not exists
+  if (!paymentMethodsStore[userId]) {
+    paymentMethodsStore[userId] = {
+      payment_methods: [],
+      default_payment_method: null
+    };
+  }
+  
+  // Create a mock payment method
+  const newPaymentMethod = {
+    id: paymentMethodId,
+    type: 'card',
+    card: {
+      brand: 'visa',
+      last4: '4242',
+      exp_month: 12,
+      exp_year: 2030
+    },
+    billing_details: {
+      name: 'Test User',
+      email: 'test@example.com'
+    },
+    created: Date.now() / 1000
+  };
+  
+  // Add to user's payment methods
+  paymentMethodsStore[userId].payment_methods.push(newPaymentMethod);
+  
+  // If this is the first payment method, set it as default
+  if (paymentMethodsStore[userId].payment_methods.length === 1) {
+    paymentMethodsStore[userId].default_payment_method = paymentMethodId;
+  }
+  
+  console.log('Updated payment methods store:', paymentMethodsStore[userId]);
+  
+  // In development, return success
+  res.json({ 
+    success: true,
+    message: 'Payment method attached successfully',
+    payment_method: newPaymentMethod
+  });
+});
+
+app.delete('/api/payment-methods/:id', (req, res) => {
+  // Mock implementation for development
+  console.log('DELETE /api/payment-methods/:id called');
+  
+  // Extract user ID from auth header (in production this would verify the JWT)
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Extract token and use it as user ID for simplicity in development
+  const token = authHeader.split(' ')[1];
+  const userId = token.split('.')[0]; // Use first part of token as mock user ID
+  
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: 'Payment method ID is required' });
+  }
+  
+  console.log(`Removing payment method ${id} for user ${userId}`);
+  
+  // Check if user has payment methods
+  if (!paymentMethodsStore[userId]) {
+    return res.status(404).json({ error: 'No payment methods found for user' });
+  }
+  
+  // Find payment method index
+  const methodIndex = paymentMethodsStore[userId].payment_methods.findIndex(pm => pm.id === id);
+  if (methodIndex === -1) {
+    return res.status(404).json({ error: 'Payment method not found' });
+  }
+  
+  // Remove payment method
+  paymentMethodsStore[userId].payment_methods.splice(methodIndex, 1);
+  
+  // If this was the default payment method, update default
+  if (paymentMethodsStore[userId].default_payment_method === id) {
+    paymentMethodsStore[userId].default_payment_method = 
+      paymentMethodsStore[userId].payment_methods.length > 0 
+        ? paymentMethodsStore[userId].payment_methods[0].id 
+        : null;
+  }
+  
+  console.log('Updated payment methods store:', paymentMethodsStore[userId]);
+  
+  // In development, return success
+  res.json({ 
+    success: true,
+    message: 'Payment method detached successfully'
+  });
+});
+
+app.post('/api/payment-methods/:id/default', (req, res) => {
+  // Mock implementation for development
+  console.log('POST /api/payment-methods/:id/default called');
+  
+  // Extract user ID from auth header (in production this would verify the JWT)
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Extract token and use it as user ID for simplicity in development
+  const token = authHeader.split(' ')[1];
+  const userId = token.split('.')[0]; // Use first part of token as mock user ID
+  
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: 'Payment method ID is required' });
+  }
+  
+  console.log(`Setting payment method ${id} as default for user ${userId}`);
+  
+  // Check if user has payment methods
+  if (!paymentMethodsStore[userId]) {
+    return res.status(404).json({ error: 'No payment methods found for user' });
+  }
+  
+  // Find payment method
+  const methodExists = paymentMethodsStore[userId].payment_methods.some(pm => pm.id === id);
+  if (!methodExists) {
+    return res.status(404).json({ error: 'Payment method not found' });
+  }
+  
+  // Set as default
+  paymentMethodsStore[userId].default_payment_method = id;
+  
+  console.log('Updated payment methods store:', paymentMethodsStore[userId]);
+  
+  // In development, return success
+  res.json({ 
+    success: true,
+    message: 'Default payment method set successfully'
+  });
+});
+
 // Subscription routes (to be implemented)
 app.get('/api/subscriptions', (req, res) => {
   // This route requires authentication

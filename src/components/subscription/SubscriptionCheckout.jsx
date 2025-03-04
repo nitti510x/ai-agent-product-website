@@ -133,7 +133,7 @@ const SubscriptionCheckout = () => {
             <div className="mb-6">
               <h3 className="text-xl font-bold mb-2 text-gray-100">{selectedPlan.name} Plan</h3>
               <div className="text-2xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">
-                ${selectedPlan.price}<span className="text-sm text-text-muted">/{selectedPlan.interval || 'mo'}</span>
+                CR {selectedPlan.price === "0.00" ? "500" : selectedPlan.price}<span className="text-sm text-text-muted">/{selectedPlan.interval || 'mo'}</span>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-6">

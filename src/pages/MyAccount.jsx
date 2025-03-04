@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Routes, Route, useLocation } from 'react-router-dom';
 import { FiUser, FiCreditCard, FiFileText, FiList, FiDollarSign } from 'react-icons/fi';
+import { IoDiamond } from 'react-icons/io5';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import PaymentMethods from '../components/billing/PaymentMethods';
@@ -35,7 +36,7 @@ function MyAccount() {
     {
       path: '/dashboard/my-account/tokens',
       label: 'Credit Management',
-      icon: <FiDollarSign className="mr-2" />
+      icon: <IoDiamond className="mr-2" />
     }
   ];
 
@@ -46,20 +47,27 @@ function MyAccount() {
       {/* Horizontal Tab Navigation */}
       <div className="mb-8">
         <div className="flex overflow-x-auto border-b border-dark-card pb-1">
-          {tabs.map((tab) => (
-            <Link
-              key={tab.path}
-              to={tab.path}
-              className={`flex items-center px-4 py-2 mr-4 whitespace-nowrap transition-colors ${
-                location.pathname === tab.path
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </Link>
-          ))}
+          {tabs.map((tab) => {
+            const isActive = location.pathname === tab.path;
+            return (
+              <Link
+                key={tab.path}
+                to={tab.path}
+                className={`flex items-center px-4 py-2 mr-4 whitespace-nowrap transition-colors ${
+                  isActive
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                {tab.path === '/dashboard/my-account/tokens' ? (
+                  <IoDiamond className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
+                ) : (
+                  tab.icon
+                )}
+                {tab.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
       

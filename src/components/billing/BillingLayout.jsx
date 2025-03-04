@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiUser, FiFileText, FiList, FiShoppingCart } from 'react-icons/fi';
+import { IoDiamond } from 'react-icons/io5';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 
 function BillingLayout({ children }) {
@@ -34,7 +35,7 @@ function BillingLayout({ children }) {
     {
       path: '/dashboard/tokens',
       label: 'Credit Management',
-      icon: <FiDollarSign className="mr-2" />
+      icon: <IoDiamond className="mr-2" />
     }
   ];
 
@@ -54,21 +55,28 @@ function BillingLayout({ children }) {
               <h2 className="text-lg font-bold text-white mb-4 px-2">Billing Menu</h2>
               <nav>
                 <ul className="space-y-1">
-                  {menuItems.map((item) => (
-                    <li key={item.path}>
-                      <Link
-                        to={item.path}
-                        className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                          location.pathname === item.path
-                            ? 'bg-primary/20 text-primary'
-                            : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
-                        }`}
-                      >
-                        {item.icon}
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {menuItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <li key={item.path}>
+                        <Link
+                          to={item.path}
+                          className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                            isActive
+                              ? 'bg-primary/20 text-primary'
+                              : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
+                          }`}
+                        >
+                          {item.path === '/dashboard/tokens' ? (
+                            <IoDiamond className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
+                          ) : (
+                            item.icon
+                          )}
+                          {item.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
             </div>

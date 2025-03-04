@@ -363,7 +363,7 @@ const CheckoutForm = () => {
                     </>
                   ) : (
                     <>
-                      <FiStar className="text-primary mr-2" /> {selectedPlan?.name} - ${selectedPlan?.price}/mo
+                      <FiStar className="text-primary mr-2" /> {selectedPlan?.name} - ${selectedPlan?.price === "0.00" ? "500" : selectedPlan?.price}/mo
                     </>
                   )}
                 </h3>
