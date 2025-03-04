@@ -48,12 +48,25 @@ app.get('/api/plans', async (req, res) => {
     const result = await pool.query('SELECT * FROM plans WHERE active = true ORDER BY price ASC');
     
     // Process the features column which is stored as JSON
-    const plans = result.rows.map(plan => ({
-      ...plan,
-      features: typeof plan.features === 'string' 
-        ? JSON.parse(plan.features) 
-        : plan.features
-    }));
+    const plans = result.rows.map(plan => {
+      // Handle different types of features storage
+      let features = plan.features;
+      
+      // If features is a string, try to parse it as JSON
+      if (typeof features === 'string') {
+        try {
+          features = JSON.parse(features);
+        } catch (e) {
+          console.error(`Error parsing features JSON for plan ${plan.id}:`, e);
+          // Keep as is if parsing fails
+        }
+      }
+      
+      return {
+        ...plan,
+        features
+      };
+    });
     
     res.json(plans);
   } catch (error) {
@@ -74,11 +87,21 @@ app.get('/api/plans/:id', async (req, res) => {
     const plan = result.rows[0];
     
     // Process the features column which is stored as JSON
+    let features = plan.features;
+    
+    // If features is a string, try to parse it as JSON
+    if (typeof features === 'string') {
+      try {
+        features = JSON.parse(features);
+      } catch (e) {
+        console.error(`Error parsing features JSON for plan ${plan.id}:`, e);
+        // Keep as is if parsing fails
+      }
+    }
+    
     res.json({
       ...plan,
-      features: typeof plan.features === 'string' 
-        ? JSON.parse(plan.features) 
-        : plan.features
+      features
     });
   } catch (error) {
     console.error('Error fetching plan by ID:', error);

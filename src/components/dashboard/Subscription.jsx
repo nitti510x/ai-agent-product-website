@@ -65,7 +65,8 @@ function Subscription() {
       setPlans(availablePlans);
     } catch (error) {
       console.error('Error fetching plans:', error);
-      setError('Failed to load subscription plans');
+      setError(`Failed to load subscription plans: ${error.message}`);
+      setPlans([]); // Ensure plans is an empty array, not undefined
     }
   };
 
@@ -348,6 +349,16 @@ function Subscription() {
                           </span>
                         </li>
                       ))
+                    ) : Array.isArray(plan.features) ? (
+                      // Handle features as an array of objects with icon and text properties
+                      plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                          <span className="text-gray-300">
+                            {feature.text || (typeof feature === 'string' ? feature : JSON.stringify(feature))}
+                          </span>
+                        </li>
+                      ))
                     ) : (
                       // Handle features as a flat object
                       Object.entries(plan.features).map(([key, value], index) => (
@@ -361,7 +372,7 @@ function Subscription() {
                       ))
                     )
                   ) : Array.isArray(plan.features) ? (
-                    // Handle features as an array
+                    // Handle features as an array of strings
                     plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
                         <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
