@@ -192,8 +192,6 @@ function Subscription() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-white mb-8">Subscription Plans</h1>
-
       {error && (
         <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
           <div className="flex items-center">
