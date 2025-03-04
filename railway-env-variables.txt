@@ -1,19 +1,5 @@
-# Production environment variables
-NODE_ENV=production
-
-# Database connection string (will be set by Railway)
-# DATABASE_URL will be automatically set by Railway
-
-# Port (Railway will set this automatically)
-# PORT will be automatically set by Railway
-
-# Frontend variables (these will be embedded in the build)
-# These should be set in Railway environment variables
-# VITE_SUPABASE_URL
-# VITE_SUPABASE_ANON_KEY
-
-# CORS settings
-CORS_ORIGIN=https://intellagents.geniusos.co
+# Railway Environment Variables for Production Testing
+# Copy these to your Railway project's environment variables
 
 # Supabase Configuration
 VITE_SUPABASE_URL=https://qdrtpsuqffsdocjrifwm.supabase.co
@@ -25,9 +11,14 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_51QxwKqLPMz9ELzNngHZrTXXyHlFhe4vhVMgxtSs66kJ
 STRIPE_WEBHOOK_SECRET=whsec_yourwhsec_ec3f7ae53395f039dee9e96efb46154e364902c2e69cef3c975fbf4120b144f9_webhook_secret_for_development
 
 # API Configuration
-VITE_USE_LOCAL_API=true  # Set to 'false' in production to use Supabase Edge Functions
+VITE_USE_LOCAL_API=false  # Set to 'false' in production to use the API on the same server
 
-# Railway PostgreSQL connection string - Development Only
-DATABASE_URL=postgresql://postgres:QZLxtAAYlkHPKWcXwbRGlrJpWjuvfEan@metro.proxy.rlwy.net:44666/railway
-VITE_DATABASE_URL=postgresql://postgres:QZLxtAAYlkHPKWcXwbRGlrJpWjuvfEan@metro.proxy.rlwy.net:44666/railway
+# Railway PostgreSQL connection string
+# DATABASE_URL will be automatically set by Railway if you link the PostgreSQL service
 
+# CORS settings
+CORS_ORIGIN=https://intellagents.geniusos.co
+# Your custom subdomain for deployment
+
+# Node environment
+NODE_ENV=production

@@ -24,8 +24,15 @@ const swaggerDocument = JSON.parse(fs.readFileSync(resolve(__dirname, 'swagger.j
 const app = express();
 const port = process.env.PORT || 3001;
 
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Swagger documentation
@@ -128,6 +135,11 @@ app.post('/api/subscriptions/:id/cancel', (req, res) => {
 app.post('/api/subscriptions/:id/reactivate', (req, res) => {
   // This route requires authentication
   res.status(501).json({ error: 'Not implemented yet' });
+});
+
+// Health check endpoint for Railway
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API server is running' });
 });
 
 // Root route for API info
