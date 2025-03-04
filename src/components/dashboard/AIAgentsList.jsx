@@ -4,6 +4,9 @@ import { FiSettings, FiActivity, FiBarChart2, FiHelpCircle } from 'react-icons/f
 import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill } from 'react-icons/ri';
 
 function AIAgentsList() {
+  // Define a consistent gradient matching the site style
+  const mainGradient = 'from-emerald-400 to-blue-500';
+
   const agents = [
     {
       id: 'support',
@@ -83,31 +86,31 @@ function AIAgentsList() {
     switch (status) {
       case 'operational':
         return (
-          <div className="absolute top-4 right-4 group">
-            <div className="w-4 h-4 bg-primary rounded-full" />
-            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card rounded-lg text-sm text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+          <div className="absolute top-3 right-3 group">
+            <div className="w-3 h-3 bg-emerald-400 rounded-full shadow-glow-sm" />
+            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card/90 backdrop-blur-sm rounded-lg text-xs text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10 shadow-lg border border-white/5">
               Agent is operational
             </div>
           </div>
         );
       case 'pending':
         return (
-          <div className="absolute top-4 right-4 group">
-            <div className="w-4 h-4 rounded-full border-2 border-yellow-500 flex items-center justify-center">
-              <span className="text-yellow-500 text-[10px] font-bold">!</span>
+          <div className="absolute top-3 right-3 group">
+            <div className="w-3 h-3 rounded-full border-2 border-yellow-500 flex items-center justify-center">
+              <span className="text-yellow-500 text-[8px] font-bold">!</span>
             </div>
-            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card rounded-lg text-sm text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card/90 backdrop-blur-sm rounded-lg text-xs text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10 shadow-lg border border-white/5">
               Setup in progress
             </div>
           </div>
         );
       default:
         return (
-          <div className="absolute top-4 right-4 group">
-            <div className={`w-4 h-4 rounded-full ${agentStatus === 'inactive' ? 'bg-yellow-500' : 'border-2 border-red-500 flex items-center justify-center'}`}>
-              {agentStatus !== 'inactive' && <span className="text-red-500 text-[10px] font-bold">!</span>}
+          <div className="absolute top-3 right-3 group">
+            <div className={`w-3 h-3 rounded-full ${agentStatus === 'inactive' ? 'bg-yellow-500' : 'border-2 border-red-500 flex items-center justify-center'}`}>
+              {agentStatus !== 'inactive' && <span className="text-red-500 text-[8px] font-bold">!</span>}
             </div>
-            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card rounded-lg text-sm text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <div className="absolute right-0 mt-2 px-3 py-1 bg-dark-card/90 backdrop-blur-sm rounded-lg text-xs text-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10 shadow-lg border border-white/5">
               {agentStatus === 'inactive' ? 'Agent is inactive' : 'Setup required'}
             </div>
           </div>
@@ -116,64 +119,77 @@ function AIAgentsList() {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-100">AI Assistants</h1>
-          <p className="text-gray-400 mt-2">Your active AI integrations</p>
+    <div className="max-w-7xl mx-auto">
+      {/* Header with gradient underline */}
+      <div className="relative mb-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-white">AI Assistants</h1>
+            <p className="text-gray-400 text-sm mt-1">Your active AI integrations</p>
+          </div>
+          <Link
+            to="/dashboard/usage"
+            className="px-4 py-2 bg-dark-card/80 border border-emerald-400/20 text-emerald-400 rounded-lg hover:bg-dark-card hover:border-emerald-400/40 transition-all duration-300 text-sm font-medium flex items-center"
+          >
+            <FiBarChart2 className="mr-2" />
+            View Overall Usage
+          </Link>
         </div>
-        <Link
-          to="/dashboard/usage"
-          className="btn-primary hover:shadow-glow-strong transition-all duration-300"
-        >
-          View Overall Usage
-        </Link>
+        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-400/20 to-blue-500/20 mt-4"></div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* Agents grid - 4 across */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {agents.map((agent) => (
           <div
             key={agent.id}
-            className="bg-dark-lighter p-6 rounded-xl border border-dark-card hover:border-primary transition-all duration-300 relative"
+            className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden hover:border-emerald-400/30 transition-all duration-300 relative shadow-md hover:shadow-lg"
           >
             {getSetupStatusIndicator(agent.setupStatus, agent.status)}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-dark rounded-xl flex items-center justify-center mb-4 text-primary">
+            
+            {/* Agent header with icon */}
+            <div className="flex items-center p-4 border-b border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-dark-card to-dark-lighter flex items-center justify-center text-emerald-400 mr-3">
                 {agent.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-2">
-                {agent.name}
-              </h3>
-              <p className="text-gray-400 text-sm mb-6">{agent.description}</p>
-              <div className="flex space-x-4">
-                <Link
-                  to={`/dashboard/activity/${agent.id}`}
-                  className="flex items-center px-4 py-2 rounded-lg bg-dark hover:bg-dark-card text-gray-400 hover:text-primary transition-all duration-300 hover:shadow-glow"
-                >
-                  <FiActivity className="w-5 h-5 mr-2" />
-                  Logs
-                </Link>
-                <Link
-                  to={`/dashboard/usage/${agent.id}`}
-                  className="flex items-center px-4 py-2 rounded-lg bg-dark hover:bg-dark-card text-gray-400 hover:text-primary transition-all duration-300 hover:shadow-glow"
-                >
-                  <FiBarChart2 className="w-5 h-5 mr-2" />
-                  Usage
-                </Link>
-                <Link
-                  to={`/dashboard/settings/${agent.id}`}
-                  className="flex items-center px-4 py-2 rounded-lg bg-dark hover:bg-dark-card text-gray-400 hover:text-primary transition-all duration-300 hover:shadow-glow"
-                >
-                  <FiSettings className="w-5 h-5 mr-2" />
-                  Configure
-                </Link>
+              <div>
+                <h3 className="font-medium text-white text-sm">
+                  {agent.name}
+                </h3>
+                <p className="text-gray-400 text-xs">{agent.description}</p>
               </div>
+            </div>
+            
+            {/* Action buttons */}
+            <div className="p-3 flex flex-wrap gap-2">
+              <Link
+                to={`/dashboard/activity/${agent.id}`}
+                className="flex items-center px-3 py-1.5 rounded-lg bg-dark-lighter hover:bg-dark-card text-gray-400 hover:text-emerald-400 transition-all duration-300 text-xs"
+              >
+                <FiActivity className="w-3.5 h-3.5 mr-1.5" />
+                Logs
+              </Link>
+              <Link
+                to={`/dashboard/usage/${agent.id}`}
+                className="flex items-center px-3 py-1.5 rounded-lg bg-dark-lighter hover:bg-dark-card text-gray-400 hover:text-emerald-400 transition-all duration-300 text-xs"
+              >
+                <FiBarChart2 className="w-3.5 h-3.5 mr-1.5" />
+                Usage
+              </Link>
+              <Link
+                to={`/dashboard/settings/${agent.id}`}
+                className="flex items-center px-3 py-1.5 rounded-lg bg-dark-lighter hover:bg-dark-card text-gray-400 hover:text-emerald-400 transition-all duration-300 text-xs"
+              >
+                <FiSettings className="w-3.5 h-3.5 mr-1.5" />
+                Configure
+              </Link>
+              
               {agent.setupStatus !== 'operational' && (
                 <Link
                   to={`/dashboard/setup/${agent.id}`}
-                  className="flex items-center mt-4 text-gray-400 hover:text-secondary transition-colors"
+                  className="flex items-center px-3 py-1.5 mt-2 text-gray-400 hover:text-blue-400 transition-colors text-xs w-full justify-center bg-dark-lighter/50 rounded-lg"
                 >
-                  <FiHelpCircle className="w-5 h-5 mr-2" />
+                  <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
                   Setup Guide
                 </Link>
               )}

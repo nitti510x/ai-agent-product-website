@@ -93,9 +93,18 @@ function LandingPage() {
               <RouterLink to="/login" className="btn-primary hover:shadow-glow-strong transition-all duration-300">
                 Login
               </RouterLink>
-              <button className="btn-outline hover:shadow-glow-blue-strong transition-all duration-300">
-                Get Started
-              </button>
+              <a 
+                href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
+                className="flex items-center"
+              >
+                <img 
+                  alt="Add to Slack" 
+                  height="40" 
+                  width="139" 
+                  src="https://platform.slack-edge.com/img/add_to_slack.png" 
+                  srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" 
+                />
+              </a>
             </div>
           </div>
         </div>
@@ -118,10 +127,18 @@ function LandingPage() {
                 for all social platforms directly from your Slack workspace.
               </p>
               <div className="flex gap-4">
-                <button className="btn-primary flex items-center hover:shadow-glow-strong transition-all duration-300">
-                  <RiSlackFill className="w-6 h-6 mr-2" />
-                  Add to Slack
-                </button>
+                <a 
+                  href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
+                  className="flex items-center"
+                >
+                  <img 
+                    alt="Add to Slack" 
+                    height="40" 
+                    width="139" 
+                    src="https://platform.slack-edge.com/img/add_to_slack.png" 
+                    srcSet="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" 
+                  />
+                </a>
                 <button className="btn-outline hover:shadow-glow-blue-strong transition-all duration-300">
                   Watch Demo
                 </button>
