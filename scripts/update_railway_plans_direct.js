@@ -10,6 +10,23 @@ const pool = new Pool({
 // Plan data from the pricing page
 const plans = [
   {
+    id: 'plan_free',
+    name: 'Free Trial',
+    description: 'Perfect for teams ready to revolutionize their social media strategy',
+    stripe_product_id: 'prod_free_trial', // Placeholder
+    stripe_price_id: 'price_free_trial', // Placeholder
+    price: 0.00,
+    interval: 'month',
+    features: JSON.stringify([
+      { icon: 'credit', text: '50 credits (Enough for multiple posts)' },
+      { icon: 'assistant', text: '1 AI Agent (Link 1 social account)' },
+      { icon: 'slack', text: 'Slack Access (For your workspace)' },
+      { icon: 'content', text: 'Content Generation AI Agents' },
+      { icon: 'social', text: 'Social Media AI Agents' },
+      { icon: 'card', text: 'No credit card required' }
+    ])
+  },
+  {
     id: 'plan_starter',
     name: 'Starter',
     description: 'Perfect for small teams getting started with AI marketing',

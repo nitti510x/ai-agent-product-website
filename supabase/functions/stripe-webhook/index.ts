@@ -6,8 +6,8 @@ import Stripe from 'https://esm.sh/stripe@11.1.0'
 serve(async (req) => {
   try {
     // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    const supabaseUrl = Deno.env.get('APP_SUPABASE_URL') ?? ''
+    const supabaseKey = Deno.env.get('APP_SUPABASE_KEY') ?? ''
     const supabase = createClient(supabaseUrl, supabaseKey)
     
     // Create Stripe client

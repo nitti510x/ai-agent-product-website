@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy:edge": "./scripts/deploy_edge_functions.sh",
+    "check:edge": "node scripts/check_edge_functions.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -17,12 +19,15 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.49.1",
+    "bootstrap": "^5.3.3",
     "canvas-confetti": "^1.9.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
     "pg": "^8.13.3",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-router-dom": "^6.15.0",

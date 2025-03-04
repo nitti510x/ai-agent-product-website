@@ -1,47 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FiUser, FiMail, FiLock, FiSave, FiCreditCard } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiUser, FiMail, FiLock, FiSave } from 'react-icons/fi';
 import { supabase } from '../../config/supabase';
 
 function Profile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     name: '',
-    email: ''
+    email: '',
   });
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [loginProvider, setLoginProvider] = useState(null);
 
   useEffect(() => {
-    async function loadUserProfile() {
-      try {
-        setLoading(true);
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user) {
-          setUserData({
-            name: user.user_metadata?.full_name || '',
-            email: user.email || ''
-          });
-          
-          // Determine login provider
-          const loginProvider = getLoginProvider(user);
-          setLoginProvider(loginProvider);
-        }
-      } catch (error) {
-        console.error('Error loading user profile:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
     loadUserProfile();
   }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      setLoading(true);
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return;
+      }
+      
+      // Determine login provider
+      const provider = getLoginProvider(user);
+      setLoginProvider(provider);
+      
+      // Set user data
+      setUserData({
+        name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
+        email: user.email,
+      });
+      
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      setError('Failed to load profile information');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Function to determine login provider
   const getLoginProvider = (user) => {
@@ -127,21 +136,18 @@ function Profile() {
 
   return (
     <div>
-      <div className="flex items-center mb-8">
-        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
-      </div>
+      <h1 className="text-3xl font-bold text-white mb-8">Profile Settings</h1>
       
       <div className="grid md:grid-cols-2 gap-8">
         {/* Basic Information */}
-        <div className="bg-dark-lighter p-6 rounded-xl border border-dark-card">
-          <h2 className="text-xl font-bold text-gray-100 mb-6">Basic Information</h2>
+        <div className="bg-dark-lighter p-6 rounded-xl">
+          <h2 className="text-xl font-bold text-white mb-6">Basic Information</h2>
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Full Name
               </label>
-              <div className="relative flex items-center">
+              <div className="flex items-center">
                 <FiUser className="w-5 h-5 text-gray-400 mr-3" />
                 <p className="text-gray-100">{userData.name}</p>
               </div>
@@ -150,7 +156,7 @@ function Profile() {
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Email Address
               </label>
-              <div className="relative flex items-center">
+              <div className="flex items-center">
                 <FiMail className="w-5 h-5 text-gray-400 mr-3" />
                 <p className="text-gray-100">{userData.email}</p>
               </div>
@@ -159,7 +165,7 @@ function Profile() {
               <label className="block text-sm font-medium text-gray-400 mb-2">
                 Login Provider
               </label>
-              <div className="relative flex items-center">
+              <div className="flex items-center">
                 <FiLock className="w-5 h-5 text-gray-400 mr-3" />
                 <p className="text-gray-100">{loginProvider}</p>
               </div>
@@ -169,8 +175,8 @@ function Profile() {
 
         {/* Password Change - Only show for email/password users */}
         {loginProvider === 'Email/Password' && (
-          <div className="bg-dark-lighter p-6 rounded-xl border border-dark-card">
-            <h2 className="text-xl font-bold text-gray-100 mb-6">Change Password</h2>
+          <div className="bg-dark-lighter p-6 rounded-xl">
+            <h2 className="text-xl font-bold text-white mb-6">Change Password</h2>
             <form onSubmit={handlePasswordChange} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">
@@ -230,8 +236,8 @@ function Profile() {
         
         {/* Message for SSO users */}
         {loginProvider && loginProvider !== 'Email/Password' && (
-          <div className="bg-dark-lighter p-6 rounded-xl border border-dark-card">
-            <h2 className="text-xl font-bold text-gray-100 mb-6">Password Management</h2>
+          <div className="bg-dark-lighter p-6 rounded-xl">
+            <h2 className="text-xl font-bold text-white mb-6">Password Management</h2>
             <div className="p-4 bg-dark rounded-lg border border-dark-card">
               <p className="text-gray-300">
                 You're signed in with {loginProvider}. Password management is handled through your {loginProvider} account.
@@ -240,7 +246,6 @@ function Profile() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

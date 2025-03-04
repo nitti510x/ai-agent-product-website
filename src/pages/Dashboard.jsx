@@ -9,13 +9,14 @@ import OverallUsage from '../components/dashboard/OverallUsage';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import TokenManagement from '../components/dashboard/TokenManagement';
+import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import SetupGuide from '../components/dashboard/SetupGuide';
 import BillingLayout from '../components/billing/BillingLayout';
 import TransactionHistory from '../components/billing/TransactionHistory';
 import PaymentMethods from '../components/billing/PaymentMethods';
 import SubscriptionCheckout from '../components/subscription/SubscriptionCheckout';
+import MyAccount from '../pages/MyAccount';
 import Logo from '../components/Logo';
-import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import { FiUser, FiLogOut, FiCreditCard } from 'react-icons/fi';
 
 function Dashboard() {
@@ -81,7 +82,7 @@ function Dashboard() {
                 <TokenBalanceWidget compact={true} />
               </div>
               <Link 
-                to="/dashboard/billing/profile" 
+                to="/dashboard/my-account/profile" 
                 className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
               >
                 <FiUser className="w-6 h-6 mr-1" />
@@ -120,6 +121,9 @@ function Dashboard() {
           <Route path="billing/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
           <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+          
+          {/* My Account Routes */}
+          <Route path="my-account/*" element={<MyAccount />} />
         </Routes>
       </div>
     </div>

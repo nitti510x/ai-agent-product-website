@@ -33,47 +33,49 @@ function BillingLayout({ children }) {
     },
     {
       path: '/dashboard/tokens',
-      label: 'Token Management',
+      label: 'Credit Management',
       icon: <FiDollarSign className="mr-2" />
     }
   ];
 
   return (
-    <div className="bg-dark text-white min-h-screen">
-      <div className="container mx-auto py-8">
-        <div className="mb-10">
-          <div className="flex items-center mb-8">
-            <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-            <h1 className="text-3xl font-bold text-white">
-              {isCheckoutPage ? 'Complete Your Order' : 'My Account'}
-            </h1>
-          </div>
-          
-          {!isCheckoutPage && (
-            <div className="bg-dark-lighter rounded-xl p-1 mb-8">
-              <div className="flex overflow-x-auto scrollbar-thin scrollbar-thumb-dark-card scrollbar-track-transparent">
-                <div className="flex w-full">
-                  {menuItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={`px-4 py-2 rounded-lg whitespace-nowrap flex items-center ${
-                        location.pathname === item.path
-                          ? 'bg-dark text-primary'
-                          : 'text-gray-400 hover:text-gray-200'
-                      }`}
-                    >
-                      {item.icon}
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+    <div>
+      {!isCheckoutPage && (
+        <div className="flex items-center mb-8">
+          <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
+          <h1 className="text-3xl font-bold text-white">Billing & Payments</h1>
         </div>
-
-        <div className="bg-dark-lighter rounded-xl p-6">
+      )}
+      
+      <div className="flex flex-col md:flex-row gap-8">
+        {!isCheckoutPage && (
+          <div className="w-full md:w-64 shrink-0">
+            <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
+              <h2 className="text-lg font-bold text-white mb-4 px-2">Billing Menu</h2>
+              <nav>
+                <ul className="space-y-1">
+                  {menuItems.map((item) => (
+                    <li key={item.path}>
+                      <Link
+                        to={item.path}
+                        className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                          location.pathname === item.path
+                            ? 'bg-primary/20 text-primary'
+                            : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
+                        }`}
+                      >
+                        {item.icon}
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )}
+        
+        <div className="flex-1">
           {children}
         </div>
       </div>

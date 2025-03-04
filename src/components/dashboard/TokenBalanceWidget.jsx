@@ -95,7 +95,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
             <FiDollarSign size={20} className="text-primary" />
           </div>
           <div>
-            <div className="text-white font-semibold">Token Balance</div>
+            <div className="text-white font-semibold">Credit Balance</div>
             <div className={`text-xl font-bold ${isLowBalance ? 'text-red-400' : 'text-primary'}`}>
               {tokens?.balance || 0}
             </div>
@@ -104,23 +104,16 @@ const TokenBalanceWidget = ({ compact = false }) => {
         
         <Link 
           to="/dashboard/tokens" 
-          className={`px-3 py-1.5 rounded-lg flex items-center text-sm font-medium transition-colors ${
-            isLowBalance 
-              ? 'bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300' 
-              : 'bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover'
-          }`}
+          className="px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover rounded-lg transition-colors text-sm"
         >
-          <FiDollarSign className="mr-1" />
-          {isLowBalance ? 'Buy Tokens' : 'Manage'}
+          Buy Credits
         </Link>
       </div>
       
       {isLowBalance && (
-        <div className="mt-3 bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-2 rounded-lg text-sm">
-          <div className="flex items-center">
-            <FiAlertTriangle className="mr-2" size={14} />
-            <span>Your token balance is running low!</span>
-          </div>
+        <div className="mt-3 flex items-center text-yellow-500 text-sm">
+          <FiAlertTriangle className="mr-1.5" size={14} />
+          <span>Low credit balance! Consider purchasing more.</span>
         </div>
       )}
     </div>

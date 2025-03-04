@@ -1,42 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiCheck, FiAlertTriangle, FiCreditCard, FiTrash2 } from 'react-icons/fi';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { supabase } from '../../config/supabase';
-import stripePromise from '../../config/stripe';
 import { stripeCustomers, stripePaymentMethods } from '../../utils/edgeFunctions';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { FiPlus, FiCheck, FiAlertTriangle, FiCreditCard, FiTrash2, FiInfo } from 'react-icons/fi';
 
-// Add Card Form component using Stripe Elements
-function AddCardForm({ onSuccess, onCancel }) {
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+
+// Card input styles
+const cardElementOptions = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#ffffff',
+      '::placeholder': {
+        color: '#aab7c4',
+      },
+    },
+    invalid: {
+      color: '#fa755a',
+    },
+  },
+};
+
+// Add Payment Method Form
+function AddPaymentMethodForm({ onSuccess, onCancel }) {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [usingFallback, setUsingFallback] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
-  const [name, setName] = useState('');
-  const [isDefault, setIsDefault] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  const cardElementOptions = {
-    style: {
-      base: {
-        color: '#ffffff',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-          color: '#8c9eb8'
-        }
-      },
-      invalid: {
-        color: '#fa755a',
-        iconColor: '#fa755a'
-      }
-    },
-    hidePostalCode: true
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     
     if (!stripe || !elements) {
+      setError("Stripe hasn't loaded yet. Please try again in a moment.");
       return;
     }
     
@@ -44,50 +44,54 @@ function AddCardForm({ onSuccess, onCancel }) {
     setError(null);
     
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-      
-      // Create payment method with Stripe
+      // Create payment method
+      console.log('Creating payment method...');
       const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
         type: 'card',
         card: elements.getElement(CardElement),
-        billing_details: { name }
       });
       
       if (stripeError) {
-        throw stripeError;
+        console.error('Stripe createPaymentMethod error:', stripeError);
+        throw new Error(stripeError.message);
       }
       
-      // Check if user already has a Stripe customer
-      let customerData = await stripeCustomers.get(user.id);
-      
-      // If not, create a new customer
-      if (!customerData || !customerData.stripe_customer_id) {
-        customerData = await stripeCustomers.create({
-          userId: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || user.email
-        });
+      if (!paymentMethod || !paymentMethod.id) {
+        throw new Error('Failed to create payment method. Please try again.');
       }
+      
+      console.log('Payment method created:', paymentMethod.id);
       
       // Attach payment method to customer
-      await stripePaymentMethods.attach({
-        userId: user.id,
-        paymentMethodId: paymentMethod.id
-      });
-      
-      // Clear form
-      elements.getElement(CardElement).clear();
-      setName('');
-      
-      // Notify parent component
-      onSuccess();
+      try {
+        console.log('Attaching payment method to customer...');
+        await stripePaymentMethods.attach(paymentMethod.id);
+        console.log('Payment method attached successfully');
+        
+        // Clear form and notify parent
+        elements.getElement(CardElement).clear();
+        onSuccess();
+      } catch (attachError) {
+        console.error('Error attaching payment method:', attachError);
+        
+        // Check if the error is from our API or from Stripe
+        if (attachError.message.includes('API error')) {
+          // Try to extract more details from the error message
+          const errorDetails = attachError.message.includes('details') 
+            ? attachError.message 
+            : 'Failed to attach payment method to your account. Please try again.';
+          
+          throw new Error(errorDetails);
+        } else if (attachError.message.includes('Failed to fetch')) {
+          // Connection error - could be that the server is not running
+          setUsingFallback(true);
+          throw new Error('Connection error. The server may be offline, but your card has been validated. In a production environment, this would be saved.');
+        } else {
+          throw new Error(`Failed to attach payment method: ${attachError.message}`);
+        }
+      }
     } catch (error) {
-      console.error('Error adding payment method:', error);
+      console.error('Error in payment method flow:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -95,66 +99,166 @@ function AddCardForm({ onSuccess, onCancel }) {
   };
 
   return (
-    <div className="bg-dark-card p-6 rounded-lg shadow-lg mb-6 border border-dark-card/30">
-      <h3 className="text-xl font-semibold mb-4 text-white">Add Payment Method</h3>
+    <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <h3 className="text-xl font-bold text-white mb-4">Add Payment Method</h3>
+      
+      {usingFallback && import.meta.env.DEV && (
+        <div className="mb-6 bg-blue-900/20 border border-blue-500/50 text-blue-200 p-4 rounded-lg">
+          <div className="flex items-start">
+            <FiInfo className="text-blue-500 mt-1 mr-3 flex-shrink-0" size={20} />
+            <div>
+              <p className="text-sm">
+                <strong>Development Mode:</strong> Using fallback implementation. Your card will be validated but not actually saved to Stripe.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {error && (
+        <div className="mb-6 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <FiAlertTriangle className="mr-2" size={20} />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-300 mb-2">Name on Card</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white"
-            placeholder="John Doe"
-            required
-          />
-        </div>
-        
-        <div className="mb-4">
-          <label className="block text-gray-300 mb-2">Card Details</label>
-          <div className="p-3 bg-gray-700 border border-gray-500 rounded focus-within:border-primary transition-colors">
+        <div className="mb-6">
+          <label className="block text-white font-medium mb-2">Card Details</label>
+          <div className="p-4 bg-dark/50 border border-gray-700 rounded-lg focus-within:border-primary transition-colors">
             <CardElement options={cardElementOptions} />
           </div>
+          <p className="text-gray-400 text-sm mt-2">
+            Your card information is securely processed by Stripe.
+          </p>
         </div>
-        
-        <div className="mb-4">
-          <label className="flex items-center text-gray-300">
-            <input
-              type="checkbox"
-              checked={isDefault}
-              onChange={(e) => setIsDefault(e.target.checked)}
-              className="mr-2 h-4 w-4 accent-primary"
-            />
-            Set as default payment method
-          </label>
-        </div>
-        
-        {error && (
-          <div className="mb-4 p-3 bg-red-900/20 border border-red-500/50 rounded flex items-center">
-            <FiAlertTriangle className="text-red-500 mr-2" />
-            <span className="text-red-500">{error}</span>
-          </div>
-        )}
         
         <div className="flex justify-end space-x-3">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+            className="px-4 py-2 bg-dark/50 hover:bg-dark/70 border border-gray-700 rounded-lg text-white transition-colors"
             disabled={loading}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-primary hover:bg-primary-hover rounded text-dark font-semibold flex items-center"
-            disabled={loading || !stripe}
+            className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
+            disabled={!stripe || loading}
           >
-            {loading ? 'Processing...' : 'Add Card'}
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-dark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </>
+            ) : (
+              <>
+                <FiCreditCard className="mr-2" />
+                Add Card
+              </>
+            )}
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+// Payment Method Card
+function PaymentMethodCard({ paymentMethod, isDefault, onSetDefault, onDelete }) {
+  const { card } = paymentMethod;
+  const [loading, setLoading] = useState(false);
+  
+  const handleSetDefault = async () => {
+    setLoading(true);
+    try {
+      await stripePaymentMethods.setDefault(paymentMethod.id);
+      onSetDefault(paymentMethod.id);
+    } catch (error) {
+      console.error('Error setting default payment method:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to remove this payment method?')) {
+      setLoading(true);
+      try {
+        await stripePaymentMethods.detach(paymentMethod.id);
+        onDelete(paymentMethod.id);
+      } catch (error) {
+        console.error('Error removing payment method:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  
+  return (
+    <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 hover:border-primary/30 transition-all duration-300">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="mr-4 text-2xl">
+            {card?.brand === 'visa' && <span className="text-blue-400">Visa</span>}
+            {card?.brand === 'mastercard' && <span className="text-red-400">Mastercard</span>}
+            {card?.brand === 'amex' && <span className="text-blue-300">Amex</span>}
+            {card?.brand === 'discover' && <span className="text-yellow-400">Discover</span>}
+            {!['visa', 'mastercard', 'amex', 'discover'].includes(card?.brand) && (
+              <FiCreditCard className="text-gray-400" />
+            )}
+          </div>
+          <div>
+            <h5 className="text-white font-medium">
+              {card?.brand?.charAt(0).toUpperCase() + card?.brand?.slice(1) || 'Card'} 
+              ending in {card?.last4}
+            </h5>
+            <div className="flex items-center mt-1">
+              <span className="text-gray-400 text-sm">
+                Expires {card?.exp_month}/{card?.exp_year}
+              </span>
+              {isDefault && (
+                <span className="ml-2 px-2 py-0.5 bg-primary/20 text-primary rounded-full text-xs">
+                  Default
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center">
+          {!isDefault && (
+            <button
+              className="mr-3 px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover rounded-lg transition-colors flex items-center"
+              onClick={handleSetDefault}
+              disabled={loading}
+            >
+              <FiCheck className="mr-1.5" />
+              Set as Default
+            </button>
+          )}
+          <button
+            className="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 rounded-lg transition-colors flex items-center"
+            onClick={handleDelete}
+            disabled={loading}
+          >
+            {loading ? (
+              <svg className="animate-spin h-4 w-4 text-red-500 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <FiTrash2 className="mr-1.5" />
+            )}
+            Remove
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -166,24 +270,34 @@ function PaymentMethods() {
   const [successMessage, setSuccessMessage] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [user, setUser] = useState(null);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        console.log('Authenticated user:', user);
-        if (user) {
-          setUser(user);
-          fetchPaymentMethods(user.id);
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Auth session:', session ? 'Session exists' : 'No session');
+        
+        if (session) {
+          const { data: { user } } = await supabase.auth.getUser();
+          console.log('Authenticated user:', user);
+          
+          if (user) {
+            setUser(user);
+            fetchPaymentMethods();
+          } else {
+            console.error('Session exists but no user found');
+            setError('User authentication error');
+            setLoading(false);
+          }
         } else {
-          // For development without authentication, use a mock user ID
-          console.log('No authenticated user found, using mock user ID for development');
-          setUser({ id: 'mock-user-id' });
-          fetchPaymentMethods('mock-user-id');
+          console.error('No active session found');
+          setError('Please sign in to manage payment methods');
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error fetching user:', error);
-        setError('Failed to authenticate user');
+        setError('Failed to authenticate user: ' + error.message);
         setLoading(false);
       }
     };
@@ -191,82 +305,83 @@ function PaymentMethods() {
     fetchUser();
   }, []);
 
-  const fetchPaymentMethods = async (userId) => {
+  const fetchPaymentMethods = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log(`Fetching payment methods for user: ${userId}`);
-      
-      // Use a timeout to handle network issues
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
+      // First ensure we have a Stripe customer
       try {
-        const data = await stripePaymentMethods.list(userId);
-        clearTimeout(timeoutId);
-        
-        console.log('Payment methods:', data);
-        setPaymentMethods(data || []);
-      } catch (fetchError) {
-        if (fetchError.name === 'AbortError') {
-          throw new Error('Request timed out. Server may be unavailable.');
+        await stripeCustomers.create();
+      } catch (customerError) {
+        console.error('Error creating customer:', customerError);
+        if (customerError.message.includes('Database setup incomplete')) {
+          setError('Database setup is incomplete. Please contact support to set up the payment system.');
+          setLoading(false);
+          return;
         }
-        throw fetchError;
+        
+        // Check if we're using the fallback implementation
+        if (import.meta.env.DEV && customerError.message.includes('Failed to fetch')) {
+          setUsingFallback(true);
+        }
+        
+        // Continue anyway, as the customer might already exist
       }
       
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching payment methods:', error);
-      
-      // Handle network errors more gracefully
-      if (error.message === 'Failed to fetch') {
-        setError('Failed to connect to the server. Please check if the API server is running.');
-      } else {
-        setError(`Failed to load payment methods: ${error.message}`);
-      }
-      
-      setLoading(false);
-      
-      // In development, show mock data if the server is unreachable
-      if (error.message === 'Failed to fetch' || error.message.includes('timed out')) {
-        console.log('Using mock data due to server connection issue');
-        setPaymentMethods([
-          {
-            id: 'pm_mock_fallback_1',
-            type: 'card',
-            card: {
-              brand: 'visa',
-              last4: '4242',
-              exp_month: 12,
-              exp_year: 2025
-            },
-            is_default: true
-          },
-          {
-            id: 'pm_mock_fallback_2',
-            type: 'card',
-            card: {
-              brand: 'mastercard',
-              last4: '5555',
-              exp_month: 10,
-              exp_year: 2024
-            },
-            is_default: false
+      // Then fetch payment methods
+      try {
+        const data = await stripePaymentMethods.list();
+        console.log('Payment methods:', data);
+        
+        // Check if we're using the fallback implementation
+        if (import.meta.env.DEV && data.length > 0 && !data[0].hasOwnProperty('customer_id')) {
+          setUsingFallback(true);
+        }
+        
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setPaymentMethods(data);
+        } else if (data && typeof data === 'object') {
+          // Handle case where data might be an object with data property
+          setPaymentMethods(data.data || []);
+        } else {
+          console.warn('Unexpected payment methods data format:', data);
+          setPaymentMethods([]);
+        }
+      } catch (paymentError) {
+        console.error('Error fetching payment methods:', paymentError);
+        if (paymentError.message.includes('Database setup incomplete')) {
+          setError('Database setup is incomplete. Please contact support to set up the payment system.');
+        } else if (paymentError.message.includes('body stream already read')) {
+          // This is likely a transient error, retry once
+          try {
+            console.log('Retrying payment methods fetch after body stream error...');
+            const retryData = await stripePaymentMethods.list();
+            if (Array.isArray(retryData)) {
+              setPaymentMethods(retryData);
+              return;
+            }
+          } catch (retryError) {
+            console.error('Error on retry:', retryError);
           }
-        ]);
+          setError('Failed to load payment methods. Please refresh the page and try again.');
+        } else {
+          setError('Failed to load payment methods: ' + paymentError.message);
+        }
       }
+    } catch (error) {
+      console.error('Error in fetchPaymentMethods:', error);
+      setError('Failed to load payment methods: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleAddSuccess = () => {
     setShowAddForm(false);
     setSuccessMessage('Payment method added successfully');
-    
-    // Refresh payment methods
-    if (user) {
-      fetchPaymentMethods(user.id);
-    }
+    fetchPaymentMethods();
     
     // Clear success message after 3 seconds
     setTimeout(() => {
@@ -274,150 +389,140 @@ function PaymentMethods() {
     }, 3000);
   };
 
-  const handleSetDefault = async (paymentMethodId) => {
-    try {
-      if (!user) return;
-      
-      setLoading(true);
-      setError(null);
-      
-      // Set as default
-      await stripePaymentMethods.attach({
-        userId: user.id,
-        paymentMethodId: paymentMethodId
-      });
-      
-      setSuccessMessage('Default payment method updated');
-      
-      // Refresh payment methods
-      fetchPaymentMethods(user.id);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-    } catch (error) {
-      console.error('Error setting default payment method:', error);
-      setError(error.message || 'Failed to update default payment method');
-      setLoading(false);
-    }
+  const handleSetDefault = (paymentMethodId) => {
+    setPaymentMethods(prevMethods => 
+      prevMethods.map(method => ({
+        ...method,
+        is_default: method.id === paymentMethodId
+      }))
+    );
+    setSuccessMessage('Default payment method updated');
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 3000);
   };
-  
-  const handleDeletePaymentMethod = async (paymentMethodId) => {
-    try {
-      if (!user) return;
-      
-      setLoading(true);
-      setError(null);
-      
-      // Delete payment method
-      await stripePaymentMethods.detach(paymentMethodId, user.id);
-      
-      setSuccessMessage('Payment method deleted successfully');
-      
-      // Refresh payment methods
-      fetchPaymentMethods(user.id);
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-    } catch (error) {
-      console.error('Error deleting payment method:', error);
-      setError(error.message || 'Failed to delete payment method');
-      setLoading(false);
-    }
+
+  const handleDelete = (paymentMethodId) => {
+    setPaymentMethods(prevMethods => 
+      prevMethods.filter(method => method.id !== paymentMethodId)
+    );
+    setSuccessMessage('Payment method removed');
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 3000);
   };
-  
+
+  if (!user && !loading && error) {
+    return (
+      <div className="p-6">
+        <div className="bg-dark-card p-6 rounded-lg shadow-lg border border-dark-card/30 w-full">
+          <h2 className="text-xl font-bold text-white mb-4">Authentication Required</h2>
+          <div className="p-3 bg-yellow-900/20 border border-yellow-500/50 rounded mb-4">
+            <p className="text-yellow-500">{error}</p>
+          </div>
+          <hr className="border-gray-700 my-4" />
+          <p className="text-gray-300">
+            Please <a href="/login" className="text-primary hover:text-primary-hover">sign in</a> to manage your payment methods.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6 bg-dark-card rounded-lg shadow-xl border border-dark-card/30">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">Payment Methods</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center px-4 py-2 bg-primary hover:bg-primary-hover rounded text-dark font-semibold"
-          disabled={showAddForm}
-        >
-          <FiPlus className="mr-2" />
-          Add Payment Method
-        </button>
+    <div className="space-y-8">
+      <div className="flex items-center mb-8">
+        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
+        <h1 className="text-3xl font-bold text-white">Payment Methods</h1>
       </div>
       
       {successMessage && (
-        <div className="mb-4 p-3 bg-green-900/20 border border-green-500/50 rounded flex items-center">
-          <FiCheck className="text-green-500 mr-2" />
-          <span className="text-green-500">{successMessage}</span>
+        <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <FiCheck className="mr-2" size={20} />
+            <span>{successMessage}</span>
+          </div>
         </div>
       )}
       
-      {error && (
-        <div className="mb-4 p-3 bg-red-900/20 border border-red-500/50 rounded flex items-center">
-          <FiAlertTriangle className="text-red-500 mr-2" />
-          <span className="text-red-500">{error}</span>
+      {error && !loading && (
+        <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <FiAlertTriangle className="mr-2" size={20} />
+            <span>{error}</span>
+          </div>
         </div>
       )}
       
-      {showAddForm && (
-        <Elements stripe={stripePromise}>
-          <AddCardForm 
-            onSuccess={handleAddSuccess} 
-            onCancel={() => setShowAddForm(false)} 
-          />
-        </Elements>
-      )}
-      
-      {loading && !showAddForm ? (
-        <div className="flex justify-center items-center p-10">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      ) : paymentMethods.length > 0 ? (
-        <div className="space-y-4">
-          {paymentMethods.map((method) => (
-            <div key={method.id} className="flex justify-between items-center p-4 bg-dark-card rounded-lg border border-dark-card/30">
-              <div className="flex items-center">
-                <FiCreditCard className="text-gray-400 mr-3 text-xl" />
-                <div>
-                  <p className="text-white">
-                    {method.card?.brand ? (method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)) : 'Card'} •••• {method.card?.last4 || '****'}
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Expires {method.card?.exp_month || '**'}/{method.card?.exp_year ? method.card.exp_year.toString().slice(-2) : '**'}
-                    {method.is_default && (
-                      <span className="ml-2 px-2 py-0.5 bg-primary/20 text-primary rounded-full text-xs">
-                        Default
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {!method.is_default && (
-                  <button 
-                    onClick={() => handleSetDefault(method.id)}
-                    className="text-primary hover:text-primary-hover text-sm"
-                    disabled={loading}
-                  >
-                    Set as Default
-                  </button>
-                )}
-                <button 
-                  onClick={() => handleDeletePaymentMethod(method.id)}
-                  className="text-red-400 hover:text-red-300"
-                  disabled={loading}
-                >
-                  <FiTrash2 />
-                </button>
-              </div>
+      {usingFallback && import.meta.env.DEV && (
+        <div className="mb-8 bg-blue-900/20 border border-blue-500/50 text-blue-200 p-4 rounded-lg">
+          <div className="flex items-start">
+            <FiInfo className="text-blue-500 mt-1 mr-3 flex-shrink-0" size={20} />
+            <div>
+              <h3 className="font-semibold text-lg">Development Mode</h3>
+              <p className="text-sm">
+                Using local storage to save payment methods. Your card information is being stored locally in your browser 
+                and will persist across page refreshes. In production, this would be saved to Stripe.
+              </p>
             </div>
-          ))}
+          </div>
+        </div>
+      )}
+      
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <div className="bg-dark-card p-6 rounded-lg text-center border border-dark-card/30">
-          <p className="text-gray-400">No payment methods found</p>
-          <p className="text-gray-500 text-sm mt-2">
-            Add a payment method to subscribe to a plan or purchase tokens
-          </p>
-        </div>
+        <>
+          {showAddForm ? (
+            <Elements stripe={stripePromise}>
+              <AddPaymentMethodForm 
+                onSuccess={handleAddSuccess} 
+                onCancel={() => setShowAddForm(false)} 
+              />
+            </Elements>
+          ) : (
+            <div className="mb-8">
+              <button 
+                className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
+                onClick={() => setShowAddForm(true)}
+              >
+                <FiPlus className="mr-2" />
+                Add Payment Method
+              </button>
+            </div>
+          )}
+          
+          {paymentMethods.length > 0 ? (
+            <div className="space-y-4">
+              {paymentMethods
+                .sort((a, b) => (b.is_default - a.is_default))
+                .map(method => (
+                  <PaymentMethodCard 
+                    key={method.id}
+                    paymentMethod={method}
+                    isDefault={method.is_default}
+                    onSetDefault={handleSetDefault}
+                    onDelete={handleDelete}
+                  />
+                ))
+              }
+            </div>
+          ) : (
+            <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-8 text-center">
+              <FiCreditCard className="mx-auto text-4xl text-gray-500 mb-3" />
+              <p className="text-gray-300 mb-2">You don't have any payment methods yet.</p>
+              <p className="text-gray-500 text-sm">
+                Add a payment method to subscribe to a plan or purchase credits.
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -206,7 +206,7 @@ const TokenManagement = () => {
       const updatedTokens = await subscriptionService.getUserTokens(user.id);
       setTokenData(updatedTokens);
       
-      setSuccess(`Successfully purchased ${selectedPackage.token_amount} tokens!`);
+      setSuccess(`Successfully purchased ${selectedPackage.token_amount} credits!`);
       setShowConfirmation(false);
       
       // Clear success message after 5 seconds
@@ -245,7 +245,7 @@ const TokenManagement = () => {
         <div className="mb-8 bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg">
           <div className="flex items-center">
             <FiAlertTriangle className="mr-2" size={20} />
-            <span>You must have an active subscription to purchase tokens. Please subscribe to a plan first.</span>
+            <span>You must have an active subscription to purchase credits. Please subscribe to a plan first.</span>
           </div>
         </div>
       </div>
@@ -256,7 +256,7 @@ const TokenManagement = () => {
     <div className="space-y-8">
       <div className="flex items-center mb-8">
         <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Token Management</h1>
+        <h1 className="text-3xl font-bold text-white">Credit Management</h1>
       </div>
 
       {error && (
@@ -271,7 +271,7 @@ const TokenManagement = () => {
       {success && (
         <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">
           <div className="flex items-center">
-            <FiDollarSign className="mr-2" size={20} />
+            <FiDollarSign className="mr-2" />
             <span>{success}</span>
           </div>
         </div>
@@ -279,35 +279,35 @@ const TokenManagement = () => {
 
       {/* Current Token Balance */}
       <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
-        <h2 className="text-2xl font-bold text-white mb-4">Your Token Balance</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Your Credit Balance</h2>
         
         <div className="flex items-center mb-6">
           <span className="text-4xl font-bold text-primary mr-3">
             {tokenData?.tokens?.balance || 0}
           </span>
-          <span className="text-gray-400">tokens remaining</span>
+          <span className="text-gray-400">credits remaining</span>
         </div>
         
         <p className="text-gray-300 mb-4">
-          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} tokens per billing cycle.
+          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} credits per billing cycle.
         </p>
         
         {tokenData?.tokens?.balance < 100 && (
           <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg mt-4">
             <div className="flex items-center">
               <FiAlertTriangle className="mr-2" size={20} />
-              <span>Your token balance is running low! Consider purchasing more tokens below.</span>
+              <span>Your credit balance is running low! Consider purchasing more credits below.</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Available Token Packages */}
-      <h2 className="text-2xl font-bold text-white mb-6">Purchase Additional Tokens</h2>
+      <h2 className="text-2xl font-bold text-white mb-6">Purchase Additional Credits</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {packages.map((pkg) => (
-          <div key={pkg.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
+          <div key={pkg.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col hover:border-primary/50 transition-all duration-300">
             <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
             <p className="text-gray-400 mb-4">{pkg.description}</p>
             
@@ -318,7 +318,7 @@ const TokenManagement = () => {
             <div className="flex-grow mb-6">
               <div className="flex items-center text-gray-300 mb-2">
                 <FiDollarSign className="mr-2 text-primary" />
-                <span>{pkg.token_amount} tokens</span>
+                <span>{pkg.token_amount} credits</span>
               </div>
             </div>
             
@@ -340,7 +340,7 @@ const TokenManagement = () => {
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
-              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} tokens</span> for ${selectedPackage.price}.
+              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} credits</span> for ${selectedPackage.price}.
             </p>
             
             <Elements stripe={stripePromise}>

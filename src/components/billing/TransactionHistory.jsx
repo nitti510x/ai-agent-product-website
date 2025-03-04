@@ -96,8 +96,9 @@ function TransactionHistory() {
         <h2 className="text-2xl font-bold text-white mb-6">Your Transactions</h2>
         
         {transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <p>No transaction history found.</p>
+          <div className="text-center py-12 bg-dark rounded-lg border border-dark-card/50">
+            <p className="text-gray-400 mb-4">No transaction history found.</p>
+            <p className="text-gray-500 text-sm">Your payment history will appear here once you make a purchase.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

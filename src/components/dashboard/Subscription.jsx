@@ -160,6 +160,10 @@ function Subscription() {
     }
   };
 
+  const handleSelectPlan = (planId) => {
+    subscribeToPlan(planId);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -170,10 +174,7 @@ function Subscription() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center mb-8">
-        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Subscription Management</h1>
-      </div>
+      <h1 className="text-3xl font-bold text-white mb-8">Subscription Plans</h1>
 
       {error && (
         <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
@@ -185,166 +186,192 @@ function Subscription() {
       )}
 
       {/* Current Subscription */}
-      <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
-        <h2 className="text-2xl font-bold text-white mb-4">Current Subscription</h2>
-        
-        {subscription ? (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <span className="text-lg font-semibold text-white">
-                  {plans.find(p => p.id === subscription.plan_id)?.name || subscription.plan_id}
-                </span>
-                <span className="ml-3 px-2 py-1 text-xs rounded-full bg-green-900/20 text-green-500">
-                  {subscription.status}
-                </span>
-              </div>
-              <div className="text-right">
-                <p className="text-gray-400 text-sm">
-                  Current period ends on {new Date(subscription.current_period_end).toLocaleDateString()}
-                </p>
-                {subscription.cancel_at_period_end && (
-                  <p className="text-yellow-500 text-sm mt-1">
-                    Your subscription will be canceled at the end of the billing period
-                  </p>
-                )}
-              </div>
+      {subscription ? (
+        <div className="bg-dark-lighter p-6 rounded-xl mb-8 border-l-4 border-primary">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Current Subscription</h2>
+              <p className="text-gray-400">Manage your current subscription plan</p>
+            </div>
+            <div className="text-right">
+              <span className="px-3 py-1 text-sm rounded-full bg-green-900/20 text-green-500 font-medium">
+                {subscription.status}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-dark-card p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Current Plan</h3>
+              <p className="text-xl font-bold text-white">
+                {plans.find(p => p.id === subscription.plan_id)?.name || subscription.plan_id}
+              </p>
             </div>
             
-            <div className="mb-6">
-              <p className="text-gray-300 mb-2">
-                <span className="font-semibold">Current Plan:</span> {subscription.plan_id}
+            <div className="bg-dark-card p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Billing Period</h3>
+              <p className="text-white">
+                {new Date(subscription.current_period_start).toLocaleDateString()} - {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
-              <p className="text-gray-300 mb-2">
-                <span className="font-semibold">Status:</span> {subscription.status}
-              </p>
-              <p className="text-gray-300 mb-2">
-                <span className="font-semibold">Renewal Date:</span> {new Date(subscription.current_period_end).toLocaleDateString()}
-              </p>
-              {subscription.cancel_at_period_end && (
-                <p className="text-yellow-500 flex items-center mt-4">
-                  <FiAlertTriangle className="mr-2" />
-                  Your subscription will not renew after the current period ends.
-                </p>
-              )}
             </div>
             
-            <div className="flex flex-wrap gap-4">
-              <Link
-                to="/dashboard/tokens"
-                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover rounded-lg transition-colors flex items-center"
+            <div className="bg-dark-card p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-gray-400 mb-2">Next Billing Date</h3>
+              <p className="text-white">
+                {new Date(subscription.current_period_end).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+          
+          {subscription.cancel_at_period_end && (
+            <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg mb-6">
+              <div className="flex items-center">
+                <FiAlertTriangle className="mr-2" size={20} />
+                <span>Your subscription will not renew after the current period ends.</span>
+              </div>
+            </div>
+          )}
+          
+          <div className="flex flex-wrap gap-4">
+            <Link
+              to="/dashboard/my-account/tokens"
+              className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary hover:text-primary-hover rounded-lg transition-colors flex items-center"
+            >
+              <FiDollarSign className="mr-2" />
+              Manage Credits
+            </Link>
+            
+            {!subscription.cancel_at_period_end ? (
+              <button
+                onClick={cancelSubscription}
+                disabled={loading}
+                className="px-4 py-2 bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 rounded-lg transition-colors"
               >
-                <FiDollarSign className="mr-2" />
-                Manage Tokens
-              </Link>
-              
-              {!subscription.cancel_at_period_end ? (
-                <button
-                  onClick={cancelSubscription}
-                  disabled={loading}
-                  className="px-4 py-2 bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 rounded-lg transition-colors"
-                >
-                  Cancel Subscription
-                </button>
-              ) : (
-                <button
-                  onClick={reactivateSubscription}
-                  disabled={loading}
-                  className="px-4 py-2 bg-green-900/20 hover:bg-green-900/30 text-green-400 hover:text-green-300 rounded-lg transition-colors"
-                >
-                  Reactivate Subscription
-                </button>
-              )}
+                Cancel Subscription
+              </button>
+            ) : (
+              <button
+                onClick={reactivateSubscription}
+                disabled={loading}
+                className="px-4 py-2 bg-green-900/20 hover:bg-green-900/30 text-green-400 hover:text-green-300 rounded-lg transition-colors"
+              >
+                Reactivate Subscription
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-dark-lighter p-6 rounded-xl mb-8 border-l-4 border-yellow-500">
+          <div className="flex items-start mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">No Active Subscription</h2>
+              <p className="text-gray-400">You are currently on the Free Trial plan with limited features</p>
             </div>
           </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <span className="text-lg font-semibold text-white">
-                  Free Trial Plan
-                </span>
-                <span className="ml-3 px-2 py-1 text-xs rounded-full bg-blue-900/20 text-blue-500">
-                  active
-                </span>
-              </div>
-              <div className="text-right">
-                <p className="text-gray-400 text-sm">
-                  14-day trial period
-                </p>
-              </div>
-            </div>
-            
-            <div className="mb-6">
-              <p className="text-gray-300 mb-2">
-                <span className="font-semibold">Current Plan:</span> Free Trial
-              </p>
-              <p className="text-gray-300 mb-2">
-                <span className="font-semibold">Features:</span>
-              </p>
-              <ul className="ml-6 space-y-1">
-                <li className="text-gray-400 flex items-center">
-                  <FiCheck className="mr-2 text-primary" />
-                  50 credits
-                </li>
-                <li className="text-gray-400 flex items-center">
-                  <FiCheck className="mr-2 text-primary" />
-                  1 AI Agent
-                </li>
-                <li className="text-gray-400 flex items-center">
-                  <FiCheck className="mr-2 text-primary" />
-                  Slack Access
-                </li>
-              </ul>
-            </div>
-            
-            <p className="text-gray-400">
-              Upgrade to a paid plan below to get more features and credits.
+          
+          <div className="bg-dark-card p-4 rounded-lg mb-6">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Free Trial</h3>
+            <p className="text-white mb-4">
+              Your free trial includes basic access to platform features. Upgrade to a paid plan to unlock more capabilities.
             </p>
+            <div className="flex items-center">
+              <FiAlertTriangle className="text-yellow-500 mr-2" />
+              <span className="text-yellow-500">Some features are limited on the free trial</span>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Available Plans */}
-      <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
+          
+          <p className="text-gray-300 mb-4">Select a plan below to upgrade your account and access all features.</p>
+        </div>
+      )}
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Available Plans */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
+        <p className="text-gray-400 mb-6">Choose the plan that works best for you and your team</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => (
-          <div key={plan.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
-            <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-            <p className="text-gray-400 mb-4">{plan.description}</p>
+          <div 
+            key={plan.id} 
+            className={`bg-dark-lighter p-6 rounded-xl flex flex-col transition-all duration-300 ${
+              subscription && subscription.plan_id === plan.id 
+                ? 'border-2 border-primary relative' 
+                : 'hover:border-gray-700 border border-transparent'
+            }`}
+          >
+            {subscription && subscription.plan_id === plan.id && (
+              <div className="absolute -top-3 -right-3 bg-primary text-dark text-xs font-bold px-3 py-1 rounded-full">
+                Current Plan
+              </div>
+            )}
             
             <div className="mb-4">
-              <span className="text-3xl font-bold text-white">${typeof plan.price === 'number' ? plan.price.toFixed(2) : plan.price}</span>
-              <span className="text-gray-400">/{plan.interval}</span>
+              <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
+              <p className="text-gray-400">{plan.description}</p>
+            </div>
+            
+            <div className="mb-6">
+              {plan.price !== null ? (
+                <>
+                  <span className="text-3xl font-bold text-white">${plan.price}</span>
+                  <span className="text-gray-400 ml-1">/month</span>
+                </>
+              ) : (
+                <span className="text-xl font-bold text-white">Custom Pricing</span>
+              )}
             </div>
             
             <div className="flex-grow mb-6">
-              <h4 className="text-sm font-semibold text-gray-300 mb-2">Features:</h4>
+              <h4 className="text-sm font-medium text-gray-400 mb-2">Features:</h4>
               <ul className="space-y-2">
-                {plan.features && Object.entries(plan.features.feature_limits || {}).map(([key, value]) => (
-                  <li key={key} className="flex items-center text-gray-400">
-                    <FiCheck className="mr-2 text-primary" />
-                    <span className="capitalize">{key.replace('_', ' ')}: {value}</span>
+                {plan.features && plan.features.feature_limits ? 
+                  Object.entries(plan.features.feature_limits).map(([key, value], index) => (
+                    <li key={index} className="flex items-start">
+                      <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-300">
+                        <span className="capitalize">{key.replace(/_/g, ' ') === 'tokens' ? 'credits' : key.replace(/_/g, ' ')}:</span> {value}
+                      </span>
+                    </li>
+                  ))
+                : plan.features && Array.isArray(plan.features) ? plan.features.map((feature, index) => (
+                  <li key={index} className="flex items-start">
+                    <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                    <span className="text-gray-300">{feature}</span>
                   </li>
-                ))}
+                )) : plan.features && typeof plan.features === 'object' ? (
+                  Object.entries(plan.features).map(([key, value], index) => (
+                    <li key={index} className="flex items-start">
+                      <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                      <span className="text-gray-300">
+                        {key}: {typeof value === 'object' ? JSON.stringify(value) : value}
+                      </span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-400">No features listed</li>
+                )}
               </ul>
             </div>
             
-            <button
-              onClick={() => subscribeToPlan(plan.id)}
-              disabled={loading || (subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end)}
-              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center ${
-                subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end
-                  ? 'bg-gray-700 text-gray-300 cursor-not-allowed'
-                  : 'bg-primary hover:bg-primary-hover text-dark hover:shadow-glow transition-all duration-300'
-              }`}
-            >
-              <FiCreditCard className="mr-2" />
-              {subscription && subscription.plan_id === plan.id && !subscription.cancel_at_period_end
-                ? 'Current Plan'
-                : 'Subscribe'}
-            </button>
+            {subscription && subscription.plan_id === plan.id ? (
+              <button
+                disabled
+                className="w-full py-2 px-4 bg-primary/20 text-primary font-medium rounded-lg flex items-center justify-center"
+              >
+                <FiCheck className="mr-2" />
+                Current Plan
+              </button>
+            ) : (
+              <button
+                onClick={() => handleSelectPlan(plan.id)}
+                disabled={loading}
+                className="w-full py-2 px-4 bg-primary hover:bg-primary-hover text-dark font-medium rounded-lg transition-colors flex items-center justify-center"
+              >
+                <FiCreditCard className="mr-2" />
+                {loading && selectedPlan === plan.id ? 'Processing...' : 'Select Plan'}
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -355,7 +382,7 @@ function Subscription() {
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Confirm Subscription</h3>
             <p className="text-gray-400 mb-6">
-              You are about to subscribe to the <span className="text-white font-semibold">{selectedPlan.name}</span> plan for ${typeof selectedPlan.price === 'number' ? selectedPlan.price.toFixed(2) : selectedPlan.price}/{selectedPlan.interval}.
+              You are about to subscribe to the <span className="text-white font-semibold">{selectedPlan.name}</span> plan for ${selectedPlan.price}/month.
             </p>
             
             <div className="flex justify-end space-x-4">
