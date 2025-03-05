@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Link as ScrollLink } from 'react-scroll';
+import Logo from '../components/Logo';
+import { useSubscription } from '../contexts/SubscriptionContext';
+
 import { 
   FiArrowRight, 
   FiCheck, 
@@ -19,7 +22,8 @@ import {
   FiPhoneCall,
   FiCommand,
   FiSettings,
-  FiRefreshCw
+  FiRefreshCw,
+  FiX
 } from 'react-icons/fi';
 import { 
   RiRobot2Line,
@@ -44,13 +48,14 @@ import {
   RiPaletteLine,
   RiWordpressFill
 } from 'react-icons/ri';
-import Logo from '../components/Logo';
-import { useSubscription } from '../contexts/SubscriptionContext';
 
 function LandingPage() {
   const navItems = ['Features', 'Pricing', 'Integration', 'Support'];
   const navigate = useNavigate();
   const { selectPlan, selectFreeTrial } = useSubscription();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [showFreeTrialPopup, setShowFreeTrialPopup] = React.useState(false);
+  const pricingSectionRef = React.useRef(null);
 
   // Function to handle plan selection and redirect to checkout
   const handlePlanSelection = (plan) => {
@@ -154,51 +159,60 @@ function LandingPage() {
             </div>
             <div className="relative">
               <div className="relative">
-                {/* Main Slack Screenshot */}
-                <div className="relative rounded-xl overflow-hidden shadow-xl">
-                  <img 
-                    src="https://cdn.sanity.io/images/599r6htc/localized/b0e7b3f1b97d54f7cff61084c29ab2e64a490c05-1600x1003.png?w=800&q=75&fit=max&auto=format"
-                    alt="Slack Interface"
-                    className="w-full rounded-xl"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent"></div>
+                {/* Main Slack Screenshot Placeholder */}
+                <div className="relative rounded-xl overflow-hidden shadow-xl bg-dark-lighter border border-gray-700 aspect-video flex flex-col items-center justify-center p-4">
+                  <div className="text-gray-400 text-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto mb-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-lg font-medium">Slack Interface Screenshot</p>
+                    <p className="text-sm">Main dashboard view</p>
+                  </div>
                 </div>
 
-                {/* Floating Cards */}
-                <div className="absolute -right-4 -bottom-4 w-64 bg-dark-lighter p-4 rounded-lg border border-dark-card shadow-xl transform hover:scale-105 transition-all duration-300">
+                {/* Floating Cards for AI Interactions */}
+                <div className="absolute -right-4 -bottom-4 w-64 bg-dark-lighter p-4 rounded-lg border border-gray-700 shadow-xl">
                   <div className="flex items-center mb-3">
                     <RiRobot2Line className="w-6 h-6 text-primary mr-2" />
                     <span className="text-sm font-semibold">AI Assistant</span>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-muted">Engagement</span>
-                      <span className="text-primary font-semibold">150%</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-muted">Time Saved</span>
-                      <span className="text-primary font-semibold">10h</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-text-muted">Content</span>
-                      <span className="text-primary font-semibold">3x</span>
+                  <div className="bg-dark-card p-3 rounded-lg border border-gray-700 mb-2">
+                    <div className="h-20 flex items-center justify-center">
+                      <p className="text-gray-400 text-sm text-center">AI response placeholder</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-48 bg-dark-lighter p-4 rounded-lg border border-dark-card shadow-xl transform hover:scale-105 transition-all duration-300">
-                  <div className="flex items-center mb-3">
-                    <RiSlackFill className="w-6 h-6 text-primary mr-2" />
-                    <span className="text-sm font-semibold">Commands</span>
+                {/* Additional Floating Card - Command Example */}
+                <div className="absolute -left-4 top-1/4 w-56 bg-dark-lighter p-3 rounded-lg border border-gray-700 shadow-xl">
+                  <div className="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span className="text-sm font-semibold">Command</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="bg-dark rounded-md px-3 py-1 text-text-muted">/post create</div>
-                    <div className="bg-dark rounded-md px-3 py-1 text-text-muted">/schedule view</div>
-                    <div className="bg-dark rounded-md px-3 py-1 text-text-muted">/analytics</div>
+                  <div className="bg-dark-card p-2 rounded-lg border border-gray-700">
+                    <div className="h-12 flex items-center justify-center">
+                      <p className="text-gray-400 text-xs font-mono">/post create</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Analytics Card */}
+                <div className="absolute -left-8 -bottom-8 w-48 bg-dark-lighter p-3 rounded-lg border border-gray-700 shadow-xl">
+                  <div className="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span className="text-sm font-semibold">Analytics</span>
+                  </div>
+                  <div className="bg-dark-card p-2 rounded-lg border border-gray-700">
+                    <div className="h-16 flex items-center justify-center">
+                      <p className="text-gray-400 text-xs text-center">Performance metrics placeholder</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-secondary/30 blur-3xl -z-10"></div>
             </div>
           </div>
         </div>
@@ -311,7 +325,7 @@ function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20">
+      <section id="pricing" className="py-20" ref={pricingSectionRef}>
         <div className="container mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-4 bg-gradient-text bg-clip-text text-transparent">
             Simple, Transparent Pricing
@@ -320,52 +334,6 @@ function LandingPage() {
             <p className="text-text-muted text-lg max-w-2xl mx-auto">
               Choose the perfect plan for your team. Select the option that best fits your needs and start transforming your social media strategy today.
             </p>
-          </div>
-
-          {/* Free Trial Section */}
-          <div className="mb-12 max-w-3xl mx-auto p-8 rounded-xl border-2 border-primary bg-dark shadow-glow-strong relative overflow-visible mt-8">
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-dark px-6 py-1 rounded-full text-sm font-bold z-20">
-              Limited Time Offer
-            </div>
-            <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
-            <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-primary/10 rounded-full blur-xl"></div>
-            <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-primary/30 to-transparent rounded-br-3xl z-0"></div>
-            <div className="absolute top-4 left-4 text-xl z-10">✨</div>
-            <div className="text-center mb-8 relative z-10">
-              <h3 className="text-3xl font-bold mb-2 bg-gradient-text bg-clip-text text-transparent">Unleash Your AI Potential</h3>
-              <div className="text-4xl font-bold mb-3 text-white flex items-center justify-center">
-                <span className="mr-3">14-Day Free Trial</span>
-                <span className="bg-primary text-dark text-sm px-3 py-1 rounded-full">No Credit Card</span>
-              </div>
-              <p className="text-text-muted text-lg">
-                <span className="inline-block bg-dark-lighter px-3 py-1 rounded-lg mb-2">✨ Perfect for teams ready to revolutionize their social media strategy</span>
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-4 mb-8 relative z-10">
-              {[
-                { icon: "✨", text: "50 credits (Enough for multiple posts)" },
-                { icon: "🤖", text: "1 AI Agent (Link 1 social account)" },
-                { icon: "💬", text: "Slack Access (For your workspace)" },
-                { icon: "📝", text: "Content Generation AI Agents" },
-                { icon: "📱", text: "Social Media AI Agents" },
-                { icon: "💳", text: "No credit card required" }
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center text-gray-300 bg-dark-lighter p-3 rounded-lg hover:bg-dark-card transition-all duration-200">
-                  <div className="bg-primary/20 p-1.5 rounded-full mr-3 min-w-[36px] flex items-center justify-center">
-                    <span className="text-lg">{feature.icon}</span>
-                  </div>
-                  <span>{feature.text}</span>
-                </div>
-              ))}
-            </div>
-            
-            <button 
-              onClick={handleFreeTrialSelection}
-              className="w-full bg-primary hover:bg-primary-hover text-dark hover:shadow-glow-strong py-3 px-6 rounded-lg transition-all duration-300">
-              <b>Start Your Free Trial</b>
-              <span className="ml-2 bg-dark-lighter text-white text-xs px-2 py-1 rounded-full">Takes 30 Seconds</span>
-            </button>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -417,7 +385,7 @@ function LandingPage() {
 
             {/* Pro Plan */}
             <div className="p-8 rounded-xl border border-primary bg-dark shadow-glow relative overflow-visible">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-dark px-4 py-1 rounded-full text-sm font-bold z-20 shadow-glow-sm">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-dark px-4 py-1 rounded-full shadow-glow-sm font-bold">
                 Most Popular
               </div>
               <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-secondary/30 to-transparent rounded-br-3xl z-0"></div>
@@ -555,6 +523,96 @@ function LandingPage() {
               </button>
             </div>
           </div>
+
+          {/* Free Trial Hint */}
+          <div className="mt-10 text-center">
+            <p className="text-text-muted text-sm mb-2">
+              Not ready to commit? <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowFreeTrialPopup(true);
+                }}
+                className="text-primary hover:text-secondary underline font-medium focus:outline-none transition-colors"
+              >
+                Try our 14-day free trial
+              </button> with no credit card required.
+            </p>
+          </div>
+
+          {/* Free Trial Section */}
+          {showFreeTrialPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark/80 backdrop-blur-sm" style={{animation: 'fadeIn 0.3s ease-out forwards'}}>
+              <div className="w-full max-w-3xl" style={{animation: 'scaleIn 0.4s ease-out forwards'}}>
+                <div className="relative p-8 rounded-xl border-2 border-primary bg-dark/95 backdrop-blur-md shadow-glow-strong overflow-hidden" 
+                     style={{boxShadow: '0 0 20px 2px rgba(0, 255, 163, 0.3)'}}>
+                  {/* Close button */}
+                  <button 
+                    onClick={() => setShowFreeTrialPopup(false)} 
+                    className="absolute top-3 right-3 text-gray-400 hover:text-white p-2 rounded-full hover:bg-dark-lighter transition-colors z-10"
+                    aria-label="Close popup"
+                  >
+                    <FiX size={24} />
+                  </button>
+                  
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    {/* Left side - content */}
+                    <div className="flex-1">
+                      <div className="mb-4">
+                        <span className="bg-primary text-dark text-sm px-4 py-1 rounded-full shadow-glow-sm font-bold"
+                              style={{backgroundColor: '#00FFA3', color: '#111'}}>
+                          Limited Time Offer
+                        </span>
+                      </div>
+                      <h3 className="text-3xl font-bold mb-3 bg-gradient-text bg-clip-text text-transparent">
+                        Not Ready to Commit?
+                      </h3>
+                      <p className="text-xl font-bold text-white mb-3">
+                        Try Our 14-Day Free Trial
+                      </p>
+                      <p className="text-text-muted mb-6">
+                        No credit card required. Full access to essential features.
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        {[
+                          "50 AI Credits", 
+                          "1 AI Agent", 
+                          "Slack Integration", 
+                          "Content Generation"
+                        ].map((feature, index) => (
+                          <div key={index} className="flex items-center text-gray-300">
+                            <div className="w-6 h-6 mr-2 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center">
+                              <FiCheck className="text-green-500" />
+                            </div>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Right side - CTA */}
+                    <div className="flex-shrink-0 w-full md:w-auto">
+                      <button 
+                        onClick={handleFreeTrialSelection}
+                        className="w-full md:w-auto px-8 py-4 text-dark font-bold rounded-lg shadow-glow-sm transition-all duration-300 flex items-center justify-center"
+                        style={{backgroundColor: '#00FFA3', color: '#111'}}
+                      >
+                        <span className="mr-2">Start Free Trial</span>
+                        <span className="bg-dark text-white text-xs px-2 py-0.5 rounded-full">30 Sec</span>
+                        <FiArrowRight className="ml-2" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Background elements */}
+                  <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-secondary/20 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-tr from-primary/20 via-transparent to-transparent"></div>
+                  <div className="absolute -bottom-4 -right-4 text-2xl animate-pulse">✨</div>
+                  <div className="absolute top-1/2 left-1/4 text-2xl animate-pulse delay-300">✨</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -729,7 +787,7 @@ function LandingPage() {
             ].map((item, index) => (
               <div 
                 key={index}
-                className="p-8 rounded-xl border border-dark-card hover:border-primary bg-dark-lighter transition-all duration-300 text-center group"
+                className="p-8 rounded-xl border-2 border-primary/50 bg-dark/95 backdrop-blur-md shadow-glow-strong relative overflow-visible text-center group"
               >
                 <div className="text-primary mb-6 flex justify-center">
                   <div className="bg-gradient-primary bg-clip-text text-transparent transform group-hover:scale-110 transition-transform duration-300">
@@ -830,6 +888,19 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Free Trial Button */}
+      {!showFreeTrialPopup && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <button
+            onClick={() => setShowFreeTrialPopup(true)}
+            className="bg-gradient-to-r from-primary to-secondary text-dark font-bold px-4 py-3 rounded-full shadow-glow-strong hover:shadow-glow-stronger transition-all duration-300 transform hover:-translate-y-1 flex items-center"
+          >
+            <span className="mr-2">Try Free</span>
+            <span className="bg-dark text-white text-xs px-2 py-0.5 rounded-full">14 Days</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
