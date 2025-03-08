@@ -41,7 +41,7 @@ function BillingLayout({ children }) {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto">
+    <div className="max-w-[1440px] mx-auto px-8">
       {!isCheckoutPage && (
         <div className="flex items-center mb-8">
           <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>

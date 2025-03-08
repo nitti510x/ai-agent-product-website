@@ -13,10 +13,8 @@ export default function AuthUI() {
   
   // Determine redirect URL based on plan selection
   const getRedirectUrl = () => {
-    if (selectedPlan || isFreeTrialSelected) {
-      return `${window.location.origin}/dashboard/billing`;
-    }
-    return `${window.location.origin}/dashboard`;
+    // Use auth/callback route for OAuth redirects
+    return `${window.location.origin}/auth/callback`;
   };
   
   // Track the current auth view

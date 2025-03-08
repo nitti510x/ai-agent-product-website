@@ -35,22 +35,13 @@ function OverallUsage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Header with gradient underline */}
-      <div className="relative mb-8">
-        <div className="flex items-center">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center text-gray-400 hover:text-emerald-400 transition-colors mr-4"
-          >
-            <FiArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Overall Usage Dashboard</h1>
-            <p className="text-gray-400 text-sm mt-1">Analytics and performance metrics for all your AI assistants</p>
-          </div>
+    <div>
+      {/* Page title */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-white">Overall Usage Dashboard</h2>
+          <p className="text-gray-400 text-sm mt-1">Analytics and performance metrics for all your AI assistants</p>
         </div>
-        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-400/20 to-blue-500/20 mt-4"></div>
       </div>
       
       {/* Key Metrics */}

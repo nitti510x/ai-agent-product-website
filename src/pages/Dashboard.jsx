@@ -6,11 +6,14 @@ import AgentSettings from '../components/dashboard/AgentSettings';
 import AgentActivity from '../components/dashboard/AgentActivity';
 import AgentUsage from '../components/dashboard/AgentUsage';
 import OverallUsage from '../components/dashboard/OverallUsage';
+import RecentActivity from '../components/dashboard/RecentActivity';
+import DashboardLayout from '../components/dashboard/DashboardLayout';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import TokenManagement from '../components/dashboard/TokenManagement';
 import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import SetupGuide from '../components/dashboard/SetupGuide';
+import UsersManagement from '../components/dashboard/UsersManagement';
 import BillingLayout from '../components/billing/BillingLayout';
 import TransactionHistory from '../components/billing/TransactionHistory';
 import PaymentMethods from '../components/billing/PaymentMethods';
@@ -66,7 +69,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-dark">
       <nav className="bg-dark-lighter border-b border-dark-card">
-        <div className="max-w-[1440px] mx-auto px-6 py-4">
+        <div className="max-w-[1440px] mx-auto px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="text-2xl font-bold text-gray-100">
               <Logo className="h-8" />
@@ -103,17 +106,19 @@ function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-[1440px] mx-auto px-6 py-8">
+      <div className="py-8">
         <Routes>
-          <Route index element={<AIAgentsList />} />
-          <Route path="settings/:agentId" element={<AgentSettings />} />
-          <Route path="activity/:agentId" element={<AgentActivity />} />
-          <Route path="usage/:agentId" element={<AgentUsage />} />
-          <Route path="usage" element={<OverallUsage />} />
+          <Route index element={<DashboardLayout><AIAgentsList /></DashboardLayout>} />
+          <Route path="settings/:agentId" element={<DashboardLayout><AgentSettings /></DashboardLayout>} />
+          <Route path="activity/:agentId" element={<DashboardLayout><AgentActivity /></DashboardLayout>} />
+          <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
+          <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
+          <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
           <Route path="profile" element={<Profile />} />
           <Route path="subscription" element={<BillingLayout><Subscription /></BillingLayout>} />
-          <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
-          <Route path="setup/:agentId" element={<SetupGuide />} />
+          <Route path="tokens" element={<DashboardLayout><TokenManagement /></DashboardLayout>} />
+          <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
+          <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
           
           {/* Account Section Routes - All account pages use this layout */}
           <Route path="account" element={<BillingLayout><Subscription /></BillingLayout>} />
