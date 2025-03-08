@@ -61,8 +61,19 @@ function Subscription() {
   const getPlans = async () => {
     try {
       // Use the PostgreSQL service to get available plans
+      console.log('Fetching plans from API...');
       const availablePlans = await postgresService.getPlans();
+      console.log('Plans received:', availablePlans);
+      
+      if (!availablePlans || !Array.isArray(availablePlans)) {
+        console.error('Invalid plans data received:', availablePlans);
+        setError('Failed to load subscription plans: Invalid data format');
+        setPlans([]);
+        return;
+      }
+      
       setPlans(availablePlans);
+      setError(null); // Clear any previous errors
     } catch (error) {
       console.error('Error fetching plans:', error);
       setError(`Failed to load subscription plans: ${error.message}`);
@@ -184,14 +195,25 @@ function Subscription() {
   };
 
   const getFilteredPlans = () => {
+    if (!plans || !Array.isArray(plans) || plans.length === 0) {
+      return [];
+    }
+    
     // Only show paid plans (Starter, Pro, Business)
     // Exclude free trial and enterprise (enterprise is shown separately below)
-    return plans.filter(plan => 
-      plan.name.toLowerCase() !== 'free trial' && 
-      plan.name.toLowerCase() !== 'enterprise' &&
-      plan.price !== null && 
-      plan.price > 0
-    );
+    return plans.filter(plan => {
+      // Ensure plan has all required properties
+      if (!plan || typeof plan !== 'object' || !plan.name) {
+        console.warn('Invalid plan object found:', plan);
+        return false;
+      }
+      
+      const planName = String(plan.name).toLowerCase();
+      return planName !== 'free trial' && 
+             planName !== 'enterprise' &&
+             plan.price !== null && 
+             plan.price > 0;
+    });
   };
 
   if (loading) {
@@ -354,7 +376,19 @@ function Subscription() {
               <h4 className="text-sm font-medium text-gray-400 mb-2">Features:</h4>
               <ul className="space-y-2">
                 {plan.features ? (
-                  typeof plan.features === 'object' ? (
+                  Array.isArray(plan.features) ? (
+                    // Handle features as an array of objects with icon and text properties (new API format)
+                    plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
+                        <span className="text-gray-300">
+                          {typeof feature === 'object' && feature.text ? 
+                            feature.text : 
+                            (typeof feature === 'string' ? feature : JSON.stringify(feature))}
+                        </span>
+                      </li>
+                    ))
+                  ) : typeof plan.features === 'object' ? (
                     // Handle feature_limits object if it exists
                     plan.features.feature_limits ? (
                       Object.entries(plan.features.feature_limits).map(([key, value], index) => (
@@ -362,16 +396,6 @@ function Subscription() {
                           <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
                           <span className="text-gray-300">
                             <span className="capitalize">{key.replace(/_/g, ' ') === 'tokens' ? 'credits' : key.replace(/_/g, ' ')}:</span> {value}
-                          </span>
-                        </li>
-                      ))
-                    ) : Array.isArray(plan.features) ? (
-                      // Handle features as an array of objects with icon and text properties
-                      plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
-                          <span className="text-gray-300">
-                            {feature.text || (typeof feature === 'string' ? feature : JSON.stringify(feature))}
                           </span>
                         </li>
                       ))
@@ -387,14 +411,6 @@ function Subscription() {
                         </li>
                       ))
                     )
-                  ) : Array.isArray(plan.features) ? (
-                    // Handle features as an array of strings
-                    plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <FiCheck className="text-primary mt-1 mr-2 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </li>
-                    ))
                   ) : (
                     // Handle features as a string
                     <li className="flex items-start">

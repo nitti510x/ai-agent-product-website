@@ -11,7 +11,8 @@ export const postgresService = {
    */
   async getPlans() {
     try {
-      const response = await fetch(`${API_URL}/plans`);
+      // Using the new API endpoint at port 8000 with active_only parameter
+      const response = await fetch(`http://localhost:8000/api/plans/?active_only=true`);
       if (!response.ok) {
         throw new Error(`Failed to fetch plans: ${response.status} ${response.statusText}`);
       }
