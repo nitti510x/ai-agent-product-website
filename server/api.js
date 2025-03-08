@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import pg from 'pg';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
@@ -38,83 +37,9 @@ app.use(express.json());
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Create a PostgreSQL connection pool
-const { Pool } = pg;
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// PostgreSQL connection has been removed - now using agent.ops.geniusos.co endpoint
 
-// Add error handler for the pool
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle PostgreSQL client', err);
-});
-
-// API routes
-app.get('/api/plans', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM plans WHERE active = true ORDER BY price ASC');
-    
-    // Process the features column which is stored as JSON
-    const plans = result.rows.map(plan => {
-      // Handle different types of features storage
-      let features = plan.features;
-      
-      // If features is a string, try to parse it as JSON
-      if (typeof features === 'string') {
-        try {
-          features = JSON.parse(features);
-        } catch (e) {
-          console.error(`Error parsing features JSON for plan ${plan.id}:`, e);
-          // Keep as is if parsing fails
-        }
-      }
-      
-      return {
-        ...plan,
-        features
-      };
-    });
-    
-    res.json(plans);
-  } catch (error) {
-    console.error('Error fetching plans:', error);
-    res.status(500).json({ error: 'Failed to fetch plans' });
-  }
-});
-
-app.get('/api/plans/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT * FROM plans WHERE id = $1', [id]);
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Plan not found' });
-    }
-    
-    const plan = result.rows[0];
-    
-    // Process the features column which is stored as JSON
-    let features = plan.features;
-    
-    // If features is a string, try to parse it as JSON
-    if (typeof features === 'string') {
-      try {
-        features = JSON.parse(features);
-      } catch (e) {
-        console.error(`Error parsing features JSON for plan ${plan.id}:`, e);
-        // Keep as is if parsing fails
-      }
-    }
-    
-    res.json({
-      ...plan,
-      features
-    });
-  } catch (error) {
-    console.error('Error fetching plan by ID:', error);
-    res.status(500).json({ error: 'Failed to fetch plan' });
-  }
-});
+// API routes for plans have been removed - now using agent.ops.geniusos.co endpoint
 
 // In-memory storage for payment methods during development
 const paymentMethodsStore = {

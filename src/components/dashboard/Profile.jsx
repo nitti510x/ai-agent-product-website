@@ -136,8 +136,6 @@ function Profile() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-8">Profile Settings</h1>
-      
       <div className="grid md:grid-cols-2 gap-8">
         {/* Basic Information */}
         <div className="bg-dark-lighter p-6 rounded-xl">

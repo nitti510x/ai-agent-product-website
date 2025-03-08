@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '../config/supabase';
 import AIAgentsList from '../components/dashboard/AIAgentsList';
 import AgentSettings from '../components/dashboard/AgentSettings';
@@ -66,7 +66,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-dark">
       <nav className="bg-dark-lighter border-b border-dark-card">
-        <div className="container mx-auto px-6 py-4">
+        <div className="max-w-[1440px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="text-2xl font-bold text-gray-100">
               <Logo className="h-8" />
@@ -82,7 +82,7 @@ function Dashboard() {
                 <TokenBalanceWidget compact={true} />
               </div>
               <Link 
-                to="/dashboard/my-account/profile" 
+                to="/dashboard/account/profile" 
                 className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
               >
                 <FiUser className="w-6 h-6 mr-1" />
@@ -103,7 +103,7 @@ function Dashboard() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="max-w-[1440px] mx-auto px-6 py-8">
         <Routes>
           <Route index element={<AIAgentsList />} />
           <Route path="settings/:agentId" element={<AgentSettings />} />
@@ -111,19 +111,20 @@ function Dashboard() {
           <Route path="usage/:agentId" element={<AgentUsage />} />
           <Route path="usage" element={<OverallUsage />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="subscription" element={<Subscription />} />
+          <Route path="subscription" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
           <Route path="setup/:agentId" element={<SetupGuide />} />
           
-          {/* Billing Section Routes */}
-          <Route path="billing" element={<BillingLayout><SubscriptionCheckout /></BillingLayout>} />
-          <Route path="billing/profile" element={<BillingLayout><Profile /></BillingLayout>} />
-          <Route path="billing/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
-          <Route path="billing/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
-          <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+          {/* Account Section Routes - All account pages use this layout */}
+          <Route path="account" element={<BillingLayout><Subscription /></BillingLayout>} />
+          <Route path="account/profile" element={<BillingLayout><Profile /></BillingLayout>} />
+          <Route path="account/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
+          <Route path="account/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
+          <Route path="account/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
           
-          {/* My Account Routes */}
-          <Route path="my-account/*" element={<MyAccount />} />
+          {/* Redirects for backward compatibility */}
+          <Route path="my-account/*" element={<Navigate to="/dashboard/account/profile" replace />} />
+          <Route path="billing/*" element={<Navigate to="/dashboard/account/profile" replace />} />
         </Routes>
       </div>
     </div>

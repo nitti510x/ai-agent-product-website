@@ -13,38 +13,39 @@ function BillingLayout({ children }) {
   
   const menuItems = [
     {
-      path: '/dashboard/billing/profile',
+      path: '/dashboard/account/profile',
       label: 'Profile',
       icon: <FiUser className="mr-2" />
     },
     {
-      path: '/dashboard/billing/plans',
+      path: '/dashboard/account/plans',
       label: 'Subscription Plans',
       icon: <FiList className="mr-2" />
     },
     {
-      path: '/dashboard/billing/payment-methods',
+      path: '/dashboard/account/payment-methods',
       label: 'Payment Methods',
       icon: <FiCreditCard className="mr-2" />
     },
     {
-      path: '/dashboard/billing/transactions',
+      path: '/dashboard/account/transactions',
       label: 'Transaction History',
       icon: <FiFileText className="mr-2" />
     },
     {
       path: '/dashboard/tokens',
       label: 'Credit Management',
-      icon: <IoDiamond className="mr-2" />
+      icon: <IoDiamond className="mr-2" />,
+      isCredit: true
     }
   ];
 
   return (
-    <div>
+    <div className="max-w-[1440px] mx-auto">
       {!isCheckoutPage && (
         <div className="flex items-center mb-8">
           <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-          <h1 className="text-3xl font-bold text-white">Billing & Payments</h1>
+          <h1 className="text-3xl font-bold text-white">My Account</h1>
         </div>
       )}
       
@@ -52,7 +53,7 @@ function BillingLayout({ children }) {
         {!isCheckoutPage && (
           <div className="w-full md:w-64 shrink-0">
             <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
-              <h2 className="text-lg font-bold text-white mb-4 px-2">Billing Menu</h2>
+              <h2 className="text-lg font-bold text-white mb-4 px-2">Account Menu</h2>
               <nav>
                 <ul className="space-y-1">
                   {menuItems.map((item) => {
@@ -67,7 +68,7 @@ function BillingLayout({ children }) {
                               : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
                           }`}
                         >
-                          {item.path === '/dashboard/tokens' ? (
+                          {item.isCredit ? (
                             <IoDiamond className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
                           ) : (
                             item.icon

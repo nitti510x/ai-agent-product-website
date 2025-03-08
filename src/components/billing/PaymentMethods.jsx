@@ -498,10 +498,6 @@ function PaymentMethods() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center mb-8">
-        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Payment Methods</h1>
-      </div>
       
       {successMessage && (
         <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">
@@ -550,40 +546,50 @@ function PaymentMethods() {
               />
             </Elements>
           ) : (
-            <div className="mb-8">
-              <button 
-                className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
-                onClick={() => setShowAddForm(true)}
-              >
-                <FiPlus className="mr-2" />
-                Add Payment Method
-              </button>
-            </div>
-          )}
-          
-          {paymentMethods.length > 0 ? (
-            <div className="space-y-4">
-              {paymentMethods
-                .sort((a, b) => (b.is_default - a.is_default))
-                .map(method => (
-                  <PaymentMethodCard 
-                    key={method.id}
-                    paymentMethod={method}
-                    isDefault={method.id === defaultPaymentMethodId}
-                    onSetDefault={() => handleSetDefault(method.id)}
-                    onDelete={() => handleDeletePaymentMethod(method.id)}
-                  />
-                ))
-              }
-            </div>
-          ) : (
-            <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-8 text-center">
-              <FiCreditCard className="mx-auto text-4xl text-gray-500 mb-3" />
-              <p className="text-gray-300 mb-2">You don't have any payment methods yet.</p>
-              <p className="text-gray-500 text-sm">
-                Add a payment method to subscribe to a plan or purchase credits.
-              </p>
-            </div>
+            <>
+              {paymentMethods.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-gray-300">Your saved payment methods</p>
+                    <button 
+                      className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
+                      onClick={() => setShowAddForm(true)}
+                    >
+                      <FiPlus className="mr-2" />
+                      Add Payment Method
+                    </button>
+                  </div>
+                  
+                  {paymentMethods
+                    .sort((a, b) => (b.is_default - a.is_default))
+                    .map(method => (
+                      <PaymentMethodCard 
+                        key={method.id}
+                        paymentMethod={method}
+                        isDefault={method.id === defaultPaymentMethodId}
+                        onSetDefault={() => handleSetDefault(method.id)}
+                        onDelete={() => handleDeletePaymentMethod(method.id)}
+                      />
+                    ))
+                  }
+                </div>
+              ) : (
+                <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-8 text-center">
+                  <FiCreditCard className="mx-auto text-4xl text-gray-500 mb-3" />
+                  <p className="text-gray-300 mb-2">You don't have any payment methods yet.</p>
+                  <p className="text-gray-500 text-sm mb-6">
+                    Add a payment method to subscribe to a plan or purchase credits.
+                  </p>
+                  <button 
+                    className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300 mx-auto"
+                    onClick={() => setShowAddForm(true)}
+                  >
+                    <FiPlus className="mr-2" />
+                    Add Payment Method
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}

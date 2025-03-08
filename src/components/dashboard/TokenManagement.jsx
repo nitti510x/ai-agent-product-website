@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { supabase } from '../../config/supabase';
-import { subscriptionService } from '../../config/postgres';
+import { agentService } from '../../services/agentService';
 import { formatDistanceToNow } from 'date-fns';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import stripePromise from '../../config/stripe';
@@ -176,11 +176,11 @@ const TokenManagement = () => {
         setUser(user);
         
         // Get user tokens and subscription
-        const tokens = await subscriptionService.getUserTokens(user.id);
+        const tokens = await agentService.getUserTokens(user.id);
         setTokenData(tokens);
         
         // Get token packages
-        const tokenPackages = await subscriptionService.getTokenPackages();
+        const tokenPackages = await agentService.getTokenPackages();
         setPackages(tokenPackages);
       } catch (error) {
         console.error('Error fetching token data:', error);
@@ -204,7 +204,7 @@ const TokenManagement = () => {
   const handlePaymentSuccess = async () => {
     try {
       // Refresh token data
-      const updatedTokens = await subscriptionService.getUserTokens(user.id);
+      const updatedTokens = await agentService.getUserTokens(user.id);
       setTokenData(updatedTokens);
       
       setSuccess(`Successfully purchased ${selectedPackage.token_amount} credits!`);
@@ -397,9 +397,7 @@ const TokenManagement = () => {
 
       {/* Available Token Packages */}
       <div className="bg-dark-card rounded-xl shadow-lg border border-dark-card/30 overflow-hidden">
-        {/* Slim header to match parent component style */}
         <div className="px-6 pt-6 pb-4">
-          <h3 className="text-xl font-bold text-white mb-2">Token Packages</h3>
           <p className="text-gray-400 text-sm">
             Purchase additional token packs to extend your usage beyond your plan limits
           </p>

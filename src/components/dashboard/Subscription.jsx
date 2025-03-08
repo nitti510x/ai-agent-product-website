@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import { supabase } from '../../config/supabase.js';
-import { postgresService } from '../../services/postgresService.js';
+import { agentService } from '../../services/agentService.js';
 
 function Subscription() {
   const navigate = useNavigate();
@@ -49,8 +49,8 @@ function Subscription() {
 
   const getSubscription = async (userId) => {
     try {
-      // Use the PostgreSQL service to get the user's subscription
-      const userSubscription = await postgresService.getUserSubscription(userId);
+      // Use the agent service to get the user's subscription
+      const userSubscription = await agentService.getUserSubscription(userId);
       setSubscription(userSubscription);
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -60,9 +60,9 @@ function Subscription() {
 
   const getPlans = async () => {
     try {
-      // Use the PostgreSQL service to get available plans
-      console.log('Fetching plans from API...');
-      const availablePlans = await postgresService.getPlans();
+      // Use the agent service to get available plans
+      console.log('Fetching plans from agent API...');
+      const availablePlans = await agentService.getPlans();
       console.log('Plans received:', availablePlans);
       
       if (!availablePlans || !Array.isArray(availablePlans)) {
@@ -72,7 +72,16 @@ function Subscription() {
         return;
       }
       
-      setPlans(availablePlans);
+      // Sort plans by price (free plans first, then ascending by price)
+      const sortedPlans = [...availablePlans].sort((a, b) => {
+        // Put free plans first
+        if (a.price === 0 && b.price !== 0) return -1;
+        if (a.price !== 0 && b.price === 0) return 1;
+        // Then sort by price
+        return a.price - b.price;
+      });
+      
+      setPlans(sortedPlans);
       setError(null); // Clear any previous errors
     } catch (error) {
       console.error('Error fetching plans:', error);

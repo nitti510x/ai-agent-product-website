@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { supabase } from '../../config/supabase';
-import { subscriptionService } from '../../config/postgres';
+import { agentService } from '../../services/agentService';
 
 const TokenBalanceWidget = ({ compact = false }) => {
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
           return;
         }
         
-        const userData = await subscriptionService.getUserTokens(user.id);
+        const userData = await agentService.getUserTokens(user.id);
         
         if (userData?.tokens) {
           setTokens(userData.tokens);
