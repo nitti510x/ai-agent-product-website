@@ -14,13 +14,23 @@ import TokenManagement from '../components/dashboard/TokenManagement';
 import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import SetupGuide from '../components/dashboard/SetupGuide';
 import UsersManagement from '../components/dashboard/UsersManagement';
+import Help from '../components/dashboard/Help';
+import TokenPurchase from '../components/dashboard/tokens/TokenPurchase';
+import TokenHistory from '../components/dashboard/tokens/TokenHistory';
+import TokenSettings from '../components/dashboard/tokens/TokenSettings';
+import FAQs from '../components/dashboard/help/FAQs';
+import Support from '../components/dashboard/help/Support';
+import SystemStatus from '../components/dashboard/help/SystemStatus';
+import QuickSetup from '../components/dashboard/QuickSetup';
+import Security from '../components/dashboard/account/Security';
+import OrganizationProfile from '../components/dashboard/account/OrganizationProfile';
 import BillingLayout from '../components/billing/BillingLayout';
 import TransactionHistory from '../components/billing/TransactionHistory';
 import PaymentMethods from '../components/billing/PaymentMethods';
 import SubscriptionCheckout from '../components/subscription/SubscriptionCheckout';
 import MyAccount from '../pages/MyAccount';
 import Logo from '../components/Logo';
-import { FiUser, FiLogOut, FiCreditCard } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiCreditCard, FiBell, FiHelpCircle } from 'react-icons/fi';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -84,22 +94,53 @@ function Dashboard() {
               <div className="mr-4">
                 <TokenBalanceWidget compact={true} />
               </div>
+              {/* Billing/Subscription Link */}
               <Link 
-                to="/dashboard/account/profile" 
-                className="flex items-center text-gray-400 hover:text-primary transition-colors mr-4"
+                to="/dashboard/billing" 
+                className="flex items-center text-gray-400 hover:text-primary transition-colors"
               >
-                <FiUser className="w-6 h-6 mr-1" />
+                <FiCreditCard className="w-5 h-5 mr-1" />
+                <span className="text-sm">
+                  Billing
+                </span>
+              </Link>
+              {/* Help/Support Link */}
+              <Link 
+                to="/dashboard/help" 
+                className="flex items-center text-gray-400 hover:text-primary transition-colors"
+              >
+                <FiHelpCircle className="w-5 h-5 mr-1" />
+                <span className="text-sm">
+                  Help
+                </span>
+              </Link>
+              {/* Notifications */}
+              <div className="relative cursor-pointer group">
+                <div className="flex items-center text-gray-400 hover:text-primary transition-colors">
+                  <FiBell className="w-5 h-5" />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">0</div>
+                </div>
+                <div className="absolute right-0 mt-2 w-64 bg-dark-card shadow-lg rounded-lg border border-gray-700 p-3 hidden group-hover:block z-10">
+                  <p className="text-gray-300 text-sm">No new notifications</p>
+                </div>
+              </div>
+              {/* My Account Link */}
+              <Link 
+                to="/dashboard/account" 
+                className="flex items-center text-gray-400 hover:text-primary transition-colors"
+              >
+                <FiUser className="w-5 h-5 mr-1" />
                 <span className="text-sm">
                   My Account
                 </span>
               </Link>
-              {/* Removed login provider display from navigation */}
+              {/* Sign Out Button */}
               <button
                 onClick={handleSignOut}
                 className="flex items-center text-gray-400 hover:text-secondary transition-colors"
               >
-                <FiLogOut className="w-5 h-5 mr-2" />
-                <span>Sign Out</span>
+                <FiLogOut className="w-5 h-5 mr-1" />
+                <span className="text-sm">Sign Out</span>
               </button>
             </div>
           </div>
@@ -114,22 +155,36 @@ function Dashboard() {
           <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
           <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
           <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
+          <Route path="quicksetup" element={<DashboardLayout><QuickSetup /></DashboardLayout>} />
           <Route path="profile" element={<Profile />} />
-          <Route path="subscription" element={<BillingLayout><Subscription /></BillingLayout>} />
+          <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
+          <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
+          <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+          {/* Token Management Routes */}
           <Route path="tokens" element={<DashboardLayout><TokenManagement /></DashboardLayout>} />
+          <Route path="tokens/purchase" element={<DashboardLayout><TokenPurchase /></DashboardLayout>} />
+          <Route path="tokens/history" element={<DashboardLayout><TokenHistory /></DashboardLayout>} />
+          <Route path="tokens/settings" element={<DashboardLayout><TokenSettings /></DashboardLayout>} />
+          
+          {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
           <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
           
-          {/* Account Section Routes - All account pages use this layout */}
-          <Route path="account" element={<BillingLayout><Subscription /></BillingLayout>} />
-          <Route path="account/profile" element={<BillingLayout><Profile /></BillingLayout>} />
-          <Route path="account/plans" element={<BillingLayout><Subscription /></BillingLayout>} />
-          <Route path="account/payment-methods" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
-          <Route path="account/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+          {/* Help Section Routes */}
+          <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
+          <Route path="help/faqs" element={<DashboardLayout><FAQs /></DashboardLayout>} />
+          <Route path="help/support" element={<DashboardLayout><Support /></DashboardLayout>} />
+          <Route path="help/status" element={<DashboardLayout><SystemStatus /></DashboardLayout>} />
+          
+          {/* Account Section Routes */}
+          <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />
+          <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
+          <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
+          <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
           
           {/* Redirects for backward compatibility */}
-          <Route path="my-account/*" element={<Navigate to="/dashboard/account/profile" replace />} />
-          <Route path="billing/*" element={<Navigate to="/dashboard/account/profile" replace />} />
+          <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
+          <Route path="subscription/*" element={<Navigate to="/dashboard/billing" replace />} />
         </Routes>
       </div>
     </div>

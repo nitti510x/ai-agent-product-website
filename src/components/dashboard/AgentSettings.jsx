@@ -189,8 +189,8 @@ function AgentSettings() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header with gradient underline */}
-      <div className="relative mb-8">
+      {/* Page title and action buttons */}
+      <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <button
             onClick={() => navigate('/dashboard')}
@@ -199,14 +199,43 @@ function AgentSettings() {
             <FiArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Agent Settings</h1>
-            <p className="text-gray-400 text-sm mt-1">{getAgentName()}</p>
+            <h2 className="text-xl font-bold text-white">Agent Settings</h2>
+            <p className="text-gray-400 text-sm mt-1">Configure settings for {getAgentName()}</p>
           </div>
         </div>
-        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-400/20 to-blue-500/20 mt-4"></div>
+        <button
+          type="submit"
+          form="agent-settings-form"
+          disabled={isSaving}
+          className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            isSaving 
+              ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
+              : 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
+          }`}
+        >
+          {isSaving ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Saving...
+            </>
+          ) : saveSuccess ? (
+            <>
+              <FiCheckCircle className="mr-2" />
+              Saved!
+            </>
+          ) : (
+            <>
+              <FiSave className="mr-2" />
+              Save Changes
+            </>
+          )}
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit}>
+      <form id="agent-settings-form" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Basic Settings */}
           <div className="lg:col-span-1 space-y-6">
@@ -459,38 +488,7 @@ function AgentSettings() {
           </div>
         </div>
 
-        {/* Save Button */}
-        <div className="mt-6 flex justify-end">
-          <button
-            type="submit"
-            disabled={isSaving}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              isSaving 
-                ? 'bg-gray-700 text-gray-300 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-emerald-500 to-blue-500 text-white hover:from-emerald-600 hover:to-blue-600'
-            }`}
-          >
-            {isSaving ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Saving...
-              </>
-            ) : saveSuccess ? (
-              <>
-                <FiCheckCircle className="mr-2" />
-                Saved!
-              </>
-            ) : (
-              <>
-                <FiSave className="mr-2" />
-                Save Changes
-              </>
-            )}
-          </button>
-        </div>
+
       </form>
     </div>
   );

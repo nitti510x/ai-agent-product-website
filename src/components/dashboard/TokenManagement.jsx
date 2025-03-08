@@ -207,7 +207,7 @@ const TokenManagement = () => {
       const updatedTokens = await agentService.getUserTokens(user.id);
       setTokenData(updatedTokens);
       
-      setSuccess(`Successfully purchased ${selectedPackage.token_amount} credits!`);
+      setSuccess(`Successfully purchased ${selectedPackage.token_amount} tokens!`);
       setShowConfirmation(false);
       
       // Clear success message after 5 seconds
@@ -246,7 +246,7 @@ const TokenManagement = () => {
         <div className="mb-8 bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg">
           <div className="flex items-center">
             <FiAlertTriangle className="mr-2" size={20} />
-            <span>You must have an active subscription to purchase credits. Please subscribe to a plan first.</span>
+            <span>You must have an active subscription to purchase tokens. Please subscribe to a plan first.</span>
           </div>
         </div>
       </div>
@@ -257,27 +257,27 @@ const TokenManagement = () => {
     <div className="space-y-8">
       {/* Current Token Balance */}
       <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
-        <h2 className="text-2xl font-bold text-white mb-4">Your Credit Balance</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Your Token Balance</h2>
         
         <div className="flex items-center mb-6">
           <span className="text-4xl font-bold text-primary mr-3">
             {tokenData?.tokens?.balance || 0}
           </span>
-          <span className="text-gray-400"><IoDiamond className="inline mr-1" /> credits remaining</span>
+          <span className="text-gray-400"><IoDiamond className="inline mr-1" /> tokens remaining</span>
         </div>
         
-        {/* Credit panels in 50/50 layout */}
+        {/* Token panels in 50/50 layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Plan Credits Panel */}
           <div className="bg-dark-card/50 rounded-xl p-4">
             <div className="flex justify-between items-center mb-2">
-              <div className="text-gray-300 font-medium">Plan Credits</div>
+              <div className="text-gray-300 font-medium">Plan Tokens</div>
               <div className="text-gray-400 text-sm">
-                {tokenData?.subscription?.features?.feature_limits?.tokens || 0} credits per billing cycle
+                {tokenData?.subscription?.features?.feature_limits?.tokens || 0} tokens per billing cycle
               </div>
             </div>
             
-            {/* Calculate used plan credits */}
+            {/* Calculate used plan tokens */}
             {(() => {
               const planLimit = tokenData?.subscription?.features?.feature_limits?.tokens || 0;
               
@@ -341,9 +341,9 @@ const TokenManagement = () => {
                 return (
                   <>
                     <div className="flex justify-between items-center mb-2">
-                      <div className="text-gray-300 font-medium">Token Pack Credits</div>
+                      <div className="text-gray-300 font-medium">Token Pack Tokens</div>
                       <div className="text-gray-400 text-sm">
-                        {totalFromPacks} additional credits purchased
+                        {totalFromPacks} additional tokens purchased
                       </div>
                     </div>
                     
@@ -358,14 +358,14 @@ const TokenManagement = () => {
                       ></div>
                     </div>
                     <p className="text-gray-400 text-sm">
-                      These credits do not expire with your billing cycle
+                      These tokens do not expire with your billing cycle
                     </p>
                   </>
                 );
               }
               return (
                 <div className="flex flex-col justify-center items-center h-full text-center">
-                  <div className="text-gray-300 font-medium mb-2">Token Pack Credits</div>
+                  <div className="text-gray-300 font-medium mb-2">Token Pack Tokens</div>
                   <p className="text-gray-400 text-sm mb-2">
                     You haven't purchased any additional token packs yet
                   </p>
@@ -382,14 +382,14 @@ const TokenManagement = () => {
         </div>
         
         <p className="text-gray-300 mb-4">
-          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} <IoDiamond className="inline mx-1" /> credits per billing cycle.
+          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} <IoDiamond className="inline mx-1" /> tokens per billing cycle.
         </p>
         
         {tokenData?.tokens?.balance < 100 && (
           <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-3 rounded-lg">
             <div className="flex items-center">
               <FiAlertTriangle className="mr-2" size={20} />
-              <span>Your <IoDiamond className="inline mx-1" /> credit balance is running low! Consider purchasing more <IoDiamond className="inline mx-1" /> credits below.</span>
+              <span>Your <IoDiamond className="inline mx-1" /> token balance is running low! Consider purchasing more <IoDiamond className="inline mx-1" /> tokens below.</span>
             </div>
           </div>
         )}
@@ -415,7 +415,7 @@ const TokenManagement = () => {
               <div className="flex-grow mb-6">
                 <div className="flex items-center text-gray-300 mb-2">
                   <IoDiamond className="mr-2 text-primary" />
-                  <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> credits</span>
+                  <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> tokens</span>
                 </div>
               </div>
               
@@ -438,7 +438,7 @@ const TokenManagement = () => {
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
-              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <IoDiamond className="inline mx-1" /> credits</span> for ${selectedPackage.price}.
+              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <IoDiamond className="inline mx-1" /> tokens</span> for ${selectedPackage.price}.
             </p>
             
             <Elements stripe={stripePromise}>

@@ -63,15 +63,12 @@ function ActivityLayout({ children }) {
 
   return (
     <div className="max-w-[1440px] mx-auto px-8">
-      <div className="flex items-center mb-8">
-        <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-        <h1 className="text-3xl font-bold text-white">Agent Activity</h1>
-      </div>
+      {/* Title header removed */}
       
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-64 shrink-0">
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
-            <h2 className="text-lg font-bold text-white mb-4 px-2">Activity Filters</h2>
+            <h2 className="text-xl font-bold text-white mb-4 px-2">Activity</h2>
             <nav>
               <ul className="space-y-1">
                 {menuItems.map((item) => {

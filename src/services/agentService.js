@@ -27,11 +27,21 @@ export const agentService = {
     try {
       console.log('Fetching plans from agent API...');
       
+      // Get the current user's JWT token for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      
+      if (!token) {
+        console.error('No authentication token available');
+        throw new Error('Authentication required to fetch plans');
+      }
+      
       // Make the request with the exact format from the curl example
       const response = await fetch('https://agent.ops.geniusos.co/plans/?active_only=true', {
         method: 'GET',
         headers: {
-          'accept': 'application/json'
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
       

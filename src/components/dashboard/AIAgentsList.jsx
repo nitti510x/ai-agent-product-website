@@ -133,6 +133,17 @@ function AIAgentsList() {
     }
   };
 
+  // Function to open Slack app
+  const openSlackApp = () => {
+    // Try to open Slack app with deep link to the user's organization
+    window.open('slack://open', '_blank');
+    
+    // Fallback to web version if app doesn't open
+    setTimeout(() => {
+      window.open('https://app.slack.com/client', '_blank');
+    }, 1000);
+  };
+
   return (
     <div>
       {/* Page title */}
@@ -141,6 +152,19 @@ function AIAgentsList() {
           <h2 className="text-xl font-bold text-white">Your AI Assistants</h2>
           <p className="text-gray-400 text-sm mt-1">Manage and monitor your active AI integrations</p>
         </div>
+        <button
+          onClick={openSlackApp}
+          className="flex items-center px-4 py-2 bg-transparent hover:bg-gray-900 text-white font-medium rounded-lg border border-white/70 hover:border-white transition-all duration-300 hover:shadow-glow-light"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="20" height="20" style={{ marginRight: '8px' }} alt="Slack Logo">
+            <title>Slack Logo</title>
+            <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+            <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+            <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+            <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+          </svg>
+          Open Slack
+        </button>
       </div>
 
       {/* Agents grid - 4 across */}

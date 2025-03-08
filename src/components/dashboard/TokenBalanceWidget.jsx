@@ -127,10 +127,10 @@ const TokenBalanceWidget = ({ compact = false }) => {
   const planPercentage = planTokens.total > 0 ? Math.min(100, (planTokens.used / planTokens.total) * 100) : 0;
   const packPercentage = packTokens.total > 0 ? Math.min(100, (packTokens.used / packTokens.total) * 100) : 0;
   
-  // Calculate total credits (plan + pack)
+  // Calculate total tokens (plan + pack)
   const totalPlanRemaining = Math.max(0, planTokens.total - planTokens.used);
   const totalPackRemaining = Math.max(0, packTokens.total - packTokens.used);
-  const totalCredits = totalPlanRemaining + totalPackRemaining;
+  const totalTokens = totalPlanRemaining + totalPackRemaining;
 
   // Full widget version
   return (
@@ -142,24 +142,24 @@ const TokenBalanceWidget = ({ compact = false }) => {
       <div className="relative">
         {/* Header with total credits */}
         <div className="text-center mb-8">
-          <h2 className="text-white font-semibold text-lg mb-1">Your Credit Balance</h2>
+          <h2 className="text-white font-semibold text-lg mb-1">Your Token Balance</h2>
           <div className="flex items-center justify-center">
             <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-3 rounded-xl inline-flex items-center">
               <IoDiamond size={24} className="text-primary mr-3" />
-              <span className="text-5xl font-bold text-primary">{totalCredits}</span>
+              <span className="text-5xl font-bold text-primary">{totalTokens}</span>
             </div>
-            <span className="text-gray-400 ml-3 text-sm"><IoDiamond className="inline mr-1" /> credits remaining</span>
+            <span className="text-gray-400 ml-3 text-sm"><IoDiamond className="inline mr-1" /> tokens remaining</span>
           </div>
         </div>
         
-        {/* Credit panels in 50/50 layout */}
+        {/* Token panels in 50/50 layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Plan Credits Panel */}
           <div className="bg-dark-card/40 backdrop-blur-sm rounded-xl p-4 border border-primary/10 hover:border-primary/20 transition-all duration-300 shadow-lg">
             <div className="flex justify-between items-center mb-3">
-              <div className="text-gray-300 font-medium">Plan Credits</div>
+              <div className="text-gray-300 font-medium">Plan Tokens</div>
               <div className="text-xs text-gray-400 bg-dark-card/50 px-2 py-1 rounded-full">
-                {planTokens.total} credits per billing cycle
+                {planTokens.total} tokens per billing cycle
               </div>
             </div>
             
@@ -187,9 +187,9 @@ const TokenBalanceWidget = ({ compact = false }) => {
           {packTokens.total > 0 ? (
             <div className="bg-dark-card/40 backdrop-blur-sm rounded-xl p-4 border border-yellow-500/10 hover:border-yellow-500/20 transition-all duration-300 shadow-lg">
               <div className="flex justify-between items-center mb-3">
-                <div className="text-gray-300 font-medium">Token Pack Credits</div>
+                <div className="text-gray-300 font-medium">Token Pack Tokens</div>
                 <div className="text-xs text-gray-400 bg-dark-card/50 px-2 py-1 rounded-full">
-                  {packTokens.total} additional credits purchased
+                  {packTokens.total} additional tokens purchased
                 </div>
               </div>
               
@@ -214,7 +214,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
             </div>
           ) : (
             <div className="bg-dark-card/40 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50 hover:border-gray-700 transition-all duration-300 shadow-lg flex flex-col justify-center">
-              <div className="text-gray-300 font-medium mb-3">Token Pack Credits</div>
+              <div className="text-gray-300 font-medium mb-3">Token Pack Tokens</div>
               <div className="text-sm text-gray-400 mb-4">
                 You haven't purchased any additional token packs
               </div>
@@ -229,7 +229,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
         </div>
         
         <div className="text-center text-xs text-gray-400 mt-6">
-          Your basic plan includes {planTokens.total} <IoDiamond className="inline mx-0.5" /> credits per billing cycle.
+          Your basic plan includes {planTokens.total} <IoDiamond className="inline mx-0.5" /> tokens per billing cycle.
         </div>
       </div>
     </div>

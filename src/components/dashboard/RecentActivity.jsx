@@ -147,21 +147,18 @@ function RecentActivity() {
 
   return (
     <div>
-      {/* Action buttons */}
-      <div className="flex justify-end mb-6 space-x-3">
+      {/* Page title */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-white">Recent Activity</h2>
+          <p className="text-gray-400 text-sm mt-1">Track your AI assistants' usage and performance</p>
+        </div>
         <button
           onClick={handleRefresh}
           className="px-4 py-2 bg-dark-card/80 border border-emerald-400/20 text-emerald-400 rounded-lg hover:bg-dark-card hover:border-emerald-400/40 transition-all duration-300 text-sm font-medium flex items-center"
         >
           <FiRefreshCw className="mr-2" />
           Refresh
-        </button>
-        <button
-          onClick={handleExport}
-          className="px-4 py-2 bg-dark-card/80 border border-emerald-400/20 text-emerald-400 rounded-lg hover:bg-dark-card hover:border-emerald-400/40 transition-all duration-300 text-sm font-medium flex items-center"
-        >
-          <FiDownload className="mr-2" />
-          Export Logs
         </button>
       </div>
 

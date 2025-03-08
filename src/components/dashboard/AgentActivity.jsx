@@ -114,8 +114,8 @@ function AgentActivity() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header with gradient underline */}
-      <div className="relative mb-8">
+      {/* Page title and action buttons */}
+      <div className="flex justify-between items-center mb-6">
         <div className="flex items-center">
           <button
             onClick={() => navigate('/dashboard')}
@@ -124,11 +124,10 @@ function AgentActivity() {
             <FiArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white">Agent Activity</h1>
-            <p className="text-gray-400 text-sm mt-1">{getAgentName()}</p>
+            <h2 className="text-xl font-bold text-white">Agent Activity</h2>
+            <p className="text-gray-400 text-sm mt-1">View recent activities for {getAgentName()}</p>
           </div>
         </div>
-        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-400/20 to-blue-500/20 mt-4"></div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

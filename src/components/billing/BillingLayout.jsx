@@ -8,33 +8,28 @@ function BillingLayout({ children }) {
   const location = useLocation();
   const { selectedPlan, isFreeTrialSelected } = useSubscription();
   
-  // Check if we're on the checkout page (main billing route)
-  const isCheckoutPage = location.pathname === '/dashboard/billing';
+  // We want to show the sidebar for all billing pages
+  const isCheckoutPage = false; // Always show the sidebar
   
   const menuItems = [
     {
-      path: '/dashboard/account/profile',
-      label: 'Profile',
-      icon: <FiUser className="mr-2" />
-    },
-    {
-      path: '/dashboard/account/plans',
+      path: '/dashboard/billing',
       label: 'Subscription Plans',
       icon: <FiList className="mr-2" />
     },
     {
-      path: '/dashboard/account/payment-methods',
+      path: '/dashboard/billing/payment',
       label: 'Payment Methods',
       icon: <FiCreditCard className="mr-2" />
     },
     {
-      path: '/dashboard/account/transactions',
+      path: '/dashboard/billing/transactions',
       label: 'Transaction History',
       icon: <FiFileText className="mr-2" />
     },
     {
       path: '/dashboard/tokens',
-      label: 'Credit Management',
+      label: 'Token Management',
       icon: <IoDiamond className="mr-2" />,
       isCredit: true
     }
@@ -42,18 +37,13 @@ function BillingLayout({ children }) {
 
   return (
     <div className="max-w-[1440px] mx-auto px-8">
-      {!isCheckoutPage && (
-        <div className="flex items-center mb-8">
-          <div className="bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] h-8 w-1 rounded-full mr-3"></div>
-          <h1 className="text-3xl font-bold text-white">My Account</h1>
-        </div>
-      )}
+      {/* Title header removed */}
       
       <div className="flex flex-col md:flex-row gap-8">
         {!isCheckoutPage && (
           <div className="w-full md:w-64 shrink-0">
             <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
-              <h2 className="text-lg font-bold text-white mb-4 px-2">Account Menu</h2>
+              <h2 className="text-xl font-bold text-white mb-4 px-2">Billing</h2>
               <nav>
                 <ul className="space-y-1">
                   {menuItems.map((item) => {
