@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, Routes, Route, useLocation } from 'react-router-dom';
 import { FiUser, FiCreditCard, FiFileText, FiList, FiSettings } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import PaymentMethods from '../components/billing/PaymentMethods';
@@ -53,7 +54,7 @@ function MyAccount() {
     {
       path: '/dashboard/my-account/tokens',
       label: 'Credits',
-      icon: <IoDiamond />
+      icon: <FaRobot />
     }
   ];
 

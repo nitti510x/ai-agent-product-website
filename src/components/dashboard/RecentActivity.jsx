@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiClock, FiFilter, FiDownload, FiRefreshCw } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase';
 import { agentService } from '../../services/agentService';
 
@@ -266,7 +267,7 @@ function RecentActivity() {
                         {formatDate(activity.timestamp)}
                       </div>
                       <div className="flex items-center text-xs text-emerald-400">
-                        <IoDiamond className="mr-1" />
+                        <FaRobot className="mr-1" />
                         {activity.tokensUsed} tokens used
                       </div>
                     </div>

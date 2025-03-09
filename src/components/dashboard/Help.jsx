@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiHelpCircle, FiMessageSquare, FiFileText, FiExternalLink } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function Help() {
   return (
@@ -61,7 +62,7 @@ function Help() {
           <div className="border-b border-gray-700 pb-4">
             <h4 className="text-white font-medium mb-2">What are tokens and how do they work?</h4>
             <p className="text-gray-300">
-              Tokens (<IoDiamond className="inline mx-1" />) are the currency used to power your AI assistants. Each interaction with an AI assistant consumes tokens based on the complexity and length of the task. Your subscription plan includes a monthly allocation of tokens, and you can purchase additional token packs if needed.
+              Tokens (<FaRobot className="inline mx-1" />) are the currency used to power your AI assistants. Each interaction with an AI assistant consumes tokens based on the complexity and length of the task. Your subscription plan includes a monthly allocation of tokens, and you can purchase additional token packs if needed.
             </p>
           </div>
 

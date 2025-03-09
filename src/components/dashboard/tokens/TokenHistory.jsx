@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiClock, FiDownload, FiFilter } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function TokenHistory() {
   // Sample usage history data
@@ -77,14 +78,14 @@ function TokenHistory() {
           <p className="text-gray-400 font-medium mb-2">Total Tokens Used (This Month)</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">200</span>
-            <IoDiamond className="text-primary ml-2" />
+            <FaRobot className="text-primary ml-2" />
           </div>
         </div>
         <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <p className="text-gray-400 font-medium mb-2">Plan Tokens Used</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">100</span>
-            <IoDiamond className="text-primary ml-2" />
+            <FaRobot className="text-primary ml-2" />
             <span className="text-gray-400 ml-2">/ 500</span>
           </div>
         </div>
@@ -92,7 +93,7 @@ function TokenHistory() {
           <p className="text-gray-400 font-medium mb-2">Token Pack Tokens Used</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">100</span>
-            <IoDiamond className="text-primary ml-2" />
+            <FaRobot className="text-primary ml-2" />
             <span className="text-gray-400 ml-2">/ 1000</span>
           </div>
         </div>
@@ -127,7 +128,7 @@ function TokenHistory() {
                   <td className="py-4">
                     <div className="flex items-center">
                       <span>{item.tokens_used}</span>
-                      <IoDiamond className="text-primary ml-1 w-4 h-4" />
+                      <FaRobot className="text-primary ml-1 w-4 h-4" />
                     </div>
                   </td>
                   <td className="py-4">

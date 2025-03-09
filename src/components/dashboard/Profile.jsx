@@ -135,7 +135,12 @@ function Profile() {
   };
 
   return (
-    <div>
+    <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-white">My Profile</h1>
+        <p className="text-gray-400 mt-1">Manage your personal information and account security</p>
+      </div>
+      
       <div className="grid md:grid-cols-2 gap-8">
         {/* Basic Information */}
         <div className="bg-dark-lighter p-6 rounded-xl">
@@ -244,7 +249,7 @@ function Profile() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiSettings, FiActivity, FiBarChart2, FiHelpCircle } from 'react-icons/fi';
 import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill } from 'react-icons/ri';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function AIAgentsList() {
   // Define a consistent gradient matching the site style
@@ -230,7 +231,7 @@ function AIAgentsList() {
                   to="/dashboard/account/plans"
                   className="flex items-center px-3 py-1.5 mt-1 text-purple-300 hover:text-purple-200 transition-colors text-xs w-full justify-center bg-purple-900/20 border border-purple-500/20 rounded-lg"
                 >
-                  <IoDiamond className="w-3.5 h-3.5 mr-1.5" />
+                  <FaRobot className="w-3.5 h-3.5 mr-1.5" />
                   Upgrade Plan to Access
                 </Link>
               )}

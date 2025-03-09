@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiAlertTriangle, FiCreditCard, FiClock } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase';
 import { agentService } from '../../services/agentService';
 import { formatDistanceToNow } from 'date-fns';
@@ -263,7 +264,7 @@ const TokenManagement = () => {
           <span className="text-4xl font-bold text-primary mr-3">
             {tokenData?.tokens?.balance || 0}
           </span>
-          <span className="text-gray-400"><IoDiamond className="inline mr-1" /> tokens remaining</span>
+          <span className="text-gray-400"><FaRobot className="inline mr-1" /> tokens remaining</span>
         </div>
         
         {/* Token panels in 50/50 layout */}
@@ -382,14 +383,14 @@ const TokenManagement = () => {
         </div>
         
         <p className="text-gray-300 mb-4">
-          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} <IoDiamond className="inline mx-1" /> tokens per billing cycle.
+          Your {tokenData?.subscription?.plan_id} plan includes {tokenData?.subscription?.features?.feature_limits?.tokens} <FaRobot className="inline mx-1" /> tokens per billing cycle.
         </p>
         
         {tokenData?.tokens?.balance < 100 && (
           <div className="bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-3 rounded-lg">
             <div className="flex items-center">
               <FiAlertTriangle className="mr-2" size={20} />
-              <span>Your <IoDiamond className="inline mx-1" /> token balance is running low! Consider purchasing more <IoDiamond className="inline mx-1" /> tokens below.</span>
+              <span>Your <FaRobot className="inline mx-1" /> token balance is running low! Consider purchasing more <FaRobot className="inline mx-1" /> tokens below.</span>
             </div>
           </div>
         )}
@@ -414,8 +415,8 @@ const TokenManagement = () => {
               
               <div className="flex-grow mb-6">
                 <div className="flex items-center text-gray-300 mb-2">
-                  <IoDiamond className="mr-2 text-primary" />
-                  <span>{pkg.token_amount} <IoDiamond className="inline mx-1" /> tokens</span>
+                  <FaRobot className="mr-2 text-primary" />
+                  <span>{pkg.token_amount} <FaRobot className="inline mx-1" /> tokens</span>
                 </div>
               </div>
               
@@ -438,7 +439,7 @@ const TokenManagement = () => {
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
-              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <IoDiamond className="inline mx-1" /> tokens</span> for ${selectedPackage.price}.
+              You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <FaRobot className="inline mx-1" /> tokens</span> for ${selectedPackage.price}.
             </p>
             
             <Elements stripe={stripePromise}>

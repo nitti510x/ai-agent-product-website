@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiAlertCircle, FiCheck, FiClock, FiAlertTriangle } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function SystemStatus() {
   // Sample system status data

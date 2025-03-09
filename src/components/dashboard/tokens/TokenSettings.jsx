@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiSettings, FiAlertCircle, FiToggleLeft, FiToggleRight, FiBell } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function TokenSettings() {
   const [lowBalanceAlert, setLowBalanceAlert] = useState(true);
@@ -59,7 +60,7 @@ function TokenSettings() {
                 />
                 <div className="flex items-center bg-dark-card/70 px-3 py-1 rounded-lg">
                   <span className="text-white font-medium">{lowBalanceThreshold}</span>
-                  <IoDiamond className="text-primary ml-1 w-4 h-4" />
+                  <FaRobot className="text-primary ml-1 w-4 h-4" />
                 </div>
               </div>
             </div>
@@ -132,7 +133,7 @@ function TokenSettings() {
                 <h5 className="text-white font-medium">Pro Pack</h5>
                 <div className="flex items-center mt-2">
                   <span className="text-gray-300">500</span>
-                  <IoDiamond className="text-primary ml-1 w-4 h-4" />
+                  <FaRobot className="text-primary ml-1 w-4 h-4" />
                   <span className="text-gray-400 ml-2">$45</span>
                 </div>
               </div>
@@ -141,7 +142,7 @@ function TokenSettings() {
                 <h5 className="text-white font-medium">Business Pack</h5>
                 <div className="flex items-center mt-2">
                   <span className="text-gray-300">1000</span>
-                  <IoDiamond className="text-primary ml-1 w-4 h-4" />
+                  <FaRobot className="text-primary ml-1 w-4 h-4" />
                   <span className="text-gray-400 ml-2">$80</span>
                 </div>
               </div>
@@ -150,7 +151,7 @@ function TokenSettings() {
                 <h5 className="text-white font-medium">Enterprise Pack</h5>
                 <div className="flex items-center mt-2">
                   <span className="text-gray-300">5000</span>
-                  <IoDiamond className="text-primary ml-1 w-4 h-4" />
+                  <FaRobot className="text-primary ml-1 w-4 h-4" />
                   <span className="text-gray-400 ml-2">$350</span>
                 </div>
               </div>
@@ -181,7 +182,7 @@ function TokenSettings() {
                   placeholder="No limit"
                   className="bg-dark-card/70 border border-gray-700 rounded-lg px-4 py-2 text-white w-full focus:outline-none focus:border-primary"
                 />
-                <IoDiamond className="text-primary ml-2 w-5 h-5" />
+                <FaRobot className="text-primary ml-2 w-5 h-5" />
               </div>
             </div>
             
@@ -194,7 +195,7 @@ function TokenSettings() {
                   placeholder="No limit"
                   className="bg-dark-card/70 border border-gray-700 rounded-lg px-4 py-2 text-white w-full focus:outline-none focus:border-primary"
                 />
-                <IoDiamond className="text-primary ml-2 w-5 h-5" />
+                <FaRobot className="text-primary ml-2 w-5 h-5" />
               </div>
             </div>
           </div>

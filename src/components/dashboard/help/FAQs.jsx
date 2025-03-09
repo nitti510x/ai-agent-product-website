@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiChevronDown, FiChevronUp, FiSearch } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function FAQs() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,7 +16,7 @@ function FAQs() {
         {
           id: 'tokens-1',
           question: 'What are tokens and how do they work?',
-          answer: 'Tokens (<IoDiamond className="inline mx-1" />) are the currency used to power your AI assistants. Each interaction with an AI assistant consumes tokens based on the complexity and length of the task. Your subscription plan includes a monthly allocation of tokens, and you can purchase additional token packs if needed.'
+          answer: 'Tokens (<FaRobot className="inline mx-1" />) are the currency used to power your AI assistants. Each interaction with an AI assistant consumes tokens based on the complexity and length of the task. Your subscription plan includes a monthly allocation of tokens, and you can purchase additional token packs if needed.'
         },
         {
           id: 'tokens-2',
@@ -142,7 +143,7 @@ function FAQs() {
                 
                 {expandedFaqs[faq.id] && (
                   <div className="mt-2 text-gray-300">
-                    <p dangerouslySetInnerHTML={{ __html: faq.answer.replace('<IoDiamond className="inline mx-1" />', '💎') }} />
+                    <p dangerouslySetInnerHTML={{ __html: faq.answer.replace('<FaRobot className="inline mx-1" />', '💎') }} />
                   </div>
                 )}
               </div>

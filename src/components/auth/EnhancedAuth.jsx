@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../config/supabase';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import SlackLogo from '../icons/SlackLogo';
 import Logo from '../Logo';
 
@@ -322,7 +323,7 @@ const EnhancedAuth = () => {
         {/* Credits */}
         <div className="mt-8 text-center">
           <div className="flex items-center justify-center text-gray-500 text-xs">
-            <IoDiamond className="mr-1 text-emerald-400" />
+            <FaRobot className="mr-1 text-emerald-400" />
             <span>Powered by geniusOS</span>
           </div>
         </div>

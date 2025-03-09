@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiDownload, FiAlertTriangle, FiClock, FiFilter, FiSearch } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase.js';
 import { subscriptionService } from '../../config/postgres.js';
 
@@ -71,7 +72,7 @@ function TransactionHistory() {
 
   const getTransactionIcon = (type) => {
     if (type === 'subscription') return <div className="bg-blue-500/10 p-1.5 rounded-md"><FiDownload className="text-blue-400" size={14} /></div>;
-    if (type === 'token_purchase') return <div className="bg-emerald-500/10 p-1.5 rounded-md"><IoDiamond className="text-emerald-400" size={14} /></div>;
+    if (type === 'token_purchase') return <div className="bg-emerald-500/10 p-1.5 rounded-md"><FaRobot className="text-emerald-400" size={14} /></div>;
     return <div className="bg-gray-700/30 p-1.5 rounded-md"><FiDownload className="text-gray-400" size={14} /></div>;
   };
 

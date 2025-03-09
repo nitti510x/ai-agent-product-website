@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiUser, FiGlobe, FiBarChart2, FiUsers, FiHeadphones, FiCpu, 
          FiFileText, FiCode, FiLink, FiShield, FiUserCheck, FiStar, FiCheck, FiMail } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { fetchSubscriptionPlans, formatPrice } from '../../utils/planUtils';
 import { useAuth } from '../../context/AuthContext';
 
@@ -110,7 +111,7 @@ const PricingPlans = () => {
                       <span>{key}: {JSON.stringify(value)}</span>
                     ) : (
                       <span>{key.toLowerCase().includes('token') || key.toLowerCase().includes('credit') ? 
-                        <>{value} <IoDiamond className="inline text-primary" /> {key}</> : 
+                        <>{value} <FaRobot className="inline text-primary" /> {key}</> : 
                         value}
                       </span>
                     )}

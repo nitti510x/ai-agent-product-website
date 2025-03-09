@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiSettings, FiCheckCircle, FiCreditCard, FiSlack, FiImage, FiFileText, FiArrowRight } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 
 function QuickSetup() {
@@ -38,7 +39,7 @@ function QuickSetup() {
       id: 'tokens',
       title: 'Purchase Tokens',
       description: 'Buy tokens to use with our AI agents',
-      icon: <IoDiamond className="w-6 h-6" />,
+      icon: <FaRobot className="w-6 h-6" />,
       path: '/dashboard/tokens/purchase',
       completed: completedSteps.tokens
     },
@@ -170,7 +171,7 @@ function QuickSetup() {
                 <h4 className="text-white font-medium mb-2">{agent.name}</h4>
                 <p className="text-gray-400 text-sm mb-4">{agent.description}</p>
                 <div className="text-gray-300 mb-4 flex items-center">
-                  <IoDiamond className="text-primary mr-1" />
+                  <FaRobot className="text-primary mr-1" />
                   <span>{agent.tokenCost} tokens</span>
                 </div>
                 <Link

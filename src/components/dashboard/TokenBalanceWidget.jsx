@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase';
 import { agentService } from '../../services/agentService';
 
@@ -116,7 +117,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
           isLowBalance ? 'bg-red-900/20 text-red-400 hover:bg-red-900/30 hover:text-red-300' : 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary-hover'
         } transition-colors`}
       >
-        <IoDiamond className="mr-1.5 text-primary" />
+        <FaRobot className="mr-1.5 text-primary" />
         <span className="font-medium">{tokens?.balance || 0}</span>
         {isLowBalance && <FiAlertTriangle className="ml-1.5 text-yellow-500" size={14} />}
       </Link>
@@ -145,10 +146,10 @@ const TokenBalanceWidget = ({ compact = false }) => {
           <h2 className="text-white font-semibold text-lg mb-1">Your Token Balance</h2>
           <div className="flex items-center justify-center">
             <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-3 rounded-xl inline-flex items-center">
-              <IoDiamond size={24} className="text-primary mr-3" />
+              <FaRobot size={24} className="text-primary mr-3" />
               <span className="text-5xl font-bold text-primary">{totalTokens}</span>
             </div>
-            <span className="text-gray-400 ml-3 text-sm"><IoDiamond className="inline mr-1" /> tokens remaining</span>
+            <span className="text-gray-400 ml-3 text-sm"><FaRobot className="inline mr-1" /> tokens remaining</span>
           </div>
         </div>
         
@@ -229,7 +230,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
         </div>
         
         <div className="text-center text-xs text-gray-400 mt-6">
-          Your basic plan includes {planTokens.total} <IoDiamond className="inline mx-0.5" /> tokens per billing cycle.
+          Your basic plan includes {planTokens.total} <FaRobot className="inline mx-0.5" /> tokens per billing cycle.
         </div>
       </div>
     </div>

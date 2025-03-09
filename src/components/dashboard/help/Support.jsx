@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiMessageSquare, FiSend, FiPaperclip, FiInfo } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function Support() {
   const [subject, setSubject] = useState('');

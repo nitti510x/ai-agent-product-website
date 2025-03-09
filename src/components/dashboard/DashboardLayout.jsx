@@ -7,6 +7,7 @@ import {
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -58,7 +59,7 @@ function DashboardLayout({ children }) {
     {
       path: '/dashboard/tokens',
       label: 'Token Balance',
-      icon: <IoDiamond className="mr-2" />
+      icon: <FaRobot className="mr-2" />
     },
     {
       path: '/dashboard/tokens/purchase',

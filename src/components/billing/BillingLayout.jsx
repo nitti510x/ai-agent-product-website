@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiUser, FiFileText, FiList, FiShoppingCart } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { useSubscription } from '../../contexts/SubscriptionContext';
 
 function BillingLayout({ children }) {
@@ -30,7 +31,7 @@ function BillingLayout({ children }) {
     {
       path: '/dashboard/tokens',
       label: 'Token Management',
-      icon: <IoDiamond className="mr-2" />,
+      icon: <FaRobot className="mr-2" />,
       isCredit: true
     }
   ];
@@ -59,7 +60,7 @@ function BillingLayout({ children }) {
                           }`}
                         >
                           {item.isCredit ? (
-                            <IoDiamond className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
+                            <FaRobot className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
                           ) : (
                             item.icon
                           )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiUserCheck, FiUserX, FiMail, FiSlack } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function UsersManagement() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -173,7 +174,7 @@ function UsersManagement() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Slack</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   <div className="flex items-center">
-                    <IoDiamond className="mr-1" />
+                    <FaRobot className="mr-1" />
                     Credits
                   </div>
                 </th>
@@ -216,7 +217,7 @@ function UsersManagement() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-white">
-                      <IoDiamond className="mr-1 text-emerald-400" />
+                      <FaRobot className="mr-1 text-emerald-400" />
                       <span className="text-sm">{user.credits.toLocaleString()}</span>
                     </div>
                   </td>
@@ -375,7 +376,7 @@ function UsersManagement() {
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-1">
                   <div className="flex items-center">
-                    <IoDiamond className="mr-1" />
+                    <FaRobot className="mr-1" />
                     Credits
                   </div>
                 </label>

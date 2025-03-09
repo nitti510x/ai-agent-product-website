@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FiActivity, FiBarChart2, FiSlack, FiImage, FiFileText, FiLinkedin, FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi';
 import { RiWordpressFill } from 'react-icons/ri';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function ActivityLayout({ children }) {
   const location = useLocation();
@@ -56,7 +57,7 @@ function ActivityLayout({ children }) {
     {
       path: '/dashboard/usage',
       label: 'Token Usage',
-      icon: <IoDiamond className="mr-2" />,
+      icon: <FaRobot className="mr-2" />,
       isCredit: true
     }
   ];
@@ -84,7 +85,7 @@ function ActivityLayout({ children }) {
                         }`}
                       >
                         {item.isCredit ? (
-                          <IoDiamond className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
+                          <FaRobot className={`mr-2 ${isActive ? 'text-primary' : ''}`} />
                         ) : (
                           item.icon
                         )}

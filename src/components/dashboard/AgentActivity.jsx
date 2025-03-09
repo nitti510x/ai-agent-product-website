@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiClock, FiMessageCircle, FiUser, FiSend, FiAlertCircle } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 import { BiBot } from 'react-icons/bi';
 
 function AgentActivity() {
@@ -211,7 +212,7 @@ function AgentActivity() {
                         {activity.tokensUsed !== null && (
                           <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
                             <div className="flex items-center mb-1">
-                              <IoDiamond className="text-blue-400 w-3 h-3 mr-1" />
+                              <FaRobot className="text-blue-400 w-3 h-3 mr-1" />
                               <p className="text-xs text-gray-400">Tokens Used</p>
                             </div>
                             <p className="text-sm text-white">{activity.tokensUsed}</p>

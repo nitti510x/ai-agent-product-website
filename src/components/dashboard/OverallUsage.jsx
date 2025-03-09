@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUsers, FiMessageSquare, FiCpu, FiPower, FiArrowLeft, FiBarChart2 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function OverallUsage() {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ function OverallUsage() {
             color: 'text-yellow-400'
           },
           { 
-            icon: <IoDiamond className="w-5 h-5" />, 
+            icon: <FaRobot className="w-5 h-5" />, 
             label: 'Total Tokens Used', 
             value: usageStats.totalTokensUsed,
             color: 'text-blue-400'

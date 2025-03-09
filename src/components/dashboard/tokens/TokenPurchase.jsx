@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function TokenPurchase() {
   // Sample token packages
@@ -64,15 +65,15 @@ function TokenPurchase() {
             </div>
             <div className="space-y-3 mb-6 flex-grow">
               <div className="flex items-center text-gray-300">
-                <IoDiamond className="text-primary mr-2" />
+                <FaRobot className="text-primary mr-2" />
                 <span>{pkg.token_amount} tokens</span>
               </div>
               <div className="flex items-center text-gray-300">
-                <IoDiamond className="text-primary mr-2" />
+                <FaRobot className="text-primary mr-2" />
                 <span>${(pkg.price / pkg.token_amount).toFixed(2)} per token</span>
               </div>
               <div className="flex items-center text-gray-300">
-                <IoDiamond className="text-primary mr-2" />
+                <FaRobot className="text-primary mr-2" />
                 <span>Never expires</span>
               </div>
             </div>

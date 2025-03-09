@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiBarChart2, FiMessageCircle, FiClock, FiUsers } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
+import { FaRobot } from 'react-icons/fa6';
 
 function AgentUsage() {
   const { agentId } = useParams();
@@ -70,7 +71,7 @@ function AgentUsage() {
               
               <div className="bg-dark-lighter/50 p-4 rounded-lg border border-white/5">
                 <div className="flex items-center mb-1">
-                  <IoDiamond className="text-blue-400 w-4 h-4 mr-2" />
+                  <FaRobot className="text-blue-400 w-4 h-4 mr-2" />
                   <p className="text-xs text-gray-400">Total Tokens Used</p>
                 </div>
                 <p className="text-2xl font-bold text-white">{usageData.totalTokens.toLocaleString()}</p>
