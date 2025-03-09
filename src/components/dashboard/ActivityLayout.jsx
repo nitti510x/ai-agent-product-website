@@ -63,10 +63,11 @@ function ActivityLayout({ children }) {
   ];
 
   return (
-    <div className="max-w-[1440px] mx-auto px-8">
-      {/* Title header removed */}
-      
-      <div className="flex flex-col md:flex-row gap-8">
+    <>
+      <div className="max-w-[1440px] mx-auto px-8 page-content">
+        {/* Title header removed */}
+        
+        <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-64 shrink-0">
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
             <h2 className="text-xl font-bold text-white mb-4 px-2">Activity</h2>
@@ -104,6 +105,28 @@ function ActivityLayout({ children }) {
         </div>
       </div>
     </div>
+    
+    {/* Dashboard Footer */}
+    <footer className="sticky-footer mt-16 pt-6 pb-0 border-t border-gray-700/40 bg-[#1A1E23] w-full" style={{ marginBottom: '-1px' }}>
+      <div className="max-w-[1440px] mx-auto px-8">
+        <div className="flex flex-wrap items-center justify-between pt-5 pb-3 px-2">
+          <div className="flex items-center space-x-2">
+            <FaRobot className="text-primary" size={18} />
+            <span className="text-white text-sm font-medium">geniusOS</span>
+            <span className="text-gray-400 text-xs px-2">© {new Date().getFullYear()}</span>
+          </div>
+          
+          <div className="flex items-center space-x-8 text-sm">
+            <Link to="/terms" className="text-gray-300 hover:text-primary transition-colors">Terms</Link>
+            <Link to="/privacy" className="text-gray-300 hover:text-primary transition-colors">Privacy</Link>
+            <Link to="/security" className="text-gray-300 hover:text-primary transition-colors">Security</Link>
+            <Link to="/help" className="text-gray-300 hover:text-primary transition-colors">Help</Link>
+            <Link to="/status" className="text-gray-300 hover:text-primary transition-colors">Status</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+    </>
   );
 }
 

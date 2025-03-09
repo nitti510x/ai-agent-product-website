@@ -1,7 +1,6 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiBarChart2, FiMessageCircle, FiClock, FiUsers } from 'react-icons/fi';
-import { IoDiamond } from 'react-icons/io5';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import { FiBarChart2, FiMessageCircle, FiClock, FiUsers, FiSettings, FiActivity, FiHelpCircle } from 'react-icons/fi';
 import { FaRobot } from 'react-icons/fa6';
 
 function AgentUsage() {
@@ -33,22 +32,79 @@ function AgentUsage() {
     ]
   };
 
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
+  // Determine active tab based on URL path
+  const getActiveTab = () => {
+    if (currentPath.includes('/settings/')) return 'settings';
+    if (currentPath.includes('/activity/')) return 'logs';
+    if (currentPath.includes('/usage/')) return 'usage';
+    if (currentPath.includes('/setup/')) return 'setup';
+    return 'usage'; // Default tab for this component
+  };
+  
+  const activeTab = getActiveTab();
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header with gradient underline */}
-      <div className="relative mb-8">
-        <div className="flex items-center">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center text-gray-400 hover:text-emerald-400 transition-colors mr-4"
-          >
-            <FiArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Agent Usage Statistics</h1>
-            <p className="text-gray-400 text-sm mt-1">{getAgentName()}</p>
-          </div>
+      <div className="relative mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-white">{getAgentName()}</h2>
+          <p className="text-gray-400 text-sm mt-1">Configure and monitor your AI assistant</p>
         </div>
+      </div>
+      
+      {/* Tabs Navigation */}
+      <div className="flex border-b border-gray-700/40 mb-6">
+        <Link 
+          to={`/dashboard/settings/${agentId}`}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === 'settings' 
+            ? 'text-emerald-400 border-b-2 border-emerald-400' 
+            : 'text-gray-400 hover:text-white'}`}
+        >
+          <div className="flex items-center">
+            <FiSettings className="mr-2" />
+            Settings
+          </div>
+        </Link>
+        <Link 
+          to={`/dashboard/activity/${agentId}`}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === 'logs' 
+            ? 'text-emerald-400 border-b-2 border-emerald-400' 
+            : 'text-gray-400 hover:text-white'}`}
+        >
+          <div className="flex items-center">
+            <FiActivity className="mr-2" />
+            Logs
+          </div>
+        </Link>
+        <Link 
+          to={`/dashboard/usage/${agentId}`}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === 'usage' 
+            ? 'text-emerald-400 border-b-2 border-emerald-400' 
+            : 'text-gray-400 hover:text-white'}`}
+        >
+          <div className="flex items-center">
+            <FiBarChart2 className="mr-2" />
+            Usage
+          </div>
+        </Link>
+        <Link 
+          to={`/dashboard/setup/${agentId}`}
+          className={`px-4 py-2 text-sm font-medium ${activeTab === 'setup' 
+            ? 'text-emerald-400 border-b-2 border-emerald-400' 
+            : 'text-gray-400 hover:text-white'}`}
+        >
+          <div className="flex items-center">
+            <FiHelpCircle className="mr-2" />
+            Setup Guide
+          </div>
+        </Link>
+      </div>
+
+      <div className="mb-8">
         <div className="h-0.5 w-full bg-gradient-to-r from-emerald-400/20 to-blue-500/20 mt-4"></div>
       </div>
       

@@ -385,40 +385,7 @@ const TokenManagement = () => {
         )}
       </div>
 
-      {/* Available Token Packages */}
-      <div className="bg-[#1A1E23] rounded-xl shadow-lg border border-dark-card/30 overflow-hidden">
-        <div className="px-6 pt-6 pb-4">
-          <h2 className="text-xl font-bold text-white">Token Packages</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 p-6">
-          {packages.map((pkg) => (
-            <div key={pkg.id} className="bg-dark-card/50 rounded-2xl shadow-lg border border-dark-card/30 p-6 flex flex-col hover:border-primary/50 transition-all duration-300">
-              <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
-              <p className="text-gray-400 mb-4">{pkg.description}</p>
-              
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-white">${pkg.price}</span>
-              </div>
-              
-              <div className="flex-grow mb-6">
-                <div className="flex items-center text-gray-300 mb-2">
-                  <FaRobot className="mr-2 text-primary" />
-                  <span>{pkg.token_amount} <FaRobot className="inline mx-1" /> tokens</span>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => handlePurchaseTokens(pkg.id)}
-                disabled={purchasing}
-                className="w-full py-3 rounded-lg font-semibold flex items-center justify-center bg-primary hover:bg-primary-hover text-dark hover:shadow-glow transition-all duration-300"
-              >
-                <FiCreditCard className="mr-2" />
-                {purchasing ? 'Processing...' : 'Purchase'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Token Packages panel removed */}
 
       {/* Purchase Confirmation Modal */}
       {showConfirmation && selectedPackage && (
