@@ -215,9 +215,15 @@ export const fetchSubscriptionPlans = async () => {
   ];
 
   try {
-    // In production environment, always use the fallback plans for now
-    // This prevents TypeError when trying to access undefined properties
-    if (process.env.NODE_ENV === 'production') {
+    // Always return hardcoded plans for now to avoid any API-related errors
+    // This is the safest approach until API issues are resolved
+    console.log('Using hardcoded plans data to ensure consistent display');
+    return fallbackPlans;
+    
+    /* 
+    // The code below is kept but commented out until API issues are resolved
+    // Check if we're in production and use hardcoded data if so
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
       console.log('Production environment detected, using hardcoded plans data');
       return fallbackPlans;
     }
@@ -268,6 +274,7 @@ export const fetchSubscriptionPlans = async () => {
       console.warn('Fetch error:', fetchError);
       return fallbackPlans;
     }
+    */
   } catch (error) {
     console.error('Error in fetchSubscriptionPlans:', error);
     console.log('Falling back to hardcoded plans array due to error');
