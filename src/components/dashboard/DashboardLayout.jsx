@@ -224,45 +224,20 @@ function DashboardLayout({ children }) {
   // No section navigation buttons needed as they're in the top navigation
 
   return (
-    <>
-      <div className="max-w-[1440px] mx-auto px-8 page-content">
-        {/* Title header removed */}
-        
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="w-full md:w-64 shrink-0">
-            {/* Contextual Section Menu */}
-            <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
-            <h2 className="text-xl font-bold text-white mb-4 px-2">
-              {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
-            </h2>
-            <nav>
-              <ul className="space-y-1">
-                {/* Section-specific menu items */}
-                {getActiveMenuItems().map((item, index) => {
-                  const isActive = location.pathname === item.path;
-                  return (
-                    <li key={item.path}>
-                      <Link
-                        to={item.path}
-                        className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                        }`}
-                      >
-                        {item.icon}
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-                
-                {/* Only show AI Agents section at the bottom when in Dashboard section */}
-                {activeSection === 'dashboard' && (
-                  <>
-                    <li className="border-t border-white/5 my-3"></li>
-                    <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
-                    {agentsMenuItems.map((item) => {
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow">
+        <div className="max-w-[1440px] mx-auto px-8 page-content">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="w-full md:w-64 shrink-0">
+              {/* Contextual Section Menu */}
+              <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
+                <h2 className="text-xl font-bold text-white mb-4 px-2">
+                  {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+                </h2>
+                <nav>
+                  <ul className="space-y-1">
+                    {/* Section-specific menu items */}
+                    {getActiveMenuItems().map((item, index) => {
                       const isActive = location.pathname === item.path;
                       return (
                         <li key={item.path}>
@@ -280,40 +255,65 @@ function DashboardLayout({ children }) {
                         </li>
                       );
                     })}
-                  </>
-                )}
-              </ul>
-            </nav>
+                    
+                    {/* Only show AI Agents section at the bottom when in Dashboard section */}
+                    {activeSection === 'dashboard' && (
+                      <>
+                        <li className="border-t border-white/5 my-3"></li>
+                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
+                        {agentsMenuItems.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                }`}
+                              >
+                                {item.icon}
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </>
+                    )}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              {children}
+            </div>
           </div>
         </div>
-        
-        <div className="flex-1">
-          {children}
-        </div>
       </div>
+      
+      {/* Dashboard Footer */}
+      <footer className="border-t border-gray-700/40 bg-[#1A1E23] w-full mt-auto">
+        <div className="max-w-[1440px] mx-auto px-8">
+          <div className="flex flex-wrap items-center justify-between pt-5 pb-3 px-2">
+            <div className="flex items-center space-x-2">
+              <FaRobot className="text-primary" size={18} />
+              <span className="text-white text-sm font-medium">geniusOS</span>
+              <span className="text-gray-400 text-xs px-2">© {new Date().getFullYear()}</span>
+            </div>
+            
+            <div className="flex items-center space-x-8 text-sm">
+              <Link to="/terms" className="text-gray-300 hover:text-primary transition-colors">Terms</Link>
+              <Link to="/privacy" className="text-gray-300 hover:text-primary transition-colors">Privacy</Link>
+              <Link to="/security" className="text-gray-300 hover:text-primary transition-colors">Security</Link>
+              <Link to="/help" className="text-gray-300 hover:text-primary transition-colors">Help</Link>
+              <Link to="/status" className="text-gray-300 hover:text-primary transition-colors">Status</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
-    
-    {/* Dashboard Footer */}
-    <footer className="sticky-footer mt-16 pt-6 pb-0 border-t border-gray-700/40 bg-[#1A1E23] w-full" style={{ marginBottom: '-1px' }}>
-      <div className="max-w-[1440px] mx-auto px-8">
-        <div className="flex flex-wrap items-center justify-between pt-5 pb-3 px-2">
-          <div className="flex items-center space-x-2">
-            <FaRobot className="text-primary" size={18} />
-            <span className="text-white text-sm font-medium">geniusOS</span>
-            <span className="text-gray-400 text-xs px-2">© {new Date().getFullYear()}</span>
-          </div>
-          
-          <div className="flex items-center space-x-8 text-sm">
-            <Link to="/terms" className="text-gray-300 hover:text-primary transition-colors">Terms</Link>
-            <Link to="/privacy" className="text-gray-300 hover:text-primary transition-colors">Privacy</Link>
-            <Link to="/security" className="text-gray-300 hover:text-primary transition-colors">Security</Link>
-            <Link to="/help" className="text-gray-300 hover:text-primary transition-colors">Help</Link>
-            <Link to="/status" className="text-gray-300 hover:text-primary transition-colors">Status</Link>
-          </div>
-        </div>
-      </div>
-    </footer>
-    </>
   );
 }
 

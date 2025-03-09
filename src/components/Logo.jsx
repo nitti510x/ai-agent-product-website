@@ -21,12 +21,12 @@ function Logo({ className = "h-8" }) {
             Intelli
           </span>
           
-          {/* Agents part with bold weight, slight italic, and stronger neon blue glow */}
+          {/* Agents part with bold weight, slight italic, and gradient color without glow */}
           <span 
             className="font-bold tracking-normal bg-gradient-to-r from-[#53FFCB] to-[#53D3FF] bg-clip-text text-transparent italic"
             style={{ 
-              letterSpacing: '0.02em',
-              textShadow: '0 0 10px rgba(83, 255, 203, 0.6), 0 0 4px rgba(83, 211, 255, 0.6)'
+              letterSpacing: '0.02em'
+              /* Removed text shadow to eliminate fuzziness */
             }}
           >
             Agents
