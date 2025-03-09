@@ -215,49 +215,59 @@ export const fetchSubscriptionPlans = async () => {
   ];
 
   try {
-    // First try to use the hardcoded data directly since we're having CORS issues
-    console.log('Using hardcoded plans data due to CORS issues with external API');
-    return fallbackPlans;
+    // In production environment, always use the fallback plans for now
+    // This prevents TypeError when trying to access undefined properties
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Production environment detected, using hardcoded plans data');
+      return fallbackPlans;
+    }
 
-    // The code below is kept but commented out until CORS issues are resolved
-    /*
-    // Get the current user's JWT token for authentication
-    const { data: { session } } = await supabase.auth.getSession();
-    const token = session?.access_token;
+    // For development, try to get auth session but handle potential errors
+    let token = '';
+    try {
+      const { data } = await supabase.auth.getSession();
+      token = data?.session?.access_token || '';
+    } catch (authError) {
+      console.warn('Auth session error:', authError);
+      // Continue without token
+    }
     
     // Use the external operations API for plans with active_only parameter
     const externalApiUrl = 'https://agent.ops.geniusos.co/plans/?active_only=true';
     
-    // Fetch plans from the external API with authentication
-    const response = await fetch(externalApiUrl, {
-      headers: {
-        'accept': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
+    try {
+      // Fetch plans from the external API with authentication
+      const response = await fetch(externalApiUrl, {
+        headers: {
+          'accept': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        }
+      });
+      
+      if (!response || !response.ok) {
+        console.warn(`API request failed: ${response?.statusText || 'No response'}`);
+        return fallbackPlans;
       }
-    });
-    
-    if (!response.ok) {
-      console.warn(`API request failed with status ${response.status}: ${response.statusText}`);
-      console.log('Falling back to hardcoded plan data');
+      
+      const plans = await response.json();
+      console.log('Plans fetched successfully:', plans);
+      
+      // Ensure plans have the correct structure
+      return plans.map(plan => ({
+        ...plan,
+        features: Array.isArray(plan.features) 
+          ? plan.features 
+          : typeof plan.features === 'object' && plan.features !== null
+            ? Object.entries(plan.features).map(([key, value]) => ({
+                icon: key.toLowerCase().includes('credit') ? 'credit' : 'feature',
+                text: `${value} ${key}`
+              }))
+            : []
+      }));
+    } catch (fetchError) {
+      console.warn('Fetch error:', fetchError);
       return fallbackPlans;
     }
-    
-    const plans = await response.json();
-    console.log('Plans fetched successfully:', plans);
-    
-    // Ensure plans have the correct structure
-    return plans.map(plan => ({
-      ...plan,
-      features: Array.isArray(plan.features) 
-        ? plan.features 
-        : typeof plan.features === 'object' && plan.features !== null
-          ? Object.entries(plan.features).map(([key, value]) => ({
-              icon: key.toLowerCase().includes('credit') ? 'credit' : 'feature',
-              text: `${value} ${key}`
-            }))
-          : []
-    }));
-    */
   } catch (error) {
     console.error('Error in fetchSubscriptionPlans:', error);
     console.log('Falling back to hardcoded plans array due to error');
