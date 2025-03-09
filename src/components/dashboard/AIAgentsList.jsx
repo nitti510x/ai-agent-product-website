@@ -170,8 +170,8 @@ function AIAgentsList() {
         </a>
       </div>
 
-      {/* Agents grid - 4 across */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* Agents grid - 3 across for better spacing and readability */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {agents.map((agent) => (
           <div
             key={agent.id}

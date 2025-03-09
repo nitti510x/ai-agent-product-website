@@ -224,10 +224,10 @@ function DashboardLayout({ children }) {
   // No section navigation buttons needed as they're in the top navigation
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-grow">
-        <div className="max-w-[1440px] mx-auto px-8 page-content">
-          <div className="flex flex-col md:flex-row gap-8">
+    <div className="flex flex-col min-h-screen bg-[#111418]">
+      <div className="flex-grow flex flex-col">
+        <div className="max-w-[1440px] w-full mx-auto px-8 page-content flex-grow">
+          <div className="flex flex-col md:flex-row gap-8 pb-0">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
               <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
@@ -294,9 +294,9 @@ function DashboardLayout({ children }) {
       </div>
       
       {/* Dashboard Footer */}
-      <footer className="border-t border-gray-700/40 bg-[#1A1E23] w-full mt-auto">
+      <footer className="border-t border-gray-700/40 bg-[#1A1E23] w-full">
         <div className="max-w-[1440px] mx-auto px-8">
-          <div className="flex flex-wrap items-center justify-between pt-5 pb-3 px-2">
+          <div className="flex flex-wrap items-center justify-between pt-4 pb-3 px-2">
             <div className="flex items-center space-x-2">
               <FaRobot className="text-primary" size={18} />
               <span className="text-white text-sm font-medium">geniusOS</span>

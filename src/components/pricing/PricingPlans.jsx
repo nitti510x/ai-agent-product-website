@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiGlobe, FiBarChart2, FiUsers, FiHeadphones, FiCpu, 
          FiFileText, FiCode, FiLink, FiShield, FiUserCheck, FiStar, FiCheck, FiMail } from 'react-icons/fi';
-import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
-import { fetchSubscriptionPlans, formatPrice } from '../../utils/planUtils';
+import { fetchSubscriptionPlans } from '../../utils/planUtils';
 import { useAuth } from '../../context/AuthContext';
 
 // Map of icon names to React icon components
@@ -20,7 +19,11 @@ const iconComponents = {
   integration: FiLink,
   sla: FiShield,
   account: FiUserCheck,
-  feature: FiStar
+  feature: FiStar,
+  credit: FaRobot,
+  slack: FiCode,
+  content: FiFileText,
+  card: FiCheck
 };
 
 // Default icon if not found in the map
@@ -37,13 +40,15 @@ const PricingPlans = () => {
     const loadPlans = async () => {
       setLoading(true);
       const plansData = await fetchSubscriptionPlans();
+      console.log('Loaded plans:', plansData);
       setPlans(plansData);
       
-      // Filter out free and enterprise plans
+      // Filter out free trial and enterprise plans
       const filtered = plansData.filter(plan => 
-        plan.name.toLowerCase() !== 'free' && 
-        plan.name.toLowerCase() !== 'enterprise'
+        !plan.name.toLowerCase().includes('free') && 
+        !plan.name.toLowerCase().includes('enterprise')
       );
+      console.log('Filtered plans:', filtered);
       setFilteredPlans(filtered);
       
       setLoading(false);
@@ -83,15 +88,15 @@ const PricingPlans = () => {
             
             <div className="plan-header">
               <div className="plan-icon">
-                {plan.name === 'Starter' && <FiUser />}
+                {plan.name.toLowerCase().includes('starter') && <FiUser />}
                 {plan.name === 'Pro' && <FiStar />}
                 {plan.name === 'Business' && <FiUsers />}
               </div>
               <h3 className="plan-name">{plan.name}</h3>
               <div className="plan-price">
-                {plan.amount > 0 ? (
+                {plan.price > 0 ? (
                   <>
-                    <span className="price">${plan.amount === 0 ? "500" : formatPrice(plan.amount)}</span>
+                    <span className="price">${plan.price}</span>
                     <span className="period">/{plan.interval}</span>
                   </>
                 ) : (
@@ -104,17 +109,10 @@ const PricingPlans = () => {
             <div className="plan-features">
               <h4>Features</h4>
               <ul>
-                {plan.features && Object.entries(plan.features).map(([key, value]) => (
-                  <li key={key}>
-                    <FiCheck className="check-icon" />
-                    {typeof value === 'object' ? (
-                      <span>{key}: {JSON.stringify(value)}</span>
-                    ) : (
-                      <span>{key.toLowerCase().includes('token') || key.toLowerCase().includes('credit') ? 
-                        <>{value} <FaRobot className="inline text-primary" /> {key}</> : 
-                        value}
-                      </span>
-                    )}
+                {plan.features && Array.isArray(plan.features) && plan.features.map((feature, index) => (
+                  <li key={index}>
+                    {renderFeatureIcon(feature.icon)}
+                    <span>{feature.text}</span>
                   </li>
                 ))}
               </ul>
@@ -122,9 +120,9 @@ const PricingPlans = () => {
             
             <button 
               onClick={() => handleSelectPlan(plan)} 
-              className={`btn ${plan.name === 'Enterprise' ? 'btn-outline' : 'btn-primary'}`}
+              className={`btn ${plan.name.toLowerCase().includes('enterprise') ? 'btn-outline' : 'btn-primary'}`}
             >
-              {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
+              {plan.name.toLowerCase().includes('enterprise') ? 'Contact Sales' : 'Get Started'}
             </button>
           </div>
         ))}

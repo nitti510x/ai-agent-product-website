@@ -27,16 +27,22 @@ GeniusOS AI Agents Platform provides a subscription-based service for accessing 
 The application uses a modern serverless architecture:
 
 - **Frontend**: React application with Vite
-- **Backend**: 
-  - Supabase Edge Functions for serverless API endpoints
-  - Express.js API server for database operations
-- **Database**: 
-  - Railway PostgreSQL for plans and subscription data
-  - Supabase PostgreSQL for user authentication and other app data
+- **External API**: All data operations must use `agent.ops.geniusos.co`
 - **Authentication**: Supabase Auth
-- **Payments**: Stripe integration via Supabase Edge Functions
+- **Payments**: Stripe integration via the external API service
 
-> **Note**: The application uses Railway PostgreSQL for storing plans and subscription data, while Supabase is used only for credit card processing and user authentication.
+> **IMPORTANT**: This application should NEVER implement any API services locally. All data operations (plans, subscriptions, tokens, etc.) MUST be accessed through the external API service at `agent.ops.geniusos.co`. This is a critical architectural requirement.
+
+## External API Service
+
+The application relies exclusively on the external API service at `agent.ops.geniusos.co` for all data operations:
+
+- **Plans and Pricing**: `/plans` endpoint for subscription plans
+- **User Tokens**: Token management and usage tracking
+- **Transactions**: Payment processing and history
+- **Agent Configuration**: Settings and operational data for AI agents
+
+All client-side code should make direct requests to the external API endpoints. No local API services or proxies should be implemented within this application.
 
 ## Features
 
@@ -50,12 +56,11 @@ The application uses a modern serverless architecture:
 ## Tech Stack
 
 - **Frontend**: React, Tailwind CSS
-- **Backend**: 
-  - Supabase Edge Functions
-  - Express.js API server
-- **Database**: PostgreSQL (via Supabase and Railway)
+- **External API**: `agent.ops.geniusos.co` for all data operations
 - **Authentication**: Supabase Auth
-- **Payment Processing**: Stripe
+- **UI Components**: Custom components with FaRobot icons from react-icons/fa6
+- **Styling**: Tailwind CSS with custom color scheme (#1A1E23 for content panels, #1F242B for sidebar)
+- **Payment Processing**: Stripe (via external API)
 - **Deployment**: Railway
 
 ## Installation
