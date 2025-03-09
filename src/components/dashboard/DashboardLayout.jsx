@@ -4,15 +4,18 @@ import {
   FiHome, FiActivity, FiBarChart2, FiSettings, FiSlack, FiImage, 
   FiFileText, FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
-  FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout
+  FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
+  FiBell, FiCheckCircle
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const { unreadCount } = useNotifications();
   
   // Determine active section based on URL path
   useEffect(() => {
@@ -25,6 +28,8 @@ function DashboardLayout({ children }) {
       setActiveSection('help');
     } else if (path.includes('/dashboard/account')) {
       setActiveSection('account');
+    } else if (path.includes('/dashboard/notifications')) {
+      setActiveSection('notifications');
     } else {
       setActiveSection('dashboard');
     }
@@ -150,6 +155,35 @@ function DashboardLayout({ children }) {
     }
   ];
   
+  // Notifications section menu items
+  const notificationsMenuItems = [
+    {
+      path: '/dashboard/notifications',
+      label: 'All Notifications',
+      icon: <FiBell className="mr-2" />
+    },
+    {
+      path: '/dashboard/notifications?filter=unread',
+      label: 'Unread',
+      icon: <FiAlertCircle className="mr-2" />
+    },
+    {
+      path: '/dashboard/notifications?filter=pending',
+      label: 'Pending Approval',
+      icon: <FiClock className="mr-2" />
+    },
+    {
+      path: '/dashboard/notifications?filter=completed',
+      label: 'Completed',
+      icon: <FiCheckCircle className="mr-2" />
+    },
+    {
+      path: '/dashboard/notifications?filter=alerts',
+      label: 'Alerts',
+      icon: <FiAlertCircle className="mr-2" />
+    }
+  ];
+  
   // AI Agents section - always shown at the bottom
   const agentsMenuItems = [
     {
@@ -180,6 +214,8 @@ function DashboardLayout({ children }) {
         return helpMenuItems;
       case 'account':
         return accountMenuItems;
+      case 'notifications':
+        return notificationsMenuItems;
       default:
         return dashboardMenuItems;
     }
@@ -194,7 +230,7 @@ function DashboardLayout({ children }) {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-64 shrink-0">
           {/* Contextual Section Menu */}
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
+          <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
             <h2 className="text-xl font-bold text-white mb-4 px-2">
               {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
             </h2>
@@ -209,8 +245,8 @@ function DashboardLayout({ children }) {
                         to={item.path}
                         className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                           isActive
-                            ? 'bg-primary/20 text-primary'
-                            : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
+                            ? 'bg-emerald-500/20 text-emerald-400'
+                            : 'text-gray-300 hover:bg-black/20 hover:text-white'
                         }`}
                       >
                         {item.icon}
@@ -223,8 +259,8 @@ function DashboardLayout({ children }) {
                 {/* Only show AI Agents section at the bottom when in Dashboard section */}
                 {activeSection === 'dashboard' && (
                   <>
-                    <li className="border-t border-white/10 my-3"></li>
-                    <li className="text-gray-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
+                    <li className="border-t border-white/5 my-3"></li>
+                    <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
                     {agentsMenuItems.map((item) => {
                       const isActive = location.pathname === item.path;
                       return (
@@ -233,8 +269,8 @@ function DashboardLayout({ children }) {
                             to={item.path}
                             className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                               isActive
-                                ? 'bg-primary/20 text-primary'
-                                : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
                             }`}
                           >
                             {item.icon}

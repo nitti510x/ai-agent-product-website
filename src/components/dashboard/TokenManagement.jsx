@@ -241,18 +241,7 @@ const TokenManagement = () => {
     );
   }
 
-  if (!tokenData?.subscription) {
-    return (
-      <div className="p-6">
-        <div className="mb-8 bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg">
-          <div className="flex items-center">
-            <FiAlertTriangle className="mr-2" size={20} />
-            <span>You must have an active subscription to purchase tokens. Please subscribe to a plan first.</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // No longer checking for subscription here - moved to TokenPurchase component
 
   return (
     <div className="space-y-8">
@@ -371,8 +360,8 @@ const TokenManagement = () => {
                     You haven't purchased any additional token packs yet
                   </p>
                   <button
-                    onClick={() => document.getElementById('token-packages').scrollIntoView({ behavior: 'smooth' })}
-                    className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm transition-colors"
+                    onClick={() => navigate('/dashboard/tokens/purchase')}
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium"
                   >
                     Purchase Token Packs
                   </button>
@@ -397,11 +386,9 @@ const TokenManagement = () => {
       </div>
 
       {/* Available Token Packages */}
-      <div className="bg-dark-card rounded-xl shadow-lg border border-dark-card/30 overflow-hidden">
+      <div className="bg-[#1A1E23] rounded-xl shadow-lg border border-dark-card/30 overflow-hidden">
         <div className="px-6 pt-6 pb-4">
-          <p className="text-gray-400 text-sm">
-            Purchase additional token packs to extend your usage beyond your plan limits
-          </p>
+          <h2 className="text-xl font-bold text-white">Token Packages</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 p-6">
           {packages.map((pkg) => (

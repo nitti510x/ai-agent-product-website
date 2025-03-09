@@ -129,14 +129,14 @@ function OrganizationProfile() {
     <>
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Organization Profile</h1>
+          <h2 className="text-xl font-bold text-white">Organization Profile</h2>
           <p className="text-gray-400 mt-1">Manage your organization's details and branding information</p>
         </div>
         <button
           type="button"
           onClick={handleSubmit}
           disabled={loading}
-          className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
@@ -185,7 +185,7 @@ function OrganizationProfile() {
                     </div>
                     <input
                       type="text"
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_name"
                       name="org_name"
                       value={organization.org_name}
@@ -206,7 +206,7 @@ function OrganizationProfile() {
                     </div>
                     <input
                       type="text"
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_slogan"
                       name="org_slogan"
                       value={organization.org_slogan}
@@ -227,7 +227,7 @@ function OrganizationProfile() {
                     </div>
                     <input
                       type="text"
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_industry"
                       name="org_industry"
                       value={organization.org_industry}
@@ -248,7 +248,7 @@ function OrganizationProfile() {
                     </div>
                     <input
                       type="text"
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_location"
                       name="org_location"
                       value={organization.org_location}
@@ -269,7 +269,7 @@ function OrganizationProfile() {
                     </div>
                     <input
                       type="url"
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_website_url"
                       name="org_website_url"
                       value={organization.org_website_url}
@@ -295,7 +295,7 @@ function OrganizationProfile() {
                       <FiAward className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_brand_values"
                       name="org_brand_values"
                       value={organization.org_brand_values}
@@ -316,7 +316,7 @@ function OrganizationProfile() {
                       <FiMessageSquare className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_brand_voice"
                       name="org_brand_voice"
                       value={organization.org_brand_voice}
@@ -337,7 +337,7 @@ function OrganizationProfile() {
                       <FiTarget className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_brand_messaging"
                       name="org_brand_messaging"
                       value={organization.org_brand_messaging}
@@ -364,7 +364,7 @@ function OrganizationProfile() {
                       <FiUsers className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_target_audience"
                       name="org_target_audience"
                       value={organization.org_target_audience}
@@ -385,7 +385,7 @@ function OrganizationProfile() {
                       <FiPackage className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_primary_services"
                       name="org_primary_services"
                       value={organization.org_primary_services}
@@ -406,7 +406,7 @@ function OrganizationProfile() {
                       <FiLayers className="text-emerald-400" />
                     </div>
                     <textarea
-                      className="pl-10 w-full bg-transparent border-2 border-[#2f3946] focus:border-[#2AC4FF] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
                       id="org_secondary_services"
                       name="org_secondary_services"
                       value={organization.org_secondary_services}

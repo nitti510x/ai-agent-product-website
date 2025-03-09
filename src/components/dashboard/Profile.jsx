@@ -137,7 +137,7 @@ function Profile() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">My Profile</h1>
+        <h2 className="text-xl font-bold text-white">My Profile</h2>
         <p className="text-gray-400 mt-1">Manage your personal information and account security</p>
       </div>
       

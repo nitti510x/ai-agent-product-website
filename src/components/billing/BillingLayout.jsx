@@ -29,7 +29,7 @@ function BillingLayout({ children }) {
       icon: <FiFileText className="mr-2" />
     },
     {
-      path: '/dashboard/tokens',
+      path: '/dashboard/billing/tokens',
       label: 'Token Management',
       icon: <FaRobot className="mr-2" />,
       isCredit: true

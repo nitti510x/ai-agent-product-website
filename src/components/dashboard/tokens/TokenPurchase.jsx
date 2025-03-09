@@ -1,9 +1,36 @@
 import React from 'react';
-import { FiShoppingCart } from 'react-icons/fi';
-import { IoDiamond } from 'react-icons/io5';
+import { FiShoppingCart, FiAlertTriangle } from 'react-icons/fi';
 import { FaRobot } from 'react-icons/fa6';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '../../../config/supabase';
+import { agentService } from '../../../services/agentService';
 
 function TokenPurchase() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [tokenData, setTokenData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserAndTokens = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setUser(user);
+          const tokenData = await agentService.getUserTokens(user.id);
+          setTokenData(tokenData);
+        }
+      } catch (error) {
+        console.error('Error fetching user or token data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserAndTokens();
+  }, []);
+
   // Sample token packages
   const tokenPackages = [
     {
@@ -36,8 +63,44 @@ function TokenPurchase() {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="p-6">
+        <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
+          <div className="flex items-center">
+            <FiAlertTriangle className="mr-2" size={20} />
+            <span>You must be logged in to view this page</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const subscriptionWarning = !tokenData?.subscription && (
+    <div className="mb-8 bg-yellow-900/20 border border-yellow-500/50 text-yellow-500 p-4 rounded-lg">
+      <div className="flex items-center">
+        <FiAlertTriangle className="mr-2" size={20} />
+        <span>
+          You must have an active subscription to purchase tokens. 
+          <Link to="/dashboard/billing" className="text-primary underline ml-1 hover:text-primary-hover">
+            Subscribe to a plan
+          </Link>
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div>
+      {subscriptionWarning}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-bold text-white">Purchase Tokens</h2>
@@ -77,7 +140,11 @@ function TokenPurchase() {
                 <span>Never expires</span>
               </div>
             </div>
-            <button className="w-full bg-primary hover:bg-primary/80 text-black font-medium py-2 rounded-lg transition-colors flex items-center justify-center">
+            <button 
+              className="w-full bg-primary hover:bg-primary/80 text-black font-medium py-2 rounded-lg transition-colors flex items-center justify-center"
+              disabled={!tokenData?.subscription}
+              title={!tokenData?.subscription ? "You need an active subscription to purchase tokens" : ""}
+            >
               <FiShoppingCart className="mr-2" />
               Purchase Now
             </button>

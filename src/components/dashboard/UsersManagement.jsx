@@ -133,7 +133,7 @@ function UsersManagement() {
       </div>
 
       {/* Search and filters */}
-      <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl p-4 mb-6">
+      <div className="bg-[#1A1E23] backdrop-blur-sm border border-white/5 rounded-xl p-4 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -162,7 +162,7 @@ function UsersManagement() {
       </div>
 
       {/* Users table */}
-      <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden">
+      <div className="bg-[#1A1E23] backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

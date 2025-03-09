@@ -257,8 +257,9 @@ function Security() {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="bg-primary hover:bg-primary/80 text-black font-medium px-6 py-2 rounded-lg transition-colors"
+                    className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium"
                   >
+                    <FiLock className="mr-2" />
                     Update Password
                   </button>
                 </div>

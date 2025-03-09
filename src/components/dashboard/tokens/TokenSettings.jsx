@@ -160,53 +160,7 @@ function TokenSettings() {
         </div>
       </div>
 
-      {/* Usage Limits */}
-      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
-        <div className="flex items-center mb-6">
-          <FiAlertCircle className="text-primary mr-3 w-5 h-5" />
-          <h3 className="text-lg font-semibold text-white">Usage Limits</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <p className="text-gray-300">
-            Set daily or monthly token usage limits for your account to prevent unexpected consumption.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-white font-medium mb-2">Daily Usage Limit</h4>
-              <div className="flex items-center">
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="No limit"
-                  className="bg-dark-card/70 border border-gray-700 rounded-lg px-4 py-2 text-white w-full focus:outline-none focus:border-primary"
-                />
-                <FaRobot className="text-primary ml-2 w-5 h-5" />
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-medium mb-2">Monthly Usage Limit</h4>
-              <div className="flex items-center">
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="No limit"
-                  className="bg-dark-card/70 border border-gray-700 rounded-lg px-4 py-2 text-white w-full focus:outline-none focus:border-primary"
-                />
-                <FaRobot className="text-primary ml-2 w-5 h-5" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-6">
-            <button className="bg-primary hover:bg-primary/80 text-black font-medium px-6 py-2 rounded-lg transition-colors">
-              Save Settings
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Usage Limits section has been removed */}
     </div>
   );
 }

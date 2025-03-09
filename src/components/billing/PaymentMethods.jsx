@@ -146,7 +146,7 @@ function AddPaymentMethodForm({ onSuccess, onCancel }) {
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium"
             disabled={!stripe || loading}
           >
             {loading ? (
@@ -552,7 +552,7 @@ function PaymentMethods() {
                   <div className="flex justify-between items-center mb-4">
                     <p className="text-gray-300">Your saved payment methods</p>
                     <button 
-                      className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300"
+                      className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium"
                       onClick={() => setShowAddForm(true)}
                     >
                       <FiPlus className="mr-2" />
@@ -581,7 +581,7 @@ function PaymentMethods() {
                     Add a payment method to subscribe to a plan or purchase credits.
                   </p>
                   <button 
-                    className="px-4 py-2 bg-primary hover:bg-primary-hover rounded-lg text-dark font-semibold flex items-center hover:shadow-glow transition-all duration-300 mx-auto"
+                    className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 text-sm font-medium mx-auto"
                     onClick={() => setShowAddForm(true)}
                   >
                     <FiPlus className="mr-2" />

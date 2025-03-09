@@ -30,7 +30,10 @@ import PaymentMethods from '../components/billing/PaymentMethods';
 import SubscriptionCheckout from '../components/subscription/SubscriptionCheckout';
 import MyAccount from '../pages/MyAccount';
 import Logo from '../components/Logo';
-import { FiUser, FiLogOut, FiCreditCard, FiBell, FiHelpCircle } from 'react-icons/fi';
+import { FiUser, FiLogOut, FiCreditCard, FiHelpCircle } from 'react-icons/fi';
+import Notifications from '../components/dashboard/notifications/Notifications';
+import NotificationDropdown from '../components/dashboard/notifications/NotificationDropdown';
+import { NotificationProvider } from '../contexts/NotificationContext';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -77,7 +80,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-dark">
+      <div className="min-h-screen bg-dark">
       <nav className="bg-dark-lighter border-b border-dark-card">
         <div className="max-w-[1440px] mx-auto px-8 py-4">
           <div className="flex items-center justify-between">
@@ -115,15 +118,7 @@ function Dashboard() {
                 </span>
               </Link>
               {/* Notifications */}
-              <div className="relative cursor-pointer group">
-                <div className="flex items-center text-gray-400 hover:text-primary transition-colors">
-                  <FiBell className="w-5 h-5" />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">0</div>
-                </div>
-                <div className="absolute right-0 mt-2 w-64 bg-dark-card shadow-lg rounded-lg border border-gray-700 p-3 hidden group-hover:block z-10">
-                  <p className="text-gray-300 text-sm">No new notifications</p>
-                </div>
-              </div>
+              <NotificationDropdown />
               {/* My Account Link */}
               <Link 
                 to="/dashboard/account" 
@@ -160,6 +155,7 @@ function Dashboard() {
           <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
           <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+          <Route path="billing/tokens" element={<Navigate to="/dashboard/tokens" replace />} />
           {/* Token Management Routes */}
           <Route path="tokens" element={<DashboardLayout><TokenManagement /></DashboardLayout>} />
           <Route path="tokens/purchase" element={<DashboardLayout><TokenPurchase /></DashboardLayout>} />
@@ -178,6 +174,9 @@ function Dashboard() {
           
           {/* Account Section Routes */}
           <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />
+          
+          {/* Notifications Route */}
+          <Route path="notifications" element={<DashboardLayout><Notifications /></DashboardLayout>} />
           <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
           <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
           <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />

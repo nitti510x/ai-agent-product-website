@@ -95,13 +95,17 @@ function TransactionHistory() {
         </div>
       )}
 
-      <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl shadow-lg overflow-hidden">
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-white">Your Transactions</h2>
+          <p className="text-gray-400 mt-1">View all your payments and credit purchases</p>
+        </div>
+      </div>
+
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 overflow-hidden">
         {/* Transaction list header with search and filter */}
         <div className="p-4 border-b border-dark-card/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-medium text-white">Your Transactions</h2>
-            <p className="text-xs text-gray-400">View all your payments and credit purchases</p>
-          </div>
+          <div className="text-sm text-gray-400">Filter by date or transaction type</div>
           
           <div className="flex items-center space-x-2">
             <div className="relative">
