@@ -151,7 +151,7 @@ function SubscriptionManager() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark">
-        <div className="max-w-md w-full p-8 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30">
+        <div className="max-w-md w-full p-8 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30">
           <div className="text-center">
             <FiAlertTriangle className="mx-auto text-yellow-500" size={48} />
             <h2 className="mt-4 text-2xl font-bold text-white">Authentication Required</h2>
@@ -184,7 +184,7 @@ function SubscriptionManager() {
         )}
 
         {/* Current Subscription */}
-        <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="mb-12 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <h2 className="text-2xl font-bold text-white mb-4">Current Subscription</h2>
           
           {subscription ? (
@@ -232,7 +232,7 @@ function SubscriptionManager() {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {filteredPlans.map((plan) => (
-            <div key={plan.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
+            <div key={plan.id} className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 flex flex-col">
               <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
               <p className="text-gray-400 mb-4">{plan.description}</p>
               

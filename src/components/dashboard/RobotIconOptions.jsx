@@ -28,7 +28,7 @@ function RobotIconOptions() {
   ];
   
   return (
-    <div className="bg-[#1d2127] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
+    <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
       <h2 className="text-xl font-bold text-white mb-6">Robot Icon Options</h2>
       <p className="text-gray-400 mb-6">
         Compare different robot icons from React Icons libraries as alternatives to the diamond icon for representing tokens/credits.

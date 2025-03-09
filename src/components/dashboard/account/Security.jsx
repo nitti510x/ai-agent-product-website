@@ -119,7 +119,7 @@ function Security() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Password Change Section */}
         <div className="md:col-span-2">
-          <div className="bg-[#1d2127] rounded-2xl shadow-2xl border border-gray-800/30 p-6 mb-8">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-gray-800/30 p-6 mb-8">
             <div className="flex items-center mb-6">
               <FiLock className="text-primary mr-3 w-5 h-5" />
               <h3 className="text-lg font-semibold text-white">Change Password</h3>
@@ -270,7 +270,7 @@ function Security() {
         {/* Security Sidebar */}
         <div className="space-y-6">
           {/* Two-Factor Authentication */}
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
             <div className="flex items-center mb-4">
               <FiShield className="text-primary mr-3 w-5 h-5" />
               <h3 className="text-lg font-semibold text-white">Two-Factor Authentication</h3>
@@ -348,7 +348,7 @@ function Security() {
           </div>
           
           {/* Recent Security Activity */}
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Recent Security Activity</h3>
             <div className="space-y-4">
               <div className="border-b border-gray-700 pb-3">

@@ -46,7 +46,7 @@ function Support() {
         {/* Support form */}
         <div className="md:col-span-2">
           {!submitted ? (
-            <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+            <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
               <div className="flex items-center mb-6">
                 <FiMessageSquare className="text-primary mr-3 w-5 h-5" />
                 <h3 className="text-lg font-semibold text-white">Submit a Support Request</h3>
@@ -175,7 +175,7 @@ function Support() {
               </form>
             </div>
           ) : (
-            <div className="bg-dark-card rounded-2xl shadow-2xl border border-primary/30 p-6 text-center">
+            <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-primary/30 p-6 text-center">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FiMessageSquare className="text-primary w-8 h-8" />
               </div>
@@ -195,7 +195,7 @@ function Support() {
         
         {/* Support info sidebar */}
         <div className="space-y-6">
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Support Hours</h3>
             <div className="space-y-2 text-gray-300">
               <div className="flex justify-between">
@@ -216,7 +216,7 @@ function Support() {
             </p>
           </div>
           
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Other Ways to Get Help</h3>
             <ul className="space-y-4">
               <li>

@@ -144,7 +144,7 @@ const EnhancedAuth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark to-dark-lighter p-4">
-      <div className={`max-w-md w-full p-8 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm transition-all duration-500 ${animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      <div className={`max-w-md w-full p-8 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm transition-all duration-500 ${animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         {/* Floating particles for visual effect */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl"></div>

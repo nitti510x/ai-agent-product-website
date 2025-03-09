@@ -92,7 +92,7 @@ function UpdatePassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark to-dark-lighter">
-      <div className="max-w-md w-full p-8 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm">
+      <div className="max-w-md w-full p-8 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-transparent bg-clip-text">
             Update Password

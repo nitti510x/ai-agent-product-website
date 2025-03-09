@@ -11,7 +11,7 @@ function TokenIconPrototype() {
   const credits = [1250, 850, 320, 0];
   
   return (
-    <div className="bg-[#1d2127] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
+    <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
       <h2 className="text-xl font-bold text-white mb-6">Token Icon Prototype</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

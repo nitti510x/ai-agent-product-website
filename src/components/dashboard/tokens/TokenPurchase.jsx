@@ -49,7 +49,7 @@ function TokenPurchase() {
         {tokenPackages.map((pkg) => (
           <div 
             key={pkg.id}
-            className={`relative bg-dark-card rounded-2xl shadow-2xl border ${
+            className={`relative bg-[#1A1E23] rounded-2xl shadow-2xl border ${
               pkg.popular ? 'border-primary' : 'border-dark-card/30'
             } p-6 flex flex-col`}
           >
@@ -85,7 +85,7 @@ function TokenPurchase() {
         ))}
       </div>
 
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <h3 className="text-lg font-semibold text-white mb-4">Token Purchase FAQ</h3>
         <div className="space-y-4">
           <div className="border-b border-gray-700 pb-4">

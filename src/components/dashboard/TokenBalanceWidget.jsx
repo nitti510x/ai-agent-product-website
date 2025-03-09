@@ -85,7 +85,7 @@ const TokenBalanceWidget = ({ compact = false }) => {
         <span className="text-gray-400 text-sm">Loading...</span>
       </div>
     ) : (
-      <div className="mb-6 p-4 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 flex justify-center items-center h-24">
+      <div className="mb-6 p-4 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 flex justify-center items-center h-24">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
       </div>
     );

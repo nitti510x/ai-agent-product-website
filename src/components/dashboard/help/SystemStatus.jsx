@@ -151,7 +151,7 @@ function SystemStatus() {
       </div>
 
       {/* Overall system status */}
-      <div className={`bg-dark-card rounded-2xl shadow-2xl border ${
+      <div className={`bg-[#1A1E23] rounded-2xl shadow-2xl border ${
         overallStatus === 'operational' ? 'border-emerald-500/30' : 
         overallStatus === 'degraded' ? 'border-yellow-500/30' : 'border-red-500/30'
       } p-6 mb-8`}>
@@ -179,7 +179,7 @@ function SystemStatus() {
       </div>
 
       {/* Component status table */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <h3 className="text-lg font-semibold text-white mb-6">Component Status</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -212,7 +212,7 @@ function SystemStatus() {
       </div>
 
       {/* Recent incidents */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <div className="flex items-center mb-6">
           <FiAlertCircle className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Recent Incidents</h3>
@@ -266,7 +266,7 @@ function SystemStatus() {
       </div>
 
       {/* Scheduled maintenance */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <div className="flex items-center mb-6">
           <FiClock className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Scheduled Maintenance</h3>

@@ -108,7 +108,7 @@ function FAQs() {
       </div>
 
       {/* Search bar */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-4 mb-8">
         <div className="relative">
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
@@ -123,7 +123,7 @@ function FAQs() {
 
       {/* FAQ sections */}
       {filteredFaqs.map(category => (
-        <div key={category.id} className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+        <div key={category.id} className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
           <h3 className="text-lg font-semibold text-white mb-6">{category.title}</h3>
           
           <div className="space-y-4">

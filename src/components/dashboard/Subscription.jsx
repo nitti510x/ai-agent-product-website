@@ -476,7 +476,7 @@ function Subscription() {
       {/* Subscription Confirmation Modal */}
       {showConfirmation && selectedPlan && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Confirm Subscription</h3>
             <p className="text-gray-400 mb-6">
               You are about to subscribe to the <span className="text-white font-semibold">{selectedPlan.name}</span> plan for ${selectedPlan.price}/month.

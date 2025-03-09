@@ -17,7 +17,7 @@ function Help() {
       {/* Help sections grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Documentation section */}
-        <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <div className="flex items-center mb-4">
             <FiFileText className="text-emerald-400 w-6 h-6 mr-3" />
             <h3 className="text-lg font-semibold text-white">Documentation</h3>
@@ -34,7 +34,7 @@ function Help() {
         </div>
 
         {/* Contact support section */}
-        <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <div className="flex items-center mb-4">
             <FiMessageSquare className="text-emerald-400 w-6 h-6 mr-3" />
             <h3 className="text-lg font-semibold text-white">Contact Support</h3>
@@ -52,7 +52,7 @@ function Help() {
       </div>
 
       {/* FAQ section */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <div className="flex items-center mb-6">
           <FiHelpCircle className="text-emerald-400 w-6 h-6 mr-3" />
           <h3 className="text-lg font-semibold text-white">Frequently Asked Questions</h3>

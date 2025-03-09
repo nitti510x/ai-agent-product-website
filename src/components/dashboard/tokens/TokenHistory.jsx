@@ -74,14 +74,14 @@ function TokenHistory() {
 
       {/* Usage summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <p className="text-gray-400 font-medium mb-2">Total Tokens Used (This Month)</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">200</span>
             <FaRobot className="text-primary ml-2" />
           </div>
         </div>
-        <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <p className="text-gray-400 font-medium mb-2">Plan Tokens Used</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">100</span>
@@ -89,7 +89,7 @@ function TokenHistory() {
             <span className="text-gray-400 ml-2">/ 500</span>
           </div>
         </div>
-        <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+        <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
           <p className="text-gray-400 font-medium mb-2">Token Pack Tokens Used</p>
           <div className="flex items-center">
             <span className="text-3xl font-bold text-white">100</span>
@@ -100,7 +100,7 @@ function TokenHistory() {
       </div>
 
       {/* Usage history table */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <div className="flex items-center mb-6">
           <FiClock className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Recent Token Usage</h3>

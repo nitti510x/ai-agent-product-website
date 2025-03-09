@@ -257,7 +257,7 @@ const TokenManagement = () => {
   return (
     <div className="space-y-8">
       {/* Current Token Balance */}
-      <div className="mb-12 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+      <div className="mb-12 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Your Token Balance</h2>
         
         <div className="flex items-center mb-6">
@@ -436,7 +436,7 @@ const TokenManagement = () => {
       {/* Purchase Confirmation Modal */}
       {showConfirmation && selectedPackage && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Complete Your Purchase</h3>
             <p className="text-gray-400 mb-6">
               You are purchasing <span className="text-white font-semibold">{selectedPackage.token_amount} <FaRobot className="inline mx-1" /> tokens</span> for ${selectedPackage.price}.

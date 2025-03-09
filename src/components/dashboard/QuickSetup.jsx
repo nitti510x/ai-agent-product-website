@@ -99,7 +99,7 @@ function QuickSetup() {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg font-semibold text-white">Setup Progress</h3>
           <span className="text-primary font-medium">{progressPercentage}% Complete</span>
@@ -120,7 +120,7 @@ function QuickSetup() {
         {setupSteps.map((step) => (
           <div 
             key={step.id}
-            className={`bg-dark-card rounded-2xl shadow-2xl border ${
+            className={`bg-[#1A1E23] rounded-2xl shadow-2xl border ${
               step.completed ? 'border-primary/30' : 'border-dark-card/30'
             } p-6 transition-all duration-300 hover:border-primary/50`}
           >
@@ -159,7 +159,7 @@ function QuickSetup() {
       </div>
 
       {/* Recommended Agents */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <h3 className="text-lg font-semibold text-white mb-6">Recommended AI Agents</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {availableAgents.map((agent) => (

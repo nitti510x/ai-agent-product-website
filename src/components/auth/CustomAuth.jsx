@@ -317,7 +317,7 @@ export default function CustomAuth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark to-dark-lighter">
-      <div className="max-w-md w-full p-8 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm">
+      <div className="max-w-md w-full p-8 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm">
         <div className="text-center mb-8">
           {view === 'forgot_password' ? (
             <>

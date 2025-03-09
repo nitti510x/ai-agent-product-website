@@ -167,16 +167,15 @@ function OrganizationProfile() {
         </div>
       )}
 
-      <div className="bg-[#1d2127] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-gray-800/30 p-6">
         <div className="space-y-6">
           <form onSubmit={handleSubmit}>
             {/* Basic Information Section */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Basic Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
                 {/* Organization Name */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_name">
                     Organization Name
                   </label>
@@ -197,7 +196,7 @@ function OrganizationProfile() {
                 </div>
 
                 {/* Organization Slogan */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_slogan">
                     Slogan/Tagline
                   </label>
@@ -218,7 +217,7 @@ function OrganizationProfile() {
                 </div>
 
                 {/* Industry */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_industry">
                     Industry
                   </label>
@@ -239,7 +238,7 @@ function OrganizationProfile() {
                 </div>
 
                 {/* Location */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_location">
                     Location
                   </label>
@@ -260,7 +259,7 @@ function OrganizationProfile() {
                 </div>
 
                 {/* Website URL */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_website_url">
                     Website URL
                   </label>
@@ -279,16 +278,15 @@ function OrganizationProfile() {
                     />
                   </div>
                 </div>
-                </div>
               </div>
             </div>
 
             {/* Brand Identity Section */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Brand Identity</h3>
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Brand Values */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_values">
                     Brand Values
                   </label>
@@ -309,7 +307,7 @@ function OrganizationProfile() {
                 </div>
 
                 {/* Brand Voice */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_voice">
                     Brand Voice
                   </label>
@@ -329,8 +327,8 @@ function OrganizationProfile() {
                   </div>
                 </div>
 
-                {/* Brand Messaging */}
-                <div className="mb-6">
+                {/* Brand Messaging - Full width */}
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_messaging">
                     Brand Messaging
                   </label>
@@ -355,9 +353,9 @@ function OrganizationProfile() {
             {/* Market & Services Section */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Market & Services</h3>
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Target Audience */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_target_audience">
                     Target Audience
                   </label>
@@ -378,7 +376,7 @@ function OrganizationProfile() {
                 </div>
                 
                 {/* Primary Services */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_primary_services">
                     Primary Services/Products
                   </label>
@@ -399,7 +397,7 @@ function OrganizationProfile() {
                 </div>
                 
                 {/* Secondary Services */}
-                <div className="mb-6">
+                <div>
                   <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_secondary_services">
                     Secondary Services/Products
                   </label>

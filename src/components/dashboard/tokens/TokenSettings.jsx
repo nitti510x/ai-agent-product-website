@@ -19,7 +19,7 @@ function TokenSettings() {
       </div>
 
       {/* Notification Settings */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <div className="flex items-center mb-6">
           <FiBell className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Notification Preferences</h3>
@@ -88,7 +88,7 @@ function TokenSettings() {
       </div>
 
       {/* Token Management Settings */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
         <div className="flex items-center mb-6">
           <FiSettings className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Token Management</h3>
@@ -161,7 +161,7 @@ function TokenSettings() {
       </div>
 
       {/* Usage Limits */}
-      <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6">
+      <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <div className="flex items-center mb-6">
           <FiAlertCircle className="text-primary mr-3 w-5 h-5" />
           <h3 className="text-lg font-semibold text-white">Usage Limits</h3>

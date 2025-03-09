@@ -99,7 +99,7 @@ function AddPaymentMethodForm({ onSuccess, onCancel }) {
   };
 
   return (
-    <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
+    <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">
       <h3 className="text-xl font-bold text-white mb-4">Add Payment Method</h3>
       
       {usingFallback && import.meta.env.DEV && (
@@ -202,7 +202,7 @@ function PaymentMethodCard({ paymentMethod, isDefault, onSetDefault, onDelete })
   };
   
   return (
-    <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-6 hover:border-primary/30 transition-all duration-300">
+    <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 hover:border-primary/30 transition-all duration-300">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <div className="mr-4 text-2xl">
@@ -574,7 +574,7 @@ function PaymentMethods() {
                   }
                 </div>
               ) : (
-                <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-8 text-center">
+                <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-8 text-center">
                   <FiCreditCard className="mx-auto text-4xl text-gray-500 mb-3" />
                   <p className="text-gray-300 mb-2">You don't have any payment methods yet.</p>
                   <p className="text-gray-500 text-sm mb-6">

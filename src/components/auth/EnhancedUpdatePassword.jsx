@@ -111,7 +111,7 @@ const EnhancedUpdatePassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark to-dark-lighter p-4 bg-auth">
-      <div className={`max-w-md w-full p-8 bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm transition-all duration-500 auth-card ${animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      <div className={`max-w-md w-full p-8 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 backdrop-blur-sm transition-all duration-500 auth-card ${animateIn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         {/* Particles for visual effect */}
         <div className="particle particle-1"></div>
         <div className="particle particle-2"></div>
