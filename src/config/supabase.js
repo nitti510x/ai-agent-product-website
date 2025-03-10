@@ -38,6 +38,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: customStorage
   },
   global: {
+    headers: {
+      'x-client-info': `@supabase/javascript-client`
+    },
     // Log errors in development
     fetch: (...args) => {
       return fetch(...args).catch(error => {
