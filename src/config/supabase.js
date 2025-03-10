@@ -11,54 +11,50 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 console.log('Using Supabase URL:', supabaseUrl);
 console.log('Using Supabase Anon Key (first 10 chars):', supabaseAnonKey.substring(0, 10) + '...');
 
-// Create a mock Supabase client that handles OAuth redirects without using the actual Supabase client
-// This is a workaround for the "Cannot read properties of undefined (reading 'headers')" error
-const mockSupabaseClient = {
-  auth: {
-    getSession: () => Promise.resolve({ data: { session: null } }),
-    getUser: () => Promise.resolve({ data: { user: null } }),
-    signOut: () => Promise.resolve({ error: null }),
-    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    signInWithOAuth: (params) => {
-      try {
-        console.log('Using direct OAuth redirect instead of Supabase client');
-        const provider = params.provider;
-        const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-        const redirectTo = params.options?.redirectTo || `${siteUrl}/auth/callback`;
-        
-        // Construct the OAuth URL manually
-        // This bypasses the Supabase client entirely and directly redirects to the OAuth provider
-        let oauthUrl;
-        
-        if (provider === 'google') {
-          // Redirect directly to Google OAuth
-          const googleClientId = '1234567890-example.apps.googleusercontent.com'; // Replace with your actual Google client ID
-          oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${encodeURIComponent(redirectTo)}&response_type=code&scope=email%20profile`;
-        } else if (provider === 'slack' || provider === 'slack_oidc') {
-          // Redirect directly to Slack OAuth
-          const slackClientId = '1234567890.1234567890'; // Replace with your actual Slack client ID
-          oauthUrl = `https://slack.com/oauth/v2/authorize?client_id=${slackClientId}&redirect_uri=${encodeURIComponent(redirectTo)}&scope=users:read&user_scope=identity.basic`;
-        } else {
-          // For other providers, redirect to Supabase auth endpoint
-          oauthUrl = `${supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
+// Create a Supabase client with minimal options to avoid errors
+let supabase;
+
+try {
+  // Create the client with minimal options
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true
+    }
+  });
+  console.log('Supabase client created successfully');
+} catch (error) {
+  console.error('Error creating Supabase client:', error);
+  
+  // Create a fallback client that redirects to Supabase auth directly
+  supabase = {
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null } }),
+      getUser: () => Promise.resolve({ data: { user: null } }),
+      signOut: () => Promise.resolve({ error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      signInWithOAuth: (params) => {
+        try {
+          console.log('Using fallback OAuth redirect');
+          const provider = params.provider;
+          const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+          const redirectTo = params.options?.redirectTo || `${siteUrl}/auth/callback`;
+          
+          // Redirect directly to Supabase auth endpoint
+          const authUrl = `${supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
+          
+          console.log('Redirecting to Supabase auth URL:', authUrl);
+          window.location.href = authUrl;
+          
+          return Promise.resolve({ data: null, error: null });
+        } catch (err) {
+          console.error('Error in fallback OAuth redirect:', err);
+          return Promise.resolve({ data: null, error: err });
         }
-        
-        console.log('Redirecting to OAuth URL:', oauthUrl);
-        
-        // Perform the redirect
-        window.location.href = oauthUrl;
-        
-        return Promise.resolve({ data: null, error: null });
-      } catch (error) {
-        console.error('Error in manual OAuth redirect:', error);
-        return Promise.resolve({ data: null, error });
       }
     }
-  }
-};
-
-// Use the mock client
-const supabase = mockSupabaseClient;
+  };
+}
 
 // Helper function to check if user is authenticated
 const isAuthenticated = async () => {
