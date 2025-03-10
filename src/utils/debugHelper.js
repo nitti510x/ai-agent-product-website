@@ -6,8 +6,7 @@ export const debugSupabaseAuth = () => {
   console.log('Environment:', {
     supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
     hasAnonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-    siteUrl: import.meta.env.VITE_SITE_URL,
-    useLocalApi: import.meta.env.VITE_USE_LOCAL_API
+    siteUrl: import.meta.env.VITE_SITE_URL
   });
   
   // Test fetch to Supabase

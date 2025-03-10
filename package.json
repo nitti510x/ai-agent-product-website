@@ -5,10 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "api": "node server/api.js",
-    "dev:all": "concurrently \"npm run dev\" \"npm run api\"",
     "build": "vite build",
-    "start": "NODE_ENV=production node server/api.js",
+    "start": "vite preview --host",
     "deploy": "npm run build && npm run start",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",

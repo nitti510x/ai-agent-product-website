@@ -1,203 +1,186 @@
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { supabase } from '../../config/supabase'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import SlackLogo from '../icons/SlackLogo'
 import { useSubscription } from '../../contexts/SubscriptionContext'
 import { useNavigate } from 'react-router-dom'
 
 export default function AuthUI() {
   const [authView, setAuthView] = useState('sign_in')
-  const { selectedPlan, isFreeTrialSelected } = useSubscription();
-  const navigate = useNavigate();
-  
+  const observersEnabled = useRef(false)
+  const { selectedPlan, isFreeTrialSelected } = useSubscription()
+  const navigate = useNavigate()
+
   // Determine redirect URL based on plan selection
   const getRedirectUrl = () => {
     // Use auth/callback route for OAuth redirects
-    return `${window.location.origin}/auth/callback`;
-  };
-  
-  // Track the current auth view
+    return `${window.location.origin}/auth/callback`
+  }
+
+  // Check if we're in a safe context for observers and DOM manipulation
   useEffect(() => {
+    try {
+      // Test if we can safely use observers
+      const testDiv = document.createElement('div')
+      const testObserver = new MutationObserver(() => {})
+      testObserver.observe(testDiv, { childList: true })
+      testDiv.appendChild(document.createElement('span'))
+      testObserver.disconnect()
+
+      // If we got here, observers are safe to use
+      observersEnabled.current = true
+    } catch (e) {
+      console.warn('MutationObserver not available in this context, using fallback polling')
+      observersEnabled.current = false
+    }
+  }, [])
+
+  // Track the current auth view using polling instead of MutationObserver
+  useEffect(() => {
+    // Skip in non-browser environments
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return
+    }
+
     const checkCurrentView = () => {
-      // Check for forgot password view - multiple ways to detect it
-      const resetButton = document.querySelector('button[type="submit"]');
-      const resetLink = document.querySelector('a');
-      const emailInput = document.querySelector('input[type="email"]');
-      const passwordInput = document.querySelector('input[type="password"]');
-      const formTitle = document.querySelector('form p');
-      
-      // Most reliable check: if we have an email input but no password input, and the submit button mentions "reset"
-      if (emailInput && !passwordInput && resetButton && 
-          (resetButton.textContent.includes('reset') || resetButton.textContent.includes('Reset'))) {
-        setAuthView('forgot_password');
-        return;
-      }
-      
-      // Alternative check: if the link mentions "Sign in" and we don't have a password field
-      if (resetLink && resetLink.textContent.includes('Sign in') && 
-          emailInput && !passwordInput) {
-        setAuthView('forgot_password');
-        return;
-      }
-      
-      // Check for sign up view
-      if (resetButton && resetButton.textContent.includes('Sign up')) {
-        setAuthView('sign_up');
-        return;
-      }
-      
-      // Default to sign in
-      setAuthView('sign_in');
-    };
-    
-    // Initial check with a short delay to ensure DOM is loaded
-    setTimeout(checkCurrentView, 100);
-    
-    // Additional check after a longer delay (for slower loading)
-    setTimeout(checkCurrentView, 500);
-    
-    // Set up observer for view changes
-    const observer = new MutationObserver(() => {
-      // Run immediately for faster response
-      checkCurrentView();
-      // And again after a short delay to catch any animations or delayed renders
-      setTimeout(checkCurrentView, 100);
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Add click event listeners to links that might change the view
-    const handleLinkClick = () => {
-      // Check view after a short delay to allow for view change
-      setTimeout(checkCurrentView, 100);
-      setTimeout(checkCurrentView, 300);
-    };
-    
-    document.addEventListener('click', handleLinkClick);
-    
-    return () => {
-      observer.disconnect();
-      document.removeEventListener('click', handleLinkClick);
-    };
-  }, []);
+      try {
+        // Check for sign-in form
+        const signInForm = document.querySelector('[data-supabase-auth="sign-in"]')
+        if (signInForm) {
+          setAuthView('sign_in')
+          return
+        }
 
-  // Fix Slack button text and add Slack logo
+        // Check for sign-up form
+        const signUpForm = document.querySelector('[data-supabase-auth="sign-up"]')
+        if (signUpForm) {
+          setAuthView('sign_up')
+          return
+        }
+
+        // Check for forgot password form
+        const forgotPasswordForm = document.querySelector('[data-supabase-auth="forgotten-password"]')
+        if (forgotPasswordForm) {
+          setAuthView('forgot_password')
+          return
+        }
+      } catch (e) {
+        console.warn('Error checking auth view:', e)
+      }
+    }
+
+    // Initial check
+    checkCurrentView()
+
+    // Use polling as a safer alternative to MutationObserver
+    const interval = setInterval(checkCurrentView, 500)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
+  // Fix Slack button text and add Slack logo using polling
   useEffect(() => {
-    const fixSlackButton = () => {
-      const buttons = document.querySelectorAll('button');
-      buttons.forEach(button => {
-        // Fix Slack_oidc text
-        if (button.textContent.includes('Slack_oidc')) {
-          button.textContent = button.textContent.replace('Slack_oidc', 'Slack');
-        }
-        
-        // Add Slack logo to Slack buttons
-        if (button.textContent.includes('Slack') && !button.querySelector('svg')) {
-          // Create the SVG element
-          const svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-          svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-          svgElement.setAttribute('viewBox', '0 0 60 60');
-          svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-          svgElement.setAttribute('width', '20');
-          svgElement.setAttribute('height', '20');
-          svgElement.setAttribute('style', 'margin-right: 8px;');
-          svgElement.setAttribute('alt', 'Slack Logo');
-          
-          // Create title
-          const titleElement = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-          titleElement.textContent = 'Slack Logo';
-          svgElement.appendChild(titleElement);
-          
-          // Create paths
-          const paths = [
-            { d: 'M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12', fill: '#36C5F0' },
-            { d: 'M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z', fill: '#2EB67D' },
-            { d: 'M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12', fill: '#ECB22E' },
-            { d: 'M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z', fill: '#E01E5A' }
-          ];
-          
-          paths.forEach(pathData => {
-            const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            pathElement.setAttribute('d', pathData.d);
-            pathElement.setAttribute('fill', pathData.fill);
-            svgElement.appendChild(pathElement);
-          });
-          
-          // Insert SVG before the text
-          const buttonText = button.textContent;
-          button.textContent = '';
-          button.appendChild(svgElement);
-          const textNode = document.createTextNode(' ' + buttonText.trim());
-          button.appendChild(textNode);
-          
-          // Center the content
-          button.style.display = 'flex';
-          button.style.alignItems = 'center';
-          button.style.justifyContent = 'center';
-        }
-      });
-    };
+    // Skip in non-browser environments
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return
+    }
 
-    // Run initially after a short delay to ensure buttons are rendered
-    const initialTimer = setTimeout(fixSlackButton, 500);
-    
-    // Set up a mutation observer to catch dynamically added buttons
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach(() => {
-        fixSlackButton();
-      });
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Clean up on unmount
+    const fixSlackButton = () => {
+      try {
+        const buttons = document.querySelectorAll('button')
+        buttons.forEach(button => {
+          if (button.textContent.includes('Slack')) {
+            // Only modify if we haven't already added our custom content
+            if (!button.querySelector('.slack-logo-container')) {
+              // Store original text
+              const originalText = button.textContent.trim()
+
+              // Clear the button's content
+              button.innerHTML = ''
+
+              // Create container for logo and text
+              const container = document.createElement('div')
+              container.className = 'slack-logo-container'
+              container.style.display = 'flex'
+              container.style.alignItems = 'center'
+              container.style.justifyContent = 'center'
+              container.style.gap = '8px'
+
+              // Add Slack logo
+              const logoContainer = document.createElement('div')
+              logoContainer.style.width = '20px'
+              logoContainer.style.height = '20px'
+              logoContainer.innerHTML = SlackLogo()
+              container.appendChild(logoContainer)
+
+              // Add text
+              const textSpan = document.createElement('span')
+              textSpan.textContent = originalText
+              container.appendChild(textSpan)
+
+              // Add the container to the button
+              button.appendChild(container)
+            }
+          }
+        })
+      } catch (e) {
+        console.warn('Error fixing Slack button:', e)
+      }
+    }
+
+    // Initial fix with delay to ensure DOM is loaded
+    const initialTimer = setTimeout(fixSlackButton, 500)
+
+    // Use polling as a safer alternative to MutationObserver
+    const interval = setInterval(fixSlackButton, 1000)
+
     return () => {
-      clearTimeout(initialTimer);
-      observer.disconnect();
-    };
-  }, []);
+      clearTimeout(initialTimer)
+      clearInterval(interval)
+    }
+  }, [])
 
   // Direct DOM manipulation for forgot password page
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return
+    }
+
     const updateForgotPasswordHeader = () => {
       // Check if we're on the forgot password page by looking for the submit button text
-      const resetButton = document.querySelector('button[type="submit"]');
-      const emailInput = document.querySelector('input[type="email"]');
-      const passwordInput = document.querySelector('input[type="password"]');
-      
-      if (resetButton && 
-          resetButton.textContent.includes('reset') && 
-          emailInput && 
-          !passwordInput) {
+      const resetButton = document.querySelector('button[type="submit"]')
+      const emailInput = document.querySelector('input[type="email"]')
+      const passwordInput = document.querySelector('input[type="password"]')
+
+      if (resetButton && resetButton.textContent.includes('reset') && emailInput && !passwordInput) {
         // We're on the forgot password page, force update the header
-        const headerTitle = document.querySelector('.text-4xl');
-        const headerDesc = document.querySelector('.text-gray-400');
-        
+        const headerTitle = document.querySelector('.text-4xl')
+        const headerDesc = document.querySelector('.text-gray-400')
+
         if (headerTitle && headerDesc) {
-          headerTitle.textContent = 'Reset Password';
-          headerDesc.textContent = "We'll send you instructions to reset your password";
+          headerTitle.textContent = 'Reset Password'
+          headerDesc.textContent = "We'll send you instructions to reset your password"
         }
       }
-    };
-    
+    }
+
     // Run the check after a short delay
-    const timer1 = setTimeout(updateForgotPasswordHeader, 100);
-    const timer2 = setTimeout(updateForgotPasswordHeader, 500);
-    
-    // Set up observer for DOM changes
-    const observer = new MutationObserver(() => {
-      updateForgotPasswordHeader();
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-    
+    const timer1 = setTimeout(updateForgotPasswordHeader, 100)
+    const timer2 = setTimeout(updateForgotPasswordHeader, 500)
+
+    // Use polling as a safer alternative to MutationObserver
+    const interval = setInterval(updateForgotPasswordHeader, 1000)
+
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      observer.disconnect();
-    };
-  }, []);
+      clearTimeout(timer1)
+      clearTimeout(timer2)
+      clearInterval(interval)
+    }
+  }, [])
 
   // Get the appropriate header and description based on the current view
   const getViewContent = () => {
@@ -206,22 +189,22 @@ export default function AuthUI() {
         return {
           title: 'Get Started',
           description: 'Create your account to access all features'
-        };
+        }
       case 'forgot_password':
         return {
           title: 'Reset Password',
           description: "We'll send you instructions to reset your password"
-        };
+        }
       case 'sign_in':
       default:
         return {
           title: 'Welcome Back',
           description: 'Sign in to continue to your dashboard'
-        };
+        }
     }
-  };
+  }
 
-  const { title, description } = getViewContent();
+  const { title, description } = getViewContent()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark to-dark-lighter">
@@ -230,7 +213,7 @@ export default function AuthUI() {
           <h2 className="text-4xl font-bold bg-gradient-to-r from-[#32FF9F] to-[#2AC4FF] text-transparent bg-clip-text">{title}</h2>
           <p className="text-gray-400 mt-2">{description}</p>
         </div>
-        
+
         <Auth
           supabaseClient={supabase}
           appearance={{

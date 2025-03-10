@@ -13,13 +13,20 @@ export const apiUrl = () => {
     return '';
   }
   
-  // If using local API is explicitly enabled (development only), use the external API URL
+  // If using local API is explicitly enabled (development only), use the local API
   if (useLocalApi) {
-    // Always use the external API URL in production
-    return 'https://agent.ops.geniusos.co/api';
+    return '/api';
   }
   
   // Convert Supabase URL to Edge Functions URL
   // Format: https://<project_ref>.supabase.co -> https://<project_ref>.supabase.co/functions/v1
   return `${supabaseUrl}/functions/v1`;
+};
+
+/**
+ * Returns the base URL for the application
+ * @returns {string} The base URL
+ */
+export const baseUrl = () => {
+  return import.meta.env.VITE_SITE_URL || 'https://agentops.geniusos.co';
 };

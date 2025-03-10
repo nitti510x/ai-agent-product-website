@@ -1,114 +1,86 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Create a memory-based storage that works in all contexts
+class MemoryStorage {
+  constructor() {
+    this.store = new Map();
+  }
+  
+  getItem(key) {
+    return this.store.get(key) || null;
+  }
+  
+  setItem(key, value) {
+    this.store.set(key, value);
+  }
+  
+  removeItem(key) {
+    this.store.delete(key);
+  }
+}
 
-// Custom storage implementation that handles errors
-const customStorage = {
-  getItem: (key) => {
+// Create a storage solution that works in all contexts
+const createStorageSolution = () => {
+  // Default to memory storage
+  let storage = new MemoryStorage();
+  
+  // Try to use localStorage if available
+  if (typeof window !== 'undefined') {
     try {
-      return localStorage.getItem(key);
-    } catch (error) {
-      console.warn('Error accessing localStorage:', error);
-      return null;
-    }
-  },
-  setItem: (key, value) => {
-    try {
-      localStorage.setItem(key, value);
-    } catch (error) {
-      console.warn('Error writing to localStorage:', error);
-    }
-  },
-  removeItem: (key) => {
-    try {
-      localStorage.removeItem(key);
-    } catch (error) {
-      console.warn('Error removing from localStorage:', error);
+      // Test if localStorage is available
+      window.localStorage.setItem('supabase_test', 'test');
+      window.localStorage.removeItem('supabase_test');
+      
+      // If we got here, localStorage is available
+      storage = window.localStorage;
+    } catch (e) {
+      console.warn('localStorage not available, using memory storage instead');
     }
   }
+  
+  return storage;
 };
 
-// Safe auth state change handler
-const safeAuthStateChangeHandler = (callback) => {
-  return {
-    data: {
-      subscription: {
-        unsubscribe: () => {
-          console.log('Auth state change subscription unsubscribed safely');
-        }
-      }
-    }
-  };
-};
-
-// Initialize Supabase client with safe defaults
+// Initialize Supabase with the appropriate storage solution
 const initializeSupabase = () => {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Supabase URL or anonymous key is missing from environment variables');
+    return null;
+  }
+  
   try {
-    console.log('Initializing Supabase client with URL:', supabaseUrl);
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('Missing Supabase URL or Anon Key');
-      throw new Error('Supabase configuration is incomplete');
-    }
-    
-    // Create client with safe defaults
-    const client = createClient(supabaseUrl, supabaseAnonKey, {
+    // Create Supabase client with our storage solution
+    return createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        persistSession: true,
+        storage: createStorageSolution(),
         autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: customStorage,
-        // Safe default for auth state change
-        onAuthStateChange: safeAuthStateChangeHandler
-      },
-      global: {
-        headers: {
-          'x-client-info': '@supabase/javascript-client'
-        },
-        // Log errors in development
-        fetch: (...args) => {
-          return fetch(...args).catch(error => {
-            console.error('Supabase fetch error:', error);
-            throw error;
-          });
-        }
-      },
-      // Disable storage features to prevent errors
-      storageOptions: {
-        skipStorageAccess: true
+        persistSession: true,
+        detectSessionInUrl: true
       }
     });
-    
-    console.log('Supabase client initialized successfully');
-    return client;
   } catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
-    // Return a minimal mock client to prevent app crashes
-    return {
-      auth: {
-        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-        signOut: () => Promise.resolve({ error: null })
-      },
-      from: () => ({
-        select: () => ({ data: [], error: null })
-      })
-    };
+    console.error('Error initializing Supabase client:', error);
+    return null;
   }
 };
 
-// Export initialized client
-export const supabase = initializeSupabase();
+// Initialize the Supabase client
+const supabase = initializeSupabase();
 
 // Helper function to check if user is authenticated
 export const isAuthenticated = async () => {
   try {
-    const { data } = await supabase.auth.getSession();
-    return !!data?.session;
+    const { data: { session } } = await supabase.auth.getSession();
+    return !!session;
   } catch (error) {
-    console.error('Error checking authentication status:', error);
+    console.error('Error checking authentication:', error);
     return false;
   }
 };
+
+// Export both default and named exports
+export { supabase, isAuthenticated };
+export default supabase;

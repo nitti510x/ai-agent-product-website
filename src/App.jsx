@@ -3,13 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import AuthUI from './components/auth/Auth';
-import EnhancedAuth from './components/auth/EnhancedAuth';
-import UpdatePassword from './components/auth/UpdatePassword';
-import EnhancedUpdatePassword from './components/auth/EnhancedUpdatePassword';
 import RedirectHandler from './components/auth/RedirectHandler';
-import ChatBot from './components/chat/ChatBot';
-import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import EnhancedAuth from './components/auth/EnhancedAuth';
+import EnhancedUpdatePassword from './components/auth/EnhancedUpdatePassword';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import ChatBot from './components/chat/ChatBot';
 import CheckoutPage from './components/checkout/CheckoutPage';
 import CheckoutSuccess from './components/checkout/CheckoutSuccess';
 import './styles/auth-animations.css';
