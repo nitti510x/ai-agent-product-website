@@ -18,51 +18,32 @@ console.log('Using Site URL for redirects:', siteUrl);
 let supabase;
 
 try {
-  // Create the client with auth configuration
+  // Create the client with simplified auth configuration
+  // This is critical for OAuth to work properly
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
-      storage: {
-        getItem: (key) => {
-          console.log('Getting storage item:', key);
-          try {
-            return window.localStorage.getItem(key);
-          } catch (e) {
-            console.error('Error getting item from localStorage:', e);
-            return null;
-          }
-        },
-        setItem: (key, value) => {
-          console.log('Setting storage item:', key);
-          try {
-            window.localStorage.setItem(key, value);
-          } catch (e) {
-            console.error('Error setting item in localStorage:', e);
-          }
-        },
-        removeItem: (key) => {
-          console.log('Removing storage item:', key);
-          try {
-            window.localStorage.removeItem(key);
-          } catch (e) {
-            console.error('Error removing item from localStorage:', e);
-          }
-        }
-      },
+      flowType: 'implicit', // Try implicit flow instead of PKCE
+      storage: window.localStorage,
       storageKey: 'supabase.auth.token',
-      redirectTo: `${siteUrl}/auth/callback`,
-      cookieOptions: {
-        secure: window.location.protocol === 'https:',
-        sameSite: 'Lax',
-        domain: window.location.hostname,
-        path: '/'
-      }
+      redirectTo: `${siteUrl}/auth/callback`
     }
   });
-  console.log('Supabase client created successfully with PKCE flow');
+  
+  console.log('Supabase client created successfully with implicit flow');
+  
+  // Add a debug listener for auth state changes
+  const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Auth state changed:', event);
+    console.log('Session exists:', !!session);
+    if (session) {
+      console.log('User ID:', session.user.id);
+      console.log('Provider:', session.user.app_metadata?.provider);
+    }
+  });
+  
 } catch (error) {
   console.error('Error creating Supabase client:', error);
   

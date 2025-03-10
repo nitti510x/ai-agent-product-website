@@ -42,6 +42,7 @@ function Login() {
   const redirectUrl = `${siteUrl}/auth/callback`;
   
   console.log('Login page - Using redirect URL:', redirectUrl);
+  console.log('Login page - Site URL:', siteUrl);
 
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center">
@@ -55,26 +56,46 @@ function Login() {
             <p>Click the "Connect to Supabase" button in the top right corner to get started.</p>
           </div>
         ) : (
-          <Auth
-            supabaseClient={clientToUse}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: '#10B981',
-                    brandAccent: '#059669',
+          <>
+            <Auth
+              supabaseClient={clientToUse}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: '#10B981',
+                      brandAccent: '#059669',
+                    }
                   }
                 }
-              }
-            }}
-            providers={['google', 'slack']}
-            socialLayout="horizontal"
-            theme="dark"
-            redirectTo={redirectUrl}
-            onlyThirdPartyProviders={true}
-            view="sign_in"
-          />
+              }}
+              providers={['google', 'slack']}
+              socialLayout="horizontal"
+              theme="dark"
+              redirectTo={redirectUrl}
+              onlyThirdPartyProviders={true}
+              view="sign_in"
+            />
+            <div className="mt-6 text-center text-sm text-gray-400">
+              <p>Having trouble logging in?</p>
+              <button 
+                onClick={() => {
+                  // Clear all auth-related localStorage items
+                  Object.keys(localStorage).forEach(key => {
+                    if (key.includes('supabase') || key.includes('auth')) {
+                      localStorage.removeItem(key);
+                    }
+                  });
+                  // Reload the page
+                  window.location.reload();
+                }}
+                className="mt-2 text-emerald-500 hover:text-emerald-400"
+              >
+                Clear Auth Data & Retry
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
