@@ -13,6 +13,7 @@ A comprehensive platform for AI agents with subscription management and token-ba
   - [Environment Variables](#environment-variables)
   - [Railway PostgreSQL Configuration](#railway-postgresql-configuration)
   - [Supabase Configuration](#supabase-configuration)
+  - [OAuth Configuration](#oauth-configuration)
   - [Stripe Integration](#stripe-integration)
 - [Development](#development)
 - [Deployment](#deployment)
@@ -121,6 +122,39 @@ To configure Supabase:
 2. Enable email authentication in the Auth settings
 3. Get your Supabase URL and anon key from the project settings
 4. Add them to your `.env` file
+
+### OAuth Configuration
+
+The application uses OAuth providers (Google, Slack) for authentication. To configure OAuth:
+
+#### Google OAuth Setup
+
+1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/)
+2. Go to "APIs & Services" > "Credentials"
+3. Create an OAuth 2.0 Client ID (Web application)
+4. Add authorized JavaScript origins:
+   - Development: `http://localhost:5173` (fixed port in vite.config.js)
+   - Production: `https://agentops.geniusos.co`
+   - Supabase URL: `https://qdrtpsuqffsdocjrifwm.supabase.co`
+5. Add authorized redirect URIs:
+   - Development: `http://localhost:5173/auth/callback`
+   - Production: `https://agentops.geniusos.co/auth/callback`
+   - Supabase callback: `https://qdrtpsuqffsdocjrifwm.supabase.co/auth/v1/callback`
+
+#### Slack OAuth Setup
+
+1. Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps)
+2. Under "OAuth & Permissions", add redirect URLs:
+   - Development: `http://localhost:5173/auth/callback`
+   - Production: `https://agentops.geniusos.co/auth/callback`
+   - Supabase callback: `https://qdrtpsuqffsdocjrifwm.supabase.co/auth/v1/callback`
+3. Add the necessary scopes (typically `identity.basic`, `identity.email`)
+
+#### Supabase OAuth Configuration
+
+1. In the Supabase dashboard, go to Authentication > Providers
+2. Enable and configure Google and Slack providers with the client IDs and secrets
+3. Ensure the redirect URL in Supabase matches what you've configured in the OAuth providers
 
 ### Supabase Edge Functions
 
