@@ -5,7 +5,6 @@ import { supabase } from '../../config/supabase';
 function RedirectHandler() {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function handleAuthCallback() {
@@ -20,18 +19,12 @@ function RedirectHandler() {
         console.log('URL query:', query);
         
         // First check if we have a session already
-        try {
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            console.error('Error checking initial session:', sessionError);
-          } else if (sessionData?.session) {
-            console.log('Session already exists, redirecting to dashboard');
-            navigate('/dashboard');
-            return;
-          }
-        } catch (sessionErr) {
-          console.error('Exception checking initial session:', sessionErr);
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (sessionData?.session) {
+          console.log('Session already exists, redirecting to dashboard');
+          navigate('/dashboard');
+          return;
         }
         
         // If no session exists, we need to exchange the code for a session
@@ -42,52 +35,28 @@ function RedirectHandler() {
         
         // Give Supabase a moment to process the authentication
         setTimeout(async () => {
-          try {
-            const { data: delayedSessionData, error: delayedSessionError } = await supabase.auth.getSession();
-            
-            if (delayedSessionError) {
-              console.error('Error getting delayed session:', delayedSessionError);
-              setError(delayedSessionError.message);
-            } else if (delayedSessionData?.session) {
-              console.log('Successfully authenticated after delay');
-              navigate('/dashboard');
-              return;
-            } else {
-              console.error('No session found after delay');
-              
-              // One more attempt with a longer delay
-              setTimeout(async () => {
-                try {
-                  const { data: finalSessionData, error: finalSessionError } = await supabase.auth.getSession();
-                  
-                  if (finalSessionError) {
-                    console.error('Error getting final session:', finalSessionError);
-                    setError(finalSessionError.message);
-                  } else if (finalSessionData?.session) {
-                    console.log('Successfully authenticated after final delay');
-                    navigate('/dashboard');
-                    return;
-                  } else {
-                    console.error('Authentication failed after all attempts');
-                    setError('Authentication failed. Please try again.');
-                  }
-                } catch (finalErr) {
-                  console.error('Exception in final session check:', finalErr);
-                  setError(finalErr.message);
-                }
-                setLoading(false);
-              }, 2000); // 2 second additional delay
-            }
-          } catch (delayedErr) {
-            console.error('Exception in delayed session check:', delayedErr);
-            setError(delayedErr.message);
-            setLoading(false);
+          const { data: delayedSessionData, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error('Error getting session:', sessionError);
+            setError(sessionError.message);
+            navigate('/login');
+            return;
           }
-        }, 2000); // 2 second initial delay
+          
+          if (delayedSessionData?.session) {
+            console.log('Successfully authenticated after delay');
+            navigate('/dashboard');
+          } else {
+            console.error('Authentication failed after delay');
+            setError('Authentication failed. Please try again.');
+            navigate('/login');
+          }
+        }, 1000); // 1 second delay
       } catch (err) {
         console.error('Error in auth callback:', err);
         setError(err.message);
-        setLoading(false);
+        navigate('/login');
       }
     }
     
@@ -113,11 +82,6 @@ function RedirectHandler() {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
             <h2 className="text-xl text-white font-medium">Completing authentication...</h2>
             <p className="text-gray-400 mt-2">You'll be redirected in a moment</p>
-            {loading && (
-              <div className="mt-8 text-xs text-gray-500">
-                <p>If you're not redirected within 10 seconds, please try logging in again.</p>
-              </div>
-            )}
           </>
         )}
       </div>
