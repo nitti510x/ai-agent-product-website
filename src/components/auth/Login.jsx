@@ -1,10 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabase } from '../../contexts/SupabaseContext';
+import { supabase as directSupabase } from '../../config/supabase';
 
 function Login() {
   const { supabase } = useSupabase();
+  const clientToUse = supabase || directSupabase;
+  
+  // Clear any stale auth state on login page load
+  useEffect(() => {
+    const clearStaleAuth = async () => {
+      try {
+        // Check if we have a session that might be invalid
+        const { data, error } = await clientToUse.auth.getSession();
+        console.log('Login page - Current session check:', data?.session ? 'Exists' : 'None');
+        
+        if (error) {
+          console.error('Error checking session on login page:', error);
+          // If there's an error, clear local storage auth data
+          try {
+            const authKeys = Object.keys(localStorage).filter(key => 
+              key.includes('supabase') || key.includes('auth')
+            );
+            console.log('Clearing potential stale auth keys:', authKeys);
+            authKeys.forEach(key => localStorage.removeItem(key));
+          } catch (e) {
+            console.error('Error clearing localStorage:', e);
+          }
+        }
+      } catch (err) {
+        console.error('Exception in login page session check:', err);
+      }
+    };
+    
+    clearStaleAuth();
+  }, [clientToUse]);
+
+  // Get the site URL for redirects
+  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  const redirectUrl = `${siteUrl}/auth/callback`;
+  
+  console.log('Login page - Using redirect URL:', redirectUrl);
 
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center">
@@ -19,7 +56,7 @@ function Login() {
           </div>
         ) : (
           <Auth
-            supabaseClient={supabase}
+            supabaseClient={clientToUse}
             appearance={{
               theme: ThemeSupa,
               variables: {
@@ -34,7 +71,9 @@ function Login() {
             providers={['google', 'slack']}
             socialLayout="horizontal"
             theme="dark"
-            redirectTo={import.meta.env.VITE_SITE_URL + '/auth/callback'}
+            redirectTo={redirectUrl}
+            onlyThirdPartyProviders={true}
+            view="sign_in"
           />
         )}
       </div>

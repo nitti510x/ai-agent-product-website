@@ -25,9 +25,41 @@ try {
       persistSession: true,
       detectSessionInUrl: true,
       flowType: 'pkce',
-      storage: window.localStorage,
+      storage: {
+        getItem: (key) => {
+          console.log('Getting storage item:', key);
+          try {
+            return window.localStorage.getItem(key);
+          } catch (e) {
+            console.error('Error getting item from localStorage:', e);
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          console.log('Setting storage item:', key);
+          try {
+            window.localStorage.setItem(key, value);
+          } catch (e) {
+            console.error('Error setting item in localStorage:', e);
+          }
+        },
+        removeItem: (key) => {
+          console.log('Removing storage item:', key);
+          try {
+            window.localStorage.removeItem(key);
+          } catch (e) {
+            console.error('Error removing item from localStorage:', e);
+          }
+        }
+      },
       storageKey: 'supabase.auth.token',
-      redirectTo: `${siteUrl}/auth/callback`
+      redirectTo: `${siteUrl}/auth/callback`,
+      cookieOptions: {
+        secure: window.location.protocol === 'https:',
+        sameSite: 'Lax',
+        domain: window.location.hostname,
+        path: '/'
+      }
     }
   });
   console.log('Supabase client created successfully with PKCE flow');
@@ -84,6 +116,7 @@ const isAuthenticated = async () => {
       console.error('Error checking authentication:', error);
       return false;
     }
+    console.log('Session check result:', data);
     return !!data.session;
   } catch (err) {
     console.error('Exception checking authentication:', err);
