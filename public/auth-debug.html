@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Auth Debugger</title>
+  <!-- Import Supabase directly from CDN -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #1a1a1a;
+      color: #f0f0f0;
+    }
+    .card {
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background-color: #10B981;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #059669;
+    }
+    pre {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .success { color: #10B981; }
+    .error { color: #EF4444; }
+    .warning { color: #F59E0B; }
+    .info { color: #3B82F6; }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      background-color: #333;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: white;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .tab {
+      padding: 10px 15px;
+      background-color: #333;
+      cursor: pointer;
+      border-radius: 4px 4px 0 0;
+      margin-right: 2px;
+    }
+    .tab.active {
+      background-color: #10B981;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Supabase Auth Debugger</h1>
+    <p>This tool helps diagnose authentication issues with Supabase in production.</p>
+  </div>
+
+  <div class="card">
+    <h2>Environment & Browser Info</h2>
+    <pre id="env-info">Loading...</pre>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" data-tab="client-tab">Client</div>
+      <div class="tab" data-tab="session-tab">Session</div>
+      <div class="tab" data-tab="storage-tab">Storage</div>
+      <div class="tab" data-tab="url-tab">URL</div>
+    </div>
+
+    <div class="tab-content active" id="client-tab">
+      <h3>Supabase Client</h3>
+      <div>
+        <input type="text" id="supabase-url" placeholder="Supabase URL">
+        <input type="text" id="supabase-key" placeholder="Supabase Anon Key">
+        <input type="text" id="redirect-url" placeholder="Redirect URL (optional)">
+      </div>
+      <button id="create-client">Create Supabase Client</button>
+      <button id="use-default-client">Use Default Credentials</button>
+      <pre id="client-output">Click a button to start testing</pre>
+    </div>
+
+    <div class="tab-content" id="session-tab">
+      <h3>Session Management</h3>
+      <button id="check-session">Check Session</button>
+      <button id="sign-in-google">Sign In with Google</button>
+      <button id="sign-in-slack">Sign In with Slack</button>
+      <button id="sign-out">Sign Out</button>
+      <pre id="session-output">No session information available</pre>
+    </div>
+
+    <div class="tab-content" id="storage-tab">
+      <h3>Local Storage</h3>
+      <button id="view-storage">View Storage</button>
+      <button id="clear-storage">Clear Auth Storage</button>
+      <pre id="storage-output">Click "View Storage" to see localStorage contents</pre>
+    </div>
+
+    <div class="tab-content" id="url-tab">
+      <h3>URL Parameters</h3>
+      <button id="parse-url">Parse Current URL</button>
+      <pre id="url-output">Click "Parse Current URL" to analyze the current URL</pre>
+    </div>
+  </div>
+
+  <script>
+    // Default Supabase credentials
+    const DEFAULT_SUPABASE_URL = 'https://qdrtpsuqffsdocjrifwm.supabase.co';
+    const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcnRwc3VxZmZzZG9janJpZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA0NTM4NTMsImV4cCI6MjA1NjAyOTg1M30._qNhJuoI7nmmJxgCJ7JmqfLRYeTk1Kxr-V_N27sj8XE';
+    
+    // Helper function to log with timestamp and color
+    function log(elementId, message, type = 'info') {
+      const element = document.getElementById(elementId);
+      const timestamp = new Date().toISOString();
+      const colorClass = type === 'error' ? 'error' : 
+                        type === 'success' ? 'success' : 
+                        type === 'warning' ? 'warning' : 'info';
+      
+      element.innerHTML = `<span class="${colorClass}">[${timestamp}] ${message}</span>\n` + element.innerHTML;
+    }
+
+    // Display environment and browser information
+    function displayEnvironmentInfo() {
+      const info = {
+        'User Agent': navigator.userAgent,
+        'Window Location': window.location.href,
+        'Cookies Enabled': navigator.cookieEnabled,
+        'Local Storage Available': (() => {
+          try {
+            localStorage.setItem('test', 'test');
+            localStorage.removeItem('test');
+            return true;
+          } catch (e) {
+            return false;
+          }
+        })(),
+        'Third-Party Cookies': 'Unknown (requires testing)',
+        'Supabase Library': typeof window.supabase !== 'undefined' ? 'Available' : 'Not Available',
+        'createClient Function': typeof window.supabase?.createClient === 'function' ? 'Available' : 'Not Available'
+      };
+      
+      document.getElementById('env-info').textContent = JSON.stringify(info, null, 2);
+    }
+
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Show corresponding content
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Global variables
+    let supabase = null;
+
+    // Initialize page
+    displayEnvironmentInfo();
+
+    // Set default values in input fields
+    document.getElementById('supabase-url').value = DEFAULT_SUPABASE_URL;
+    document.getElementById('supabase-key').value = DEFAULT_SUPABASE_KEY;
+    document.getElementById('redirect-url').value = `${window.location.origin}/auth/callback`;
+
+    // Use default credentials
+    document.getElementById('use-default-client').addEventListener('click', () => {
+      document.getElementById('supabase-url').value = DEFAULT_SUPABASE_URL;
+      document.getElementById('supabase-key').value = DEFAULT_SUPABASE_KEY;
+      document.getElementById('redirect-url').value = `${window.location.origin}/auth/callback`;
+      
+      log('client-output', 'Default credentials loaded', 'info');
+    });
+
+    // Create Supabase client
+    document.getElementById('create-client').addEventListener('click', () => {
+      try {
+        log('client-output', 'Creating Supabase client...', 'info');
+        
+        const supabaseUrl = document.getElementById('supabase-url').value.trim();
+        const supabaseKey = document.getElementById('supabase-key').value.trim();
+        const redirectUrl = document.getElementById('redirect-url').value.trim();
+        
+        if (!supabaseUrl || !supabaseKey) {
+          log('client-output', 'Supabase URL and Key are required', 'error');
+          return;
+        }
+        
+        log('client-output', `Using URL: ${supabaseUrl}`, 'info');
+        log('client-output', `Using Key: ${supabaseKey.substring(0, 10)}...`, 'info');
+        
+        if (redirectUrl) {
+          log('client-output', `Using Redirect URL: ${redirectUrl}`, 'info');
+        }
+        
+        // Check if Supabase is available
+        if (typeof window.supabase === 'undefined') {
+          log('client-output', 'Supabase library is not available', 'error');
+          return;
+        }
+        
+        if (typeof window.supabase.createClient !== 'function') {
+          log('client-output', 'Supabase createClient function is not available', 'error');
+          return;
+        }
+        
+        // Create a custom storage implementation with logging
+        const customStorage = {
+          getItem: (key) => {
+            try {
+              const value = localStorage.getItem(key);
+              log('client-output', `Storage: Retrieved ${key}`, 'info');
+              return value;
+            } catch (e) {
+              log('client-output', `Storage error getting ${key}: ${e.message}`, 'error');
+              return null;
+            }
+          },
+          setItem: (key, value) => {
+            try {
+              localStorage.setItem(key, value);
+              log('client-output', `Storage: Saved ${key}`, 'info');
+            } catch (e) {
+              log('client-output', `Storage error setting ${key}: ${e.message}`, 'error');
+            }
+          },
+          removeItem: (key) => {
+            try {
+              localStorage.removeItem(key);
+              log('client-output', `Storage: Removed ${key}`, 'info');
+            } catch (e) {
+              log('client-output', `Storage error removing ${key}: ${e.message}`, 'error');
+            }
+          }
+        };
+        
+        // Create client with options
+        const options = {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+            storage: customStorage,
+            storageKey: 'supabase.auth.token',
+            cookieOptions: {
+              path: '/',
+              sameSite: 'Lax'
+            }
+          }
+        };
+        
+        // Add redirect URL if provided
+        if (redirectUrl) {
+          options.auth.redirectTo = redirectUrl;
+        }
+        
+        // Create the client
+        supabase = window.supabase.createClient(supabaseUrl, supabaseKey, options);
+        
+        // Verify the client was created properly
+        if (!supabase.auth || typeof supabase.auth.getSession !== 'function') {
+          log('client-output', 'Supabase client created but auth methods are missing', 'error');
+          return;
+        }
+        
+        log('client-output', 'Supabase client created successfully!', 'success');
+        
+        // Set up auth state change listener
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+          log('session-output', `Auth state changed: ${event}`, 'info');
+          log('session-output', `Session exists: ${!!session}`, session ? 'success' : 'warning');
+          
+          if (session) {
+            log('session-output', `User ID: ${session.user.id}`, 'info');
+            log('session-output', `Provider: ${session.user.app_metadata?.provider || 'unknown'}`, 'info');
+          }
+        });
+        
+        log('client-output', 'Auth state change listener set up', 'success');
+        
+      } catch (error) {
+        log('client-output', `Error creating Supabase client: ${error.message}`, 'error');
+        console.error('Full error:', error);
+      }
+    });
+
+    // Check session
+    document.getElementById('check-session').addEventListener('click', async () => {
+      if (!supabase) {
+        log('session-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('session-output', 'Checking session...', 'info');
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          log('session-output', `Error getting session: ${error.message}`, 'error');
+          return;
+        }
+        
+        if (data.session) {
+          log('session-output', 'Session exists!', 'success');
+          log('session-output', `User ID: ${data.session.user.id}`, 'info');
+          log('session-output', `Provider: ${data.session.user.app_metadata?.provider || 'unknown'}`, 'info');
+          log('session-output', `Expires at: ${new Date(data.session.expires_at * 1000).toISOString()}`, 'info');
+          
+          // Display full session data
+          log('session-output', `Full session data: ${JSON.stringify(data.session, null, 2)}`, 'info');
+        } else {
+          log('session-output', 'No active session found', 'warning');
+        }
+      } catch (error) {
+        log('session-output', `Error checking session: ${error.message}`, 'error');
+      }
+    });
+
+    // Sign in with Google
+    document.getElementById('sign-in-google').addEventListener('click', async () => {
+      if (!supabase) {
+        log('session-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('session-output', 'Signing in with Google...', 'info');
+        
+        const redirectTo = document.getElementById('redirect-url').value.trim() || `${window.location.origin}/auth/callback`;
+        
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectTo
+          }
+        });
+        
+        if (error) {
+          log('session-output', `Error signing in with Google: ${error.message}`, 'error');
+          return;
+        }
+        
+        log('session-output', 'Redirecting to Google login...', 'info');
+      } catch (error) {
+        log('session-output', `Error in Google sign in: ${error.message}`, 'error');
+      }
+    });
+
+    // Sign in with Slack
+    document.getElementById('sign-in-slack').addEventListener('click', async () => {
+      if (!supabase) {
+        log('session-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('session-output', 'Signing in with Slack...', 'info');
+        
+        const redirectTo = document.getElementById('redirect-url').value.trim() || `${window.location.origin}/auth/callback`;
+        
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'slack',
+          options: {
+            redirectTo: redirectTo
+          }
+        });
+        
+        if (error) {
+          log('session-output', `Error signing in with Slack: ${error.message}`, 'error');
+          return;
+        }
+        
+        log('session-output', 'Redirecting to Slack login...', 'info');
+      } catch (error) {
+        log('session-output', `Error in Slack sign in: ${error.message}`, 'error');
+      }
+    });
+
+    // Sign out
+    document.getElementById('sign-out').addEventListener('click', async () => {
+      if (!supabase) {
+        log('session-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('session-output', 'Signing out...', 'info');
+        
+        const { error } = await supabase.auth.signOut();
+        
+        if (error) {
+          log('session-output', `Error signing out: ${error.message}`, 'error');
+          return;
+        }
+        
+        log('session-output', 'Signed out successfully!', 'success');
+      } catch (error) {
+        log('session-output', `Error in sign out: ${error.message}`, 'error');
+      }
+    });
+
+    // View storage
+    document.getElementById('view-storage').addEventListener('click', () => {
+      try {
+        const output = document.getElementById('storage-output');
+        const allItems = {};
+        const authItems = {};
+        
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          try {
+            const value = localStorage.getItem(key);
+            allItems[key] = value.length > 100 ? value.substring(0, 100) + '...' : value;
+            
+            if (key.includes('supabase') || key.includes('auth')) {
+              authItems[key] = value.length > 100 ? value.substring(0, 100) + '...' : value;
+            }
+          } catch (e) {
+            allItems[key] = `[Error reading value: ${e.message}]`;
+          }
+        }
+        
+        output.textContent = 'Auth-related items:\n';
+        output.textContent += Object.keys(authItems).length === 0 
+          ? 'No Supabase auth items found in localStorage\n\n'
+          : JSON.stringify(authItems, null, 2) + '\n\n';
+        
+        output.textContent += 'All localStorage items:\n';
+        output.textContent += Object.keys(allItems).length === 0
+          ? 'localStorage is empty'
+          : JSON.stringify(allItems, null, 2);
+      } catch (error) {
+        document.getElementById('storage-output').textContent = `Error accessing localStorage: ${error.message}`;
+      }
+    });
+
+    // Clear storage
+    document.getElementById('clear-storage').addEventListener('click', () => {
+      try {
+        // Clear only Supabase auth related items
+        const keysToRemove = [];
+        
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.includes('supabase') || key.includes('auth')) {
+            keysToRemove.push(key);
+          }
+        }
+        
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        document.getElementById('storage-output').textContent = `Cleared ${keysToRemove.length} auth-related items from localStorage`;
+      } catch (error) {
+        document.getElementById('storage-output').textContent = `Error clearing localStorage: ${error.message}`;
+      }
+    });
+
+    // Parse URL
+    document.getElementById('parse-url').addEventListener('click', () => {
+      const output = document.getElementById('url-output');
+      const url = window.location;
+      
+      const urlInfo = {
+        'Full URL': url.href,
+        'Protocol': url.protocol,
+        'Host': url.host,
+        'Pathname': url.pathname,
+        'Search (Query)': url.search,
+        'Hash': url.hash,
+        'Origin': url.origin
+      };
+      
+      output.textContent = JSON.stringify(urlInfo, null, 2) + '\n\n';
+      
+      // Parse hash parameters if present
+      if (url.hash) {
+        try {
+          const hashParams = {};
+          url.hash.substring(1).split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            hashParams[key] = decodeURIComponent(value || '');
+          });
+          output.textContent += 'Hash Parameters:\n' + JSON.stringify(hashParams, null, 2) + '\n\n';
+        } catch (err) {
+          output.textContent += 'Error parsing hash: ' + err.message + '\n\n';
+        }
+      }
+      
+      // Parse query parameters if present
+      if (url.search) {
+        try {
+          const searchParams = {};
+          url.search.substring(1).split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            searchParams[key] = decodeURIComponent(value || '');
+          });
+          output.textContent += 'Query Parameters:\n' + JSON.stringify(searchParams, null, 2);
+        } catch (err) {
+          output.textContent += 'Error parsing query: ' + err.message;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

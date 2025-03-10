@@ -14,59 +14,45 @@ console.log('Using Supabase URL:', supabaseUrl);
 console.log('Using Supabase Anon Key (first 10 chars):', supabaseAnonKey.substring(0, 10) + '...');
 console.log('Using Site URL for redirects:', siteUrl);
 
+// Create a custom storage implementation that wraps localStorage with error handling
+const createCustomStorage = () => {
+  console.log('Creating custom storage implementation');
+  return {
+    getItem: (key) => {
+      try {
+        console.log(`Getting item: ${key}`);
+        return localStorage.getItem(key);
+      } catch (e) {
+        console.error(`Error getting item ${key} from localStorage:`, e);
+        return null;
+      }
+    },
+    setItem: (key, value) => {
+      try {
+        console.log(`Setting item: ${key}`);
+        localStorage.setItem(key, value);
+      } catch (e) {
+        console.error(`Error setting item ${key} in localStorage:`, e);
+      }
+    },
+    removeItem: (key) => {
+      try {
+        console.log(`Removing item: ${key}`);
+        localStorage.removeItem(key);
+      } catch (e) {
+        console.error(`Error removing item ${key} from localStorage:`, e);
+      }
+    }
+  };
+};
+
 // Create a Supabase client with proper OAuth configuration
 let supabase;
 
-// Create client with defensive error handling
-try {
-  console.log('Creating Supabase client with URL:', supabaseUrl);
-  
-  // Create a minimal client with basic options
-  const options = {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      storage: localStorage,
-      storageKey: 'supabase.auth.token',
-      flowType: 'pkce'
-    }
-  };
-  
-  // Add redirect URL if site URL is available
-  if (siteUrl) {
-    options.auth.redirectTo = `${siteUrl}/auth/callback`;
-    console.log('Setting redirect URL to:', options.auth.redirectTo);
-  }
-  
-  // Create the client
-  supabase = createClient(supabaseUrl, supabaseAnonKey, options);
-  console.log('Supabase client created successfully');
-  
-  // Set up auth state change listener
-  try {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
-      console.log('Session exists:', !!session);
-      if (session) {
-        console.log('User ID:', session.user.id);
-        console.log('Provider:', session.user.app_metadata?.provider);
-      }
-    });
-    console.log('Auth state change listener set up successfully');
-  } catch (listenerError) {
-    console.error('Error setting up auth state change listener:', listenerError);
-  }
-} catch (error) {
-  console.error('Error creating Supabase client:', error);
-  console.error('Error details:', {
-    name: error.name,
-    message: error.message,
-    stack: error.stack
-  });
-  
-  // Create a fallback client that redirects to Supabase auth directly
-  supabase = {
+// Function to create a fallback client
+const createFallbackClient = () => {
+  console.warn('Creating fallback Supabase client');
+  return {
     auth: {
       getSession: async () => {
         console.error('Using fallback getSession method');
@@ -103,8 +89,88 @@ try {
           return { data: null, error: err };
         }
       }
+    },
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          then: () => Promise.resolve([])
+        })
+      })
+    })
+  };
+};
+
+// Create client with defensive error handling
+try {
+  console.log('Creating Supabase client with URL:', supabaseUrl);
+  
+  // Verify we have the required values before attempting to create the client
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing required Supabase configuration');
+  }
+  
+  // Verify that createClient is available
+  if (typeof createClient !== 'function') {
+    console.error('createClient is not a function:', createClient);
+    throw new Error('Supabase createClient function is not available');
+  }
+  
+  // Create a minimal client with basic options
+  const options = {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storage: createCustomStorage(),
+      storageKey: 'supabase.auth.token',
+      cookieOptions: {
+        path: '/',
+        sameSite: 'Lax'
+      }
     }
   };
+  
+  // Add redirect URL if site URL is available
+  if (siteUrl) {
+    options.auth.redirectTo = `${siteUrl}/auth/callback`;
+    console.log('Setting redirect URL to:', options.auth.redirectTo);
+  }
+  
+  // Create the client
+  supabase = createClient(supabaseUrl, supabaseAnonKey, options);
+  console.log('Supabase client created successfully');
+  
+  // Verify the client was created properly by checking a method
+  if (!supabase.auth || typeof supabase.auth.getSession !== 'function') {
+    console.error('Supabase client created but auth methods are missing');
+    throw new Error('Invalid Supabase client');
+  }
+  
+  // Set up auth state change listener
+  try {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      console.log('Session exists:', !!session);
+      if (session) {
+        console.log('User ID:', session.user.id);
+        console.log('Provider:', session.user.app_metadata?.provider);
+      }
+    });
+    console.log('Auth state change listener set up successfully');
+  } catch (listenerError) {
+    console.error('Error setting up auth state change listener:', listenerError);
+    // Continue even if listener setup fails
+  }
+} catch (error) {
+  console.error('Error creating Supabase client:', error);
+  console.error('Error details:', {
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  });
+  
+  // Create a fallback client
+  supabase = createFallbackClient();
 }
 
 // Helper function to check if user is authenticated
