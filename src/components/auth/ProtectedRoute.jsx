@@ -11,20 +11,51 @@ const ProtectedRoute = ({ children }) => {
     const checkAuth = async () => {
       try {
         console.log('ProtectedRoute: Checking authentication status...');
+        
+        // First attempt
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error checking authentication:', error);
           setAuthenticated(false);
-        } else {
-          const isAuth = !!data.session;
-          console.log('User is authenticated:', isAuth);
-          setAuthenticated(isAuth);
+          setLoading(false);
+          return;
         }
+        
+        const isAuth = !!data.session;
+        console.log('User is authenticated (first check):', isAuth);
+        
+        if (isAuth) {
+          setAuthenticated(true);
+          setLoading(false);
+          return;
+        }
+        
+        // If not authenticated on first check, try again after a short delay
+        // This helps when the page is loaded right after an OAuth callback
+        setTimeout(async () => {
+          try {
+            console.log('ProtectedRoute: Checking authentication again after delay...');
+            const { data: delayedData, error: delayedError } = await supabase.auth.getSession();
+            
+            if (delayedError) {
+              console.error('Error checking delayed authentication:', delayedError);
+              setAuthenticated(false);
+            } else {
+              const isDelayedAuth = !!delayedData.session;
+              console.log('User is authenticated (delayed check):', isDelayedAuth);
+              setAuthenticated(isDelayedAuth);
+            }
+          } catch (err) {
+            console.error('Exception in delayed auth check:', err);
+            setAuthenticated(false);
+          } finally {
+            setLoading(false);
+          }
+        }, 1000);
       } catch (err) {
         console.error('Exception checking authentication:', err);
         setAuthenticated(false);
-      } finally {
         setLoading(false);
       }
     };
@@ -35,7 +66,9 @@ const ProtectedRoute = ({ children }) => {
     // Set up auth state listener
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event);
-      setAuthenticated(!!session);
+      const isAuth = !!session;
+      console.log('User is authenticated (from event):', isAuth);
+      setAuthenticated(isAuth);
       setLoading(false);
     });
 
@@ -59,10 +92,12 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!authenticated) {
+    console.log('User is not authenticated, redirecting to login');
     // Redirect to login page with a return URL
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
+  console.log('User is authenticated, rendering protected content');
   return children;
 };
 
