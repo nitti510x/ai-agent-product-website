@@ -142,7 +142,7 @@ function Dashboard() {
         </div>
       </nav>
 
-      <div className="py-8">
+      <div className="pt-8 pb-0">
         <Routes>
           <Route index element={<DashboardLayout><AIAgentsList /></DashboardLayout>} />
           <Route path="settings/:agentId" element={<DashboardLayout><AgentSettings /></DashboardLayout>} />

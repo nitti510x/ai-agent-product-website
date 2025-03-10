@@ -8,7 +8,7 @@ import {
   FiBell, FiCheckCircle
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
-import { FaRobot } from 'react-icons/fa6';
+import { FaRobot } from 'react-icons/fa';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 
@@ -295,24 +295,11 @@ function DashboardLayout({ children }) {
       </div>
       
       {/* Dashboard Footer */}
-      <footer className="sticky bottom-0 border-t border-gray-700/40 bg-[#1A1E23] w-full mt-auto">
+      <footer className="border-t border-gray-700/40 bg-[#1A1E23] w-full mt-16">
         <div className="max-w-[1440px] mx-auto px-8">
           <div className="flex flex-wrap items-center justify-between pt-4 pb-4 px-2">
             <div className="flex items-center space-x-2">
-              <span className="text-gray-400 text-xs"> 2023 GeniusOS</span>
-              {/* Debug button - only visible in development */}
-              {import.meta.env.DEV && (
-                <button 
-                  onClick={() => {
-                    const result = debugSupabaseAuth();
-                    console.log(result);
-                    alert('Debug info logged to console. Press F12 to view.');
-                  }}
-                  className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-2 rounded"
-                >
-                  Debug Auth
-                </button>
-              )}
+              <span className="text-gray-400 text-xs">Powered by geniusOS <FaRobot className="inline ml-1" /> 2025</span>
             </div>
             
             <div className="flex items-center space-x-8 text-sm">

@@ -35,11 +35,6 @@ app.use('/api/*', (req, res) => {
   res.redirect(307, `${externalApiBase}${path}`);
 });
 
-// Health check endpoint for Railway
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'API server is running' });
-});
-
 // Root route for API info
 app.get('/api', (req, res) => {
   res.json({

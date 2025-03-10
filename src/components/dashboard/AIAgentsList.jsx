@@ -147,8 +147,8 @@ function AIAgentsList() {
 
   return (
     <div>
-      {/* Page title */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Page title and button on the same line */}
+      <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-xl font-bold text-white">Your AI Assistants</h2>
           <p className="text-gray-400 text-sm mt-1">Manage and monitor your active AI integrations</p>
@@ -157,10 +157,10 @@ function AIAgentsList() {
           href="https://app.slack.com/client"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 py-2 px-4 bg-[#F7F7F7] hover:bg-gray-100 text-gray-800 rounded-lg transition-colors duration-300 font-bold"
+          className="flex items-center justify-center gap-2 py-1.5 px-3.5 bg-[#F7F7F7] hover:bg-gray-100 text-gray-800 rounded-lg transition-colors duration-300 font-bold text-sm"
         >
           Run in Slack
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="20" height="20" alt="Slack Logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="18" height="18" alt="Slack Logo">
             <title>Slack Logo</title>
             <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
             <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
