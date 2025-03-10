@@ -304,13 +304,20 @@ export default function CustomAuth() {
     }
   }, [])
 
-  const handleSlackLogin = () => {
-    supabase.auth.signInWithOAuth({
-      provider: 'slack_oidc',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`
-      }
-    })
+  const handleSlackLogin = async () => {
+    const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+    console.log(`Using redirect URL: ${siteUrl}/dashboard`);
+    
+    try {
+      supabase.auth.signInWithOAuth({
+        provider: 'slack_oidc',
+        options: {
+          redirectTo: `${siteUrl}/dashboard`,
+        },
+      });
+    } catch (error) {
+      console.error('OAuth sign-in error:', error);
+    }
   }
 
   console.log('Current view:', view) // Debug log
@@ -463,7 +470,7 @@ export default function CustomAuth() {
           theme="dark"
           providers={view === 'sign_up' ? ['google'] : ['google']}
           socialLayout="vertical"
-          redirectTo={`${window.location.origin}/dashboard`}
+          redirectTo={`${import.meta.env.VITE_SITE_URL || window.location.origin}/dashboard`}
           providerScopes={{
             slack_oidc: 'users:read'
           }}

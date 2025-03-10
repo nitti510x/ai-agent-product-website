@@ -102,10 +102,14 @@ const EnhancedAuth = () => {
     setError(null);
     
     try {
+      // Get the site URL from environment variables or fallback to window.location.origin
+      const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+      console.log(`Using redirect URL: ${siteUrl}/auth/callback`);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${siteUrl}/auth/callback`,
         },
       });
       
@@ -113,7 +117,9 @@ const EnhancedAuth = () => {
       
       // OAuth flow will redirect the user
     } catch (error) {
+      console.error('OAuth sign-in error:', error);
       setError(error.message || `An error occurred during ${provider} sign in`);
+    } finally {
       setLoading(false);
     }
   };

@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://example.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtdWJzZHF0YmJuZnNwamxmdGVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTM1ODI0NTcsImV4cCI6MjAwOTE1ODQ1N30.mock-key'
+// Log environment variables for debugging (values will be hidden in production)
+console.log('Environment check - VITE_SUPABASE_URL exists:', !!import.meta.env.VITE_SUPABASE_URL);
+console.log('Environment check - VITE_SUPABASE_ANON_KEY exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://qdrtpsuqffsdocjrifwm.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcnRwc3VxZmZzZG9janJpZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA0NTM4NTMsImV4cCI6MjA1NjAyOTg1M30._qNhJuoI7nmmJxgCJ7JmqfLRYeTk1Kxr-V_N27sj8XE';
 
 // Safe storage functions with proper error handling
 const safeLocalStorage = {
@@ -22,7 +26,7 @@ const safeLocalStorage = {
         localStorage.setItem(key, value);
       }
     } catch (error) {
-      console.warn('Error writing to localStorage:', error);
+      console.warn('Error setting localStorage:', error);
     }
   },
   removeItem: (key) => {
@@ -36,64 +40,36 @@ const safeLocalStorage = {
   }
 };
 
-// Safe auth state change handler
-const safeAuthStateChangeHandler = (event, session) => {
-  try {
-    // Handle auth state change events
-    if (event === 'SIGNED_OUT') {
-      console.log('User signed out');
-    } else if (event === 'SIGNED_IN') {
-      console.log('User signed in');
-    } else if (event === 'TOKEN_REFRESHED') {
-      console.log('Token refreshed');
-    } else if (event === 'USER_UPDATED') {
-      console.log('User updated');
-    }
-  } catch (error) {
-    console.error('Error in auth state change handler:', error);
-  }
-};
-
 // Create a Supabase client with improved error handling
 const createSupabaseClient = () => {
-  if (typeof window === 'undefined') {
-    // Return a mock client for SSR
-    return {
-      auth: {
-        getSession: () => Promise.resolve(null),
-        getUser: () => Promise.resolve(null),
-        signOut: () => Promise.resolve(),
-        onAuthStateChange: () => ({ data: null })
-      }
-    };
-  }
-
+  console.log('Creating Supabase client with URL:', supabaseUrl);
+  
   try {
-    return createClient(supabaseUrl, supabaseAnonKey, {
+    // Create the client with minimal options first
+    const client = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: safeLocalStorage,
-        onAuthStateChange: safeAuthStateChangeHandler,
-        storageKey: 'supabase.auth.token',
-        flowType: 'implicit'
-      },
-      global: {
-        headers: {
-          'X-Client-Info': 'geniusOS-AgentOps'
-        }
+        storage: safeLocalStorage
       }
     });
+    
+    console.log('Supabase client created successfully');
+    return client;
   } catch (error) {
     console.error('Error creating Supabase client:', error);
-    // Return a mock client if creation fails
+    // Return a minimal mock client if creation fails
     return {
       auth: {
-        getSession: () => Promise.resolve(null),
-        getUser: () => Promise.resolve(null),
-        signOut: () => Promise.resolve(),
-        onAuthStateChange: () => ({ data: null })
+        getSession: () => Promise.resolve({ data: { session: null } }),
+        getUser: () => Promise.resolve({ data: { user: null } }),
+        signOut: () => Promise.resolve({ error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        signInWithOAuth: (options) => {
+          console.error('Using mock signInWithOAuth due to client creation failure');
+          alert('Authentication service is currently unavailable. Please try again later.');
+          return Promise.resolve({ error: new Error('Failed to create Supabase client') });
+        }
       }
     };
   }
@@ -102,20 +78,17 @@ const createSupabaseClient = () => {
 // Initialize the Supabase client
 const supabase = createSupabaseClient();
 
-// Add a flag to check if we're using mock credentials
-export const isUsingMockSupabase = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY
-
 // Helper function to check if user is authenticated
-export const isAuthenticated = async () => {
+const isAuthenticated = async () => {
   try {
     const { data } = await supabase.auth.getSession();
-    return !!data?.session;
+    return !!data.session;
   } catch (error) {
     console.error('Error checking authentication status:', error);
     return false;
   }
-}
+};
 
 // Export both default and named export for backward compatibility
-export { supabase };
+export { supabase, isAuthenticated };
 export default supabase;
