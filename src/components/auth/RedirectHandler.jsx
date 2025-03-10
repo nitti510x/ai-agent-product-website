@@ -7,55 +7,58 @@ function RedirectHandler() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
+    async function handleAuthCallback() {
       try {
         console.log('RedirectHandler: Processing authentication callback');
-        console.log('Current URL:', window.location.href);
         
-        // Check for session
-        console.log('Checking for existing session...');
-        const { data, error: sessionError } = await supabase.auth.getSession();
+        // Get the URL hash or query parameters
+        const hash = window.location.hash;
+        const query = window.location.search;
         
-        if (sessionError) {
-          console.error('Error getting session:', sessionError);
-          setError(sessionError.message);
-          navigate('/login');
-          return;
-        }
+        console.log('URL hash:', hash);
+        console.log('URL query:', query);
         
-        if (data?.session) {
-          console.log('Session found, redirecting to dashboard');
+        // First check if we have a session already
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (sessionData?.session) {
+          console.log('Session already exists, redirecting to dashboard');
           navigate('/dashboard');
           return;
         }
         
-        // If no session exists yet, wait a moment and try again
-        console.log('No session found, waiting and trying again...');
+        // If no session exists, we need to exchange the code for a session
+        // This happens automatically with the Supabase JS client
+        // We just need to check again after a short delay
+        
+        console.log('Waiting for Supabase to process the authentication...');
+        
+        // Give Supabase a moment to process the authentication
         setTimeout(async () => {
-          const { data: delayedData, error: delayedError } = await supabase.auth.getSession();
+          const { data: delayedSessionData, error: sessionError } = await supabase.auth.getSession();
           
-          if (delayedError) {
-            console.error('Error getting session after delay:', delayedError);
-            setError(delayedError.message);
+          if (sessionError) {
+            console.error('Error getting session:', sessionError);
+            setError(sessionError.message);
             navigate('/login');
             return;
           }
           
-          if (delayedData?.session) {
-            console.log('Session found after delay, redirecting to dashboard');
+          if (delayedSessionData?.session) {
+            console.log('Successfully authenticated after delay');
             navigate('/dashboard');
           } else {
-            console.error('No session found after delay');
+            console.error('Authentication failed after delay');
             setError('Authentication failed. Please try again.');
             navigate('/login');
           }
-        }, 2000);
+        }, 1000); // 1 second delay
       } catch (err) {
-        console.error('Exception in auth callback:', err);
+        console.error('Error in auth callback:', err);
         setError(err.message);
         navigate('/login');
       }
-    };
+    }
     
     handleAuthCallback();
   }, [navigate]);
