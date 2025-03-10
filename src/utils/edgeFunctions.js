@@ -14,9 +14,11 @@ export const callEdgeFunction = async (functionName, options = {}) => {
   
   try {
     // Get auth token
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data } = await supabase.auth.getSession();
+    const session = data?.session;
     
     if (!session) {
+      console.error('Authentication session not found');
       throw new Error('Not authenticated');
     }
     
@@ -45,7 +47,16 @@ export const callEdgeFunction = async (functionName, options = {}) => {
       body: body ? JSON.stringify(body) : undefined
     });
     
-    console.log(`Response status: ${response.status}, content-type: ${response.headers.get('content-type')}`);
+    if (!response) {
+      console.error('No response received from edge function');
+      throw new Error(`No response received from ${functionName}`);
+    }
+    
+    console.log(`Response status: ${response.status}`);
+    
+    // Safely access headers
+    const contentTypeHeader = response.headers ? response.headers.get('content-type') : null;
+    console.log(`Response content-type: ${contentTypeHeader || 'unknown'}`);
     
     // Handle response
     if (!response.ok) {
@@ -73,7 +84,7 @@ export const callEdgeFunction = async (functionName, options = {}) => {
     const clonedResponse = response.clone();
     
     // First try to read as JSON if content-type suggests it's JSON
-    const contentType = response.headers.get('content-type');
+    const contentType = response.headers && response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       try {
         const jsonData = await response.json();
