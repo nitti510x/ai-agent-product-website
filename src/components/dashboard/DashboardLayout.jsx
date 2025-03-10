@@ -296,7 +296,7 @@ function DashboardLayout({ children }) {
       {/* Dashboard Footer */}
       <footer className="sticky bottom-0 border-t border-gray-700/40 bg-[#1A1E23] w-full mt-auto">
         <div className="max-w-[1440px] mx-auto px-8">
-          <div className="flex flex-wrap items-center justify-between pt-4 pb-3 px-2">
+          <div className="flex flex-wrap items-center justify-between pt-4 pb-4 px-2">
             <div className="flex items-center space-x-2">
               <FaRobot className="text-primary" size={18} />
               <span className="text-white text-sm font-medium">geniusOS</span>

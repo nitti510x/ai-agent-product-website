@@ -16,8 +16,8 @@ dist-ssr
 *.local
 
 # Environment files
-.env
-supabase/.env
+#.env
+#supabase/.env
 
 # Logs
 logs
