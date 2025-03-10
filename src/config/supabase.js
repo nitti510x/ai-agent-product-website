@@ -55,22 +55,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-// Add event listeners for auth state changes
+// Safely set up auth state change listener
 try {
-  supabase.auth.onAuthStateChange((event, session) => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     console.log('Supabase auth event:', event);
-    if (event === 'SIGNED_OUT') {
+    if (event === "SIGNED_OUT") {
       console.log('User signed out');
-    } else if (event === 'SIGNED_IN') {
-      console.log('User signed in:', session?.user?.email);
-    } else if (event === 'TOKEN_REFRESHED') {
-      console.log('Token refreshed');
-    } else if (event === 'USER_UPDATED') {
-      console.log('User updated');
+    } else if (event === "SIGNED_IN") {
+      console.log('User signed in');
     }
   });
+
+  // Add unsubscribe method to window for debugging
+  if (typeof window !== 'undefined') {
+    window.__SUPABASE_AUTH_LISTENER__ = subscription;
+  }
 } catch (error) {
-  console.warn('Error setting up auth state change listener:', error);
+  console.error('Error setting up auth listener:', error);
 }
 
 // Add a flag to check if we're using mock credentials
@@ -79,14 +80,10 @@ export const isUsingMockSupabase = !import.meta.env.VITE_SUPABASE_URL || !import
 // Helper function to check if user is authenticated
 export const isAuthenticated = async () => {
   try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      console.error('Error checking authentication:', error);
-      return false;
-    }
-    return !!data.session;
+    const { data } = await supabase.auth.getSession();
+    return !!data?.session;
   } catch (error) {
-    console.error('Error in isAuthenticated:', error);
+    console.error('Error checking authentication status:', error);
     return false;
   }
 }
