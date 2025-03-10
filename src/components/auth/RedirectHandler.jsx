@@ -1,160 +1,101 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../config/supabase';
 
 function RedirectHandler() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [status, setStatus] = useState('Processing authentication...');
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const maxRetries = 5;
 
   useEffect(() => {
-    async function handleAuthCallback() {
+    // Function to handle the OAuth callback
+    const handleAuthCallback = async () => {
       try {
-        console.log('RedirectHandler: Processing authentication callback');
+        console.log('RedirectHandler: Starting authentication processing');
+        setStatus('Checking for authentication data...');
         
-        // Get the URL hash or query parameters
+        // Check if we have a hash or query parameters that indicate an OAuth callback
         const hash = window.location.hash;
         const query = window.location.search;
         
         console.log('URL hash:', hash);
         console.log('URL query:', query);
         
-        // Check for access_token in hash or query
-        const hasAccessToken = hash.includes('access_token=') || query.includes('access_token=');
-        const hasCode = query.includes('code=');
-        
-        console.log('Has access token:', hasAccessToken);
-        console.log('Has code:', hasCode);
-        
-        // First check if we have a session already
+        // First check if we already have a session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error('Error getting initial session:', sessionError);
+          console.error('Error getting session:', sessionError);
+          setError(`Session error: ${sessionError.message}`);
+          return;
         }
         
         if (sessionData?.session) {
-          console.log('Session already exists, redirecting to dashboard');
-          console.log('Session user:', sessionData.session.user.id);
-          console.log('Session provider:', sessionData.session.user.app_metadata?.provider);
-          
-          // Store the session in localStorage as a backup
-          try {
-            localStorage.setItem('last_auth_session', JSON.stringify({
-              userId: sessionData.session.user.id,
-              timestamp: new Date().toISOString()
-            }));
-          } catch (storageErr) {
-            console.error('Error storing session backup:', storageErr);
-          }
-          
+          console.log('Session exists, redirecting to dashboard');
+          console.log('User ID:', sessionData.session.user.id);
           navigate('/dashboard');
           return;
         }
         
-        // If we have an access token or code in the URL but no session yet,
-        // we need to wait for Supabase to process it
-        if ((hasAccessToken || hasCode) && retryCount < maxRetries) {
-          const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
-          console.log(`Waiting ${delay}ms for Supabase to process the authentication (attempt ${retryCount + 1}/${maxRetries})...`);
+        // If no session yet but we have auth data in the URL, let's wait a moment
+        // for Supabase to process it
+        if (hash || query) {
+          setStatus('Processing authentication data...');
           
-          setTimeout(() => {
-            setRetryCount(prev => prev + 1);
-          }, delay);
-          
-          return;
-        }
-        
-        // If we've exhausted retries and still don't have a session
-        if (retryCount >= maxRetries) {
-          console.error('Failed to establish session after maximum retries');
-          setError('Authentication timed out. Please try again.');
-          setLoading(false);
+          // Wait a short time for Supabase to process the authentication
+          setTimeout(async () => {
+            try {
+              const { data: delayedSession, error: delayedError } = await supabase.auth.getSession();
+              
+              if (delayedError) {
+                console.error('Error getting delayed session:', delayedError);
+                setError(`Session error: ${delayedError.message}`);
+                return;
+              }
+              
+              if (delayedSession?.session) {
+                console.log('Session established after delay, redirecting to dashboard');
+                navigate('/dashboard');
+              } else {
+                console.error('No session established after delay');
+                setError('Authentication failed. Please try again.');
+              }
+            } catch (err) {
+              console.error('Error checking delayed session:', err);
+              setError(`Error: ${err.message}`);
+            }
+          }, 2000);
+        } else {
+          // No auth data in URL
+          console.error('No authentication data found in URL');
+          setError('No authentication data found. Please try logging in again.');
         }
       } catch (err) {
-        console.error('Error in auth callback:', err);
-        setError(err.message);
-        setLoading(false);
+        console.error('Unhandled exception in auth callback:', err);
+        setError(`Unhandled error: ${err.message}`);
       }
-    }
-    
+    };
+
     handleAuthCallback();
-  }, [navigate, retryCount]);
-
-  // When retry count changes, check for session again
-  useEffect(() => {
-    if (retryCount > 0 && retryCount <= maxRetries) {
-      async function checkSession() {
-        try {
-          console.log(`Retry ${retryCount}/${maxRetries}: Checking for session...`);
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-          
-          if (sessionError) {
-            console.error(`Retry ${retryCount}: Error getting session:`, sessionError);
-            return;
-          }
-          
-          if (sessionData?.session) {
-            console.log(`Retry ${retryCount}: Session found, redirecting to dashboard`);
-            navigate('/dashboard');
-          } else {
-            console.log(`Retry ${retryCount}: No session found yet`);
-          }
-        } catch (err) {
-          console.error(`Retry ${retryCount}: Exception checking session:`, err);
-        }
-      }
-      
-      checkSession();
-    }
-  }, [retryCount, navigate, maxRetries]);
-
-  const handleManualRedirect = () => {
-    navigate('/dashboard');
-  };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center">
-      <div className="text-center">
+      <div className="bg-dark-lighter p-8 rounded-xl shadow-xl w-full max-w-md text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+        <h2 className="text-xl text-white font-medium">{status}</h2>
         {error ? (
-          <div>
-            <div className="text-red-500 text-xl mb-4">Authentication Error</div>
-            <p className="text-gray-400 mb-4">{error}</p>
+          <div className="mt-4">
+            <p className="text-red-500">{error}</p>
             <button 
               onClick={() => navigate('/login')} 
-              className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 mr-2"
+              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
             >
               Return to Login
             </button>
-            <button 
-              onClick={handleManualRedirect} 
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Try Dashboard Anyway
-            </button>
           </div>
         ) : (
-          <>
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-            <h2 className="text-xl text-white font-medium">Completing authentication...</h2>
-            <p className="text-gray-400 mt-2">
-              {retryCount < maxRetries 
-                ? `Attempt ${retryCount + 1} of ${maxRetries}` 
-                : "Maximum attempts reached"}
-            </p>
-            
-            {retryCount >= 2 && (
-              <button 
-                onClick={handleManualRedirect} 
-                className="mt-6 px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-              >
-                Continue to Dashboard
-              </button>
-            )}
-          </>
+          <p className="text-gray-400 mt-2">You'll be redirected in a moment</p>
         )}
       </div>
     </div>

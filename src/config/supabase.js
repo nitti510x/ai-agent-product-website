@@ -17,35 +17,53 @@ console.log('Using Site URL for redirects:', siteUrl);
 // Create a Supabase client with proper OAuth configuration
 let supabase;
 
+// Create client with defensive error handling
 try {
-  // Create the client with simplified auth configuration
-  // This is critical for OAuth to work properly
-  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  console.log('Creating Supabase client with URL:', supabaseUrl);
+  
+  // Create a minimal client with basic options
+  const options = {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
-      flowType: 'implicit', // Try implicit flow instead of PKCE
-      storage: window.localStorage,
+      storage: localStorage,
       storageKey: 'supabase.auth.token',
-      redirectTo: `${siteUrl}/auth/callback`
+      flowType: 'pkce'
     }
-  });
+  };
   
-  console.log('Supabase client created successfully with implicit flow');
+  // Add redirect URL if site URL is available
+  if (siteUrl) {
+    options.auth.redirectTo = `${siteUrl}/auth/callback`;
+    console.log('Setting redirect URL to:', options.auth.redirectTo);
+  }
   
-  // Add a debug listener for auth state changes
-  const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-    console.log('Auth state changed:', event);
-    console.log('Session exists:', !!session);
-    if (session) {
-      console.log('User ID:', session.user.id);
-      console.log('Provider:', session.user.app_metadata?.provider);
-    }
-  });
+  // Create the client
+  supabase = createClient(supabaseUrl, supabaseAnonKey, options);
+  console.log('Supabase client created successfully');
   
+  // Set up auth state change listener
+  try {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      console.log('Session exists:', !!session);
+      if (session) {
+        console.log('User ID:', session.user.id);
+        console.log('Provider:', session.user.app_metadata?.provider);
+      }
+    });
+    console.log('Auth state change listener set up successfully');
+  } catch (listenerError) {
+    console.error('Error setting up auth state change listener:', listenerError);
+  }
 } catch (error) {
   console.error('Error creating Supabase client:', error);
+  console.error('Error details:', {
+    name: error.name,
+    message: error.message,
+    stack: error.stack
+  });
   
   // Create a fallback client that redirects to Supabase auth directly
   supabase = {

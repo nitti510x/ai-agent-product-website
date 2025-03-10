@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Auth Test</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #1a1a1a;
+      color: #f0f0f0;
+    }
+    .card {
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background-color: #10B981;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #059669;
+    }
+    pre {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .success { color: #10B981; }
+    .error { color: #EF4444; }
+    .warning { color: #F59E0B; }
+    .info { color: #3B82F6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Supabase Auth Test</h1>
+    <p>This page tests basic Supabase authentication functionality.</p>
+  </div>
+
+  <div class="card">
+    <h2>Environment Variables</h2>
+    <pre id="env-vars">Loading...</pre>
+  </div>
+
+  <div class="card">
+    <h2>Supabase Client</h2>
+    <button id="create-client">Create Supabase Client</button>
+    <button id="check-session">Check Session</button>
+    <button id="sign-in-google">Sign In with Google</button>
+    <button id="sign-in-slack">Sign In with Slack</button>
+    <button id="sign-out">Sign Out</button>
+    <pre id="client-output">Click a button to start testing</pre>
+  </div>
+
+  <div class="card">
+    <h2>URL Parameters</h2>
+    <pre id="url-params">Loading...</pre>
+  </div>
+
+  <div class="card">
+    <h2>Local Storage</h2>
+    <button id="view-storage">View Storage</button>
+    <button id="clear-storage">Clear Auth Storage</button>
+    <pre id="storage-output">Click "View Storage" to see localStorage contents</pre>
+  </div>
+
+  <script>
+    // Helper function to log with timestamp and color
+    function log(elementId, message, type = 'info') {
+      const element = document.getElementById(elementId);
+      const timestamp = new Date().toISOString();
+      const colorClass = type === 'error' ? 'error' : 
+                         type === 'success' ? 'success' : 
+                         type === 'warning' ? 'warning' : 'info';
+      
+      element.innerHTML = `<span class="${colorClass}">[${timestamp}] ${message}</span>\n` + element.innerHTML;
+    }
+
+    // Display URL parameters
+    function displayUrlParams() {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      const output = document.getElementById('url-params');
+      
+      output.textContent = `Hash: ${hash}\nSearch: ${search}`;
+      
+      // Parse hash parameters if present
+      if (hash) {
+        try {
+          const hashParams = {};
+          hash.substring(1).split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            hashParams[key] = decodeURIComponent(value || '');
+          });
+          output.textContent += `\n\nHash Parameters:\n${JSON.stringify(hashParams, null, 2)}`;
+        } catch (err) {
+          output.textContent += `\n\nError parsing hash: ${err.message}`;
+        }
+      }
+      
+      // Parse query parameters if present
+      if (search) {
+        try {
+          const searchParams = {};
+          search.substring(1).split('&').forEach(pair => {
+            const [key, value] = pair.split('=');
+            searchParams[key] = decodeURIComponent(value || '');
+          });
+          output.textContent += `\n\nQuery Parameters:\n${JSON.stringify(searchParams, null, 2)}`;
+        } catch (err) {
+          output.textContent += `\n\nError parsing query: ${err.message}`;
+        }
+      }
+    }
+
+    // Display environment variables
+    function displayEnvVars() {
+      const output = document.getElementById('env-vars');
+      
+      // These would be replaced by actual environment variables in a real app
+      const vars = {
+        'SUPABASE_URL': 'https://qdrtpsuqffsdocjrifwm.supabase.co',
+        'SITE_URL': window.location.origin
+      };
+      
+      output.textContent = JSON.stringify(vars, null, 2);
+    }
+
+    // Initialize page
+    displayUrlParams();
+    displayEnvVars();
+
+    // Global variables
+    let supabase = null;
+
+    // Event listeners
+    document.getElementById('create-client').addEventListener('click', () => {
+      try {
+        log('client-output', 'Creating Supabase client...', 'info');
+        
+        const supabaseUrl = 'https://qdrtpsuqffsdocjrifwm.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcnRwc3VxZmZzZG9janJpZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA0NTM4NTMsImV4cCI6MjA1NjAyOTg1M30._qNhJuoI7nmmJxgCJ7JmqfLRYeTk1Kxr-V_N27sj8XE';
+        
+        // Create client with minimal options
+        supabase = supabase.createClient(supabaseUrl, supabaseKey, {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
+          }
+        });
+        
+        log('client-output', 'Supabase client created successfully!', 'success');
+        
+        // Set up auth state change listener
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+          log('client-output', `Auth state changed: ${event}`, 'info');
+          log('client-output', `Session exists: ${!!session}`, session ? 'success' : 'warning');
+          
+          if (session) {
+            log('client-output', `User ID: ${session.user.id}`, 'info');
+            log('client-output', `Provider: ${session.user.app_metadata?.provider || 'unknown'}`, 'info');
+          }
+        });
+        
+      } catch (error) {
+        log('client-output', `Error creating Supabase client: ${error.message}`, 'error');
+        console.error('Full error:', error);
+      }
+    });
+
+    document.getElementById('check-session').addEventListener('click', async () => {
+      if (!supabase) {
+        log('client-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('client-output', 'Checking session...', 'info');
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          log('client-output', `Error getting session: ${error.message}`, 'error');
+          return;
+        }
+        
+        if (data?.session) {
+          log('client-output', 'Session exists!', 'success');
+          log('client-output', `User: ${data.session.user.email || data.session.user.id}`, 'info');
+          log('client-output', `Expires: ${new Date(data.session.expires_at * 1000).toLocaleString()}`, 'info');
+        } else {
+          log('client-output', 'No session found', 'warning');
+        }
+      } catch (error) {
+        log('client-output', `Exception checking session: ${error.message}`, 'error');
+      }
+    });
+
+    document.getElementById('sign-in-google').addEventListener('click', async () => {
+      if (!supabase) {
+        log('client-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('client-output', 'Initiating Google sign in...', 'info');
+        
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/test-auth.html`
+          }
+        });
+        
+        if (error) {
+          log('client-output', `Error initiating Google sign in: ${error.message}`, 'error');
+        } else {
+          log('client-output', 'Redirecting to Google...', 'info');
+        }
+      } catch (error) {
+        log('client-output', `Exception during Google sign in: ${error.message}`, 'error');
+      }
+    });
+
+    document.getElementById('sign-in-slack').addEventListener('click', async () => {
+      if (!supabase) {
+        log('client-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('client-output', 'Initiating Slack sign in...', 'info');
+        
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'slack',
+          options: {
+            redirectTo: `${window.location.origin}/test-auth.html`
+          }
+        });
+        
+        if (error) {
+          log('client-output', `Error initiating Slack sign in: ${error.message}`, 'error');
+        } else {
+          log('client-output', 'Redirecting to Slack...', 'info');
+        }
+      } catch (error) {
+        log('client-output', `Exception during Slack sign in: ${error.message}`, 'error');
+      }
+    });
+
+    document.getElementById('sign-out').addEventListener('click', async () => {
+      if (!supabase) {
+        log('client-output', 'Please create the Supabase client first', 'warning');
+        return;
+      }
+      
+      try {
+        log('client-output', 'Signing out...', 'info');
+        const { error } = await supabase.auth.signOut();
+        
+        if (error) {
+          log('client-output', `Error signing out: ${error.message}`, 'error');
+        } else {
+          log('client-output', 'Signed out successfully', 'success');
+        }
+      } catch (error) {
+        log('client-output', `Exception during sign out: ${error.message}`, 'error');
+      }
+    });
+
+    document.getElementById('view-storage').addEventListener('click', () => {
+      try {
+        const output = document.getElementById('storage-output');
+        const authItems = {};
+        
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.includes('supabase') || key.includes('auth')) {
+            try {
+              // Try to parse as JSON first
+              const value = localStorage.getItem(key);
+              try {
+                authItems[key] = JSON.parse(value);
+              } catch {
+                // If not JSON, store as string
+                authItems[key] = value;
+              }
+            } catch (err) {
+              authItems[key] = `[Error reading value: ${err.message}]`;
+            }
+          }
+        }
+        
+        if (Object.keys(authItems).length === 0) {
+          output.textContent = 'No authentication items found in localStorage';
+        } else {
+          output.textContent = JSON.stringify(authItems, null, 2);
+        }
+      } catch (error) {
+        document.getElementById('storage-output').textContent = `Error accessing localStorage: ${error.message}`;
+      }
+    });
+
+    document.getElementById('clear-storage').addEventListener('click', () => {
+      try {
+        const authKeys = [];
+        
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key.includes('supabase') || key.includes('auth')) {
+            authKeys.push(key);
+          }
+        }
+        
+        authKeys.forEach(key => localStorage.removeItem(key));
+        
+        document.getElementById('storage-output').textContent = `Cleared ${authKeys.length} authentication items from localStorage:\n${authKeys.join('\n')}`;
+      } catch (error) {
+        document.getElementById('storage-output').textContent = `Error clearing localStorage: ${error.message}`;
+      }
+    });
+
+    // Check for auth parameters in URL on page load
+    window.addEventListener('load', () => {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      if (hash.includes('access_token=') || search.includes('code=')) {
+        log('client-output', 'Authentication data detected in URL!', 'success');
+        
+        // Auto-create client if auth data is present
+        document.getElementById('create-client').click();
+        
+        // Wait a moment for client to initialize, then check session
+        setTimeout(() => {
+          document.getElementById('check-session').click();
+        }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
