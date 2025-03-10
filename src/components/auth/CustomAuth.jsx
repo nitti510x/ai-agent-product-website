@@ -309,6 +309,13 @@ export default function CustomAuth() {
     console.log(`Using redirect URL: ${siteUrl}/dashboard`);
     
     try {
+      // Check if supabase.auth is available
+      if (!supabase.auth || typeof supabase.auth.signInWithOAuth !== 'function') {
+        console.error('Supabase auth methods not available');
+        alert('Authentication service is currently unavailable. Please try again later.');
+        return;
+      }
+      
       supabase.auth.signInWithOAuth({
         provider: 'slack_oidc',
         options: {

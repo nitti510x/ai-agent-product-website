@@ -45,7 +45,7 @@ const createSupabaseClient = () => {
   console.log('Creating Supabase client with URL:', supabaseUrl);
   
   try {
-    // Create the client with minimal options first
+    // Create the client with minimal options first - no global headers to avoid the TypeError
     const client = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,

@@ -106,6 +106,12 @@ const EnhancedAuth = () => {
       const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
       console.log(`Using redirect URL: ${siteUrl}/auth/callback`);
       
+      // Check if supabase.auth is available
+      if (!supabase.auth || typeof supabase.auth.signInWithOAuth !== 'function') {
+        console.error('Supabase auth methods not available');
+        throw new Error('Authentication service is currently unavailable');
+      }
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
