@@ -10,6 +10,7 @@ import {
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { debugSupabaseAuth } from '../../utils/debugHelper';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -298,9 +299,20 @@ function DashboardLayout({ children }) {
         <div className="max-w-[1440px] mx-auto px-8">
           <div className="flex flex-wrap items-center justify-between pt-4 pb-4 px-2">
             <div className="flex items-center space-x-2">
-              <FaRobot className="text-primary" size={18} />
-              <span className="text-white text-sm font-medium">geniusOS</span>
-              <span className="text-gray-400 text-xs px-2"> {new Date().getFullYear()}</span>
+              <span className="text-gray-400 text-xs"> 2023 GeniusOS</span>
+              {/* Debug button - only visible in development */}
+              {import.meta.env.DEV && (
+                <button 
+                  onClick={() => {
+                    const result = debugSupabaseAuth();
+                    console.log(result);
+                    alert('Debug info logged to console. Press F12 to view.');
+                  }}
+                  className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-2 rounded"
+                >
+                  Debug Auth
+                </button>
+              )}
             </div>
             
             <div className="flex items-center space-x-8 text-sm">
