@@ -6,6 +6,7 @@ import AuthUI from './components/auth/Auth';
 import RedirectHandler from './components/auth/RedirectHandler';
 import EnhancedAuth from './components/auth/EnhancedAuth';
 import EnhancedUpdatePassword from './components/auth/EnhancedUpdatePassword';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import ChatBot from './components/chat/ChatBot';
@@ -31,7 +32,14 @@ function App() {
               <Route path="reset-password" element={<EnhancedUpdatePassword />} />
             </Route>
             <Route path="/auth/callback" element={<RedirectHandler />} />
-            <Route path="/dashboard/*" element={<Dashboard />} />
+            <Route 
+              path="/dashboard/*" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
           <ChatBot />
         </Router>
