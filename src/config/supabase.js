@@ -14,8 +14,13 @@ console.log('Using Supabase URL:', supabaseUrl);
 console.log('Using Supabase Anon Key (first 10 chars):', supabaseAnonKey.substring(0, 10) + '...');
 console.log('Using Site URL for redirects:', siteUrl);
 
-// Create the Supabase client with absolute minimal configuration
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create the Supabase client with minimal configuration
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    detectSessionInUrl: false
+  }
+});
 
 // Helper function to check if user is authenticated
 const isAuthenticated = async () => {
