@@ -15,12 +15,14 @@ function Login() {
       setError(null);
       
       console.log(`Initiating ${provider} OAuth login`);
-      console.log('Using redirect URL:', `${siteUrl}/auth/callback`);
+      const redirectUrl = `${siteUrl}/auth/callback`;
+      console.log('Using redirect URL:', redirectUrl);
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${siteUrl}/auth/callback`,
+          redirectTo: redirectUrl,
+          scopes: provider === 'google' ? 'email profile' : '',
         },
       });
       
