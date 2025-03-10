@@ -1,18 +1,46 @@
-// API service using fetch API to connect to the external backend
-import { supabase } from '../config/supabase.js';
-import { apiUrl } from '../config/api.js';
+import { supabase } from './supabase.js';
+import { apiUrl } from './api.js';
 
-// Get the API URL from the configuration
 const API_URL = 'https://agent.ops.geniusos.co/api';
 
-// API service for external operations
-export const apiService = {
-  /**
-   * Get user subscription from the external API
-   * @param {string} userId - The ID of the user
-   * @returns {Promise<Object>} The subscription object
-   */
-  async getUserSubscription(userId) {
+/**
+ * Subscription service for managing user subscriptions
+ * This service interacts with the external API for all subscription-related operations
+ */
+export const subscriptionService = {
+  // Get plans from the API
+  getPlans: async () => {
+    try {
+      // Get the authentication token
+      const { data } = await supabase.auth.getSession();
+      const token = data?.session?.access_token;
+      
+      if (!token) {
+        console.error('No authentication token available');
+        throw new Error('Authentication required');
+      }
+      
+      const response = await fetch(`${API_URL}/plans?active_only=true`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch plans: ${response.status} ${response.statusText}`);
+      }
+      
+      const plans = await response.json();
+      return plans;
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      throw error;
+    }
+  },
+
+  // Get subscription for a user
+  getUserSubscription: async (userId) => {
     try {
       // Get the authentication token
       const { data } = await supabase.auth.getSession();
@@ -42,12 +70,8 @@ export const apiService = {
     }
   },
 
-  /**
-   * Cancel a subscription (set cancel_at_period_end to true)
-   * @param {string} subscriptionId - The ID of the subscription to cancel
-   * @returns {Promise<Object>} The updated subscription
-   */
-  async cancelSubscription(subscriptionId) {
+  // Cancel a subscription (set cancel_at_period_end to true)
+  cancelSubscription: async (subscriptionId) => {
     try {
       // Get the authentication token
       const { data } = await supabase.auth.getSession();
@@ -78,12 +102,8 @@ export const apiService = {
     }
   },
 
-  /**
-   * Reactivate a subscription (set cancel_at_period_end to false)
-   * @param {string} subscriptionId - The ID of the subscription to reactivate
-   * @returns {Promise<Object>} The updated subscription
-   */
-  async reactivateSubscription(subscriptionId) {
+  // Reactivate a subscription (set cancel_at_period_end to false)
+  reactivateSubscription: async (subscriptionId) => {
     try {
       // Get the authentication token
       const { data } = await supabase.auth.getSession();
@@ -114,12 +134,8 @@ export const apiService = {
     }
   },
 
-  /**
-   * Get user payment methods from the external API
-   * @param {string} userId - The ID of the user
-   * @returns {Promise<Array>} Array of payment methods
-   */
-  async getUserPaymentMethods(userId) {
+  // Get transactions for a user
+  getUserTransactions: async (userId) => {
     try {
       // Get the authentication token
       const { data } = await supabase.auth.getSession();
@@ -130,7 +146,7 @@ export const apiService = {
         throw new Error('Authentication required');
       }
       
-      const response = await fetch(`${API_URL}/payment-methods/${userId}`, {
+      const response = await fetch(`${API_URL}/transactions/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -138,14 +154,18 @@ export const apiService = {
       });
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch payment methods: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to fetch transactions: ${response.status} ${response.statusText}`);
       }
       
-      const paymentMethods = await response.json();
-      return paymentMethods;
+      const transactions = await response.json();
+      return transactions;
     } catch (error) {
-      console.error(`Error fetching payment methods for user ${userId}:`, error);
+      console.error(`Error fetching transactions for user ${userId}:`, error);
       throw error;
     }
   }
+};
+
+export default {
+  subscriptionService
 };

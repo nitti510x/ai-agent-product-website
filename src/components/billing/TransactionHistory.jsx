@@ -3,7 +3,7 @@ import { FiArrowLeft, FiDownload, FiAlertTriangle, FiClock, FiFilter, FiSearch }
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase.js';
-import { subscriptionService } from '../../config/postgres.js';
+import { apiService } from '../../services/apiService.js';
 
 function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -20,8 +20,8 @@ function TransactionHistory() {
           return;
         }
         
-        // Fetch transaction history from the subscription service
-        const userTransactions = await subscriptionService.getUserTransactions(user.id);
+        // Fetch transaction history from the api service
+        const userTransactions = await apiService.getUserTransactions(user.id);
         setTransactions(userTransactions || []);
       } catch (error) {
         console.error('Error fetching transaction history:', error);

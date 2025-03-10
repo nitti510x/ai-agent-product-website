@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { FiCheck, FiAlertTriangle, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import { supabase } from '../../config/supabase.js';
 import { agentService } from '../../services/agentService.js';
+import { apiService } from '../../services/apiService.js';
 
 function Subscription() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ function Subscription() {
   const [error, setError] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
 
   useEffect(() => {
     // Get the current user
@@ -137,12 +140,11 @@ function Subscription() {
       
       console.log('Creating subscription with data:', subscriptionData);
       
-      // Use the PostgreSQL service to create a subscription
-      const newSubscription = await postgresService.createSubscription(subscriptionData);
+      // Subscription is now handled directly by the external API
+      // We no longer need to create subscriptions locally
+      window.location.href = `https://agent.ops.geniusos.co/subscribe?plan=${selectedPlan.id}&user_id=${user.id}`;
       
-      setSubscription(newSubscription);
-      setShowConfirmation(false);
-      alert('Successfully subscribed to plan!');
+      return; // Early return as we're redirecting
     } catch (error) {
       console.error('Error subscribing to plan:', error);
       setError('Failed to subscribe to plan. Please try again.');
@@ -151,51 +153,42 @@ function Subscription() {
     }
   };
 
-  const cancelSubscription = async () => {
-    if (!subscription) return;
-    
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
     try {
-      setLoading(true);
-      setError(null);
+      // Call the api service to cancel the subscription
+      await apiService.cancelSubscription(subscription.id);
       
-      // Call the PostgreSQL service to cancel the subscription
-      await postgresService.cancelSubscription(subscription.id);
-      
-      // Update the local subscription state
+      // Update the subscription in state
       setSubscription({
         ...subscription,
         cancel_at_period_end: true
       });
       
-      setLoading(false);
+      // toast.success('Subscription will be canceled at the end of the billing period');
     } catch (error) {
       console.error('Error canceling subscription:', error);
-      setError('Failed to cancel subscription');
-      setLoading(false);
+      // toast.error('Failed to cancel subscription. Please try again.');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
-  const reactivateSubscription = async () => {
-    if (!subscription) return;
-    
+  const handleReactivateSubscription = async () => {
+    setIsReactivating(true);
     try {
-      setLoading(true);
-      setError(null);
+      // Call the api service to reactivate the subscription
+      const updatedSubscription = await apiService.reactivateSubscription(subscription.id);
       
-      // Call the PostgreSQL service to reactivate the subscription
-      const updatedSubscription = await postgresService.reactivateSubscription(subscription.id);
+      // Update the subscription in state
+      setSubscription(updatedSubscription);
       
-      // Update the local subscription state
-      setSubscription({
-        ...subscription,
-        cancel_at_period_end: false
-      });
-      
-      setLoading(false);
+      // toast.success('Subscription reactivated successfully');
     } catch (error) {
       console.error('Error reactivating subscription:', error);
-      setError('Failed to reactivate subscription');
-      setLoading(false);
+      // toast.error('Failed to reactivate subscription. Please try again.');
+    } finally {
+      setIsReactivating(false);
     }
   };
 
@@ -302,19 +295,19 @@ function Subscription() {
             
             {!subscription.cancel_at_period_end ? (
               <button
-                onClick={cancelSubscription}
-                disabled={loading}
+                onClick={handleCancelSubscription}
+                disabled={isCancelling}
                 className="px-4 py-2 bg-red-900/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 rounded-lg transition-colors"
               >
-                Cancel Subscription
+                {isCancelling ? 'Cancelling...' : 'Cancel Subscription'}
               </button>
             ) : (
               <button
-                onClick={reactivateSubscription}
-                disabled={loading}
+                onClick={handleReactivateSubscription}
+                disabled={isReactivating}
                 className="px-4 py-2 bg-green-900/20 hover:bg-green-900/30 text-green-400 hover:text-green-300 rounded-lg transition-colors"
               >
-                Reactivate Subscription
+                {isReactivating ? 'Reactivating...' : 'Reactivate Subscription'}
               </button>
             )}
           </div>

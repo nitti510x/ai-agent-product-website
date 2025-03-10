@@ -6,23 +6,20 @@ export const apiUrl = () => {
   // Check if we should use the local API
   const useLocalApi = import.meta.env.VITE_USE_LOCAL_API === 'true';
   
-  // Use local API in development if specified
-  if (useLocalApi) {
-    return import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-  }
-  
-  // Otherwise use Supabase Edge Functions
+  // Use Supabase Edge Functions by default
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   if (!supabaseUrl) {
     console.error('VITE_SUPABASE_URL is not defined in environment variables');
     return '';
   }
   
-  // Convert Supabase URL to Edge Functions URL
-  // Example: https://your-project.supabase.co -> https://your-project.functions.supabase.co
-  const edgeFunctionsUrl = supabaseUrl
-    .replace('supabase.co', 'functions.supabase.co')
-    .replace('supabase.in', 'functions.supabase.co');
+  // If using local API is explicitly enabled (development only), use the external API URL
+  if (useLocalApi) {
+    // Always use the external API URL in production
+    return 'https://agent.ops.geniusos.co/api';
+  }
   
-  return edgeFunctionsUrl;
+  // Convert Supabase URL to Edge Functions URL
+  // Format: https://<project_ref>.supabase.co -> https://<project_ref>.supabase.co/functions/v1
+  return `${supabaseUrl}/functions/v1`;
 };

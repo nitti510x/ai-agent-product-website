@@ -215,19 +215,6 @@ export const fetchSubscriptionPlans = async () => {
   ];
 
   try {
-    // Always return hardcoded plans for now to avoid any API-related errors
-    // This is the safest approach until API issues are resolved
-    console.log('Using hardcoded plans data to ensure consistent display');
-    return fallbackPlans;
-    
-    /* 
-    // The code below is kept but commented out until API issues are resolved
-    // Check if we're in production and use hardcoded data if so
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      console.log('Production environment detected, using hardcoded plans data');
-      return fallbackPlans;
-    }
-
     // For development, try to get auth session but handle potential errors
     let token = '';
     try {
@@ -238,15 +225,14 @@ export const fetchSubscriptionPlans = async () => {
       // Continue without token
     }
     
-    // Use the external operations API for plans with active_only parameter
-    const externalApiUrl = 'https://agent.ops.geniusos.co/plans/?active_only=true';
+    // Use the external API URL for plans
+    const API_URL = 'https://agent.ops.geniusos.co/api';
     
     try {
-      // Fetch plans from the external API with authentication
-      const response = await fetch(externalApiUrl, {
+      const response = await fetch(`${API_URL}/plans?active_only=true`, {
         headers: {
-          'accept': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : ''
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          'Content-Type': 'application/json'
         }
       });
       
@@ -274,7 +260,6 @@ export const fetchSubscriptionPlans = async () => {
       console.warn('Fetch error:', fetchError);
       return fallbackPlans;
     }
-    */
   } catch (error) {
     console.error('Error in fetchSubscriptionPlans:', error);
     console.log('Falling back to hardcoded plans array due to error');
