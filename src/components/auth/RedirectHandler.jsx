@@ -31,102 +31,91 @@ function RedirectHandler() {
           timestamp: new Date().toISOString()
         });
         
-        // Try to get the session directly first
+        // Process the hash if it exists (Supabase OAuth returns access_token in the hash)
+        if (hash && hash.includes('access_token')) {
+          console.log('Found access_token in hash, processing...');
+          
+          // Let Supabase process the hash
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error('Error getting session after hash processing:', error);
+            setError(`Authentication error: ${error.message}`);
+            setLoading(false);
+            return;
+          }
+          
+          if (data?.session) {
+            console.log('Session created successfully:', data.session.user.email);
+            navigate('/dashboard');
+            return;
+          }
+        }
+        
+        // Check if we already have a session
         console.log('Checking for existing session...');
-        const { data: initialSession, error: initialError } = await supabase.auth.getSession();
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
-        console.log('Initial session check result:', initialSession);
-        if (initialError) console.error('Initial session check error:', initialError);
-        
-        if (initialSession?.session) {
-          console.log('Session already exists:', initialSession.session);
-          console.log('User:', initialSession.session.user.email);
+        if (sessionError) {
+          console.error('Error checking session:', sessionError);
+          setError(`Session error: ${sessionError.message}`);
           setLoading(false);
+          return;
+        }
+        
+        if (sessionData?.session) {
+          console.log('Existing session found:', sessionData.session.user.email);
           navigate('/dashboard');
           return;
         }
         
-        // If no hash or query, we can't proceed
-        if (!hash && !query) {
-          console.error('No hash or query parameters found in URL');
-          setError('No authentication data found in URL');
-          setLoading(false);
-          return;
-        }
+        // If we reach here, we don't have a session yet
+        console.log('No session found, waiting for auth completion...');
         
-        // For Supabase OAuth, we need to explicitly process the hash/query
-        console.log('Attempting to process auth callback...');
-        
-        // First try - immediate check
-        console.log('First attempt to get session after callback...');
-        const { data: firstAttempt, error: firstError } = await supabase.auth.getSession();
-        
-        if (firstError) {
-          console.error('First attempt error:', firstError);
-        }
-        
-        if (firstAttempt?.session) {
-          console.log('Session created on first attempt:', firstAttempt.session);
-          console.log('User:', firstAttempt.session.user.email);
-          setLoading(false);
-          navigate('/dashboard');
-          return;
-        }
-        
-        // Second try - wait a bit longer (3 seconds)
-        console.log('No session found immediately, waiting 3 seconds...');
+        // Wait 3 seconds and check again
         setTimeout(async () => {
           try {
-            console.log('Second attempt to get session after delay...');
-            const { data: secondAttempt, error: secondError } = await supabase.auth.getSession();
+            const { data: delayedData, error: delayedError } = await supabase.auth.getSession();
             
-            if (secondError) {
-              console.error('Second attempt error:', secondError);
-              setError(`Authentication error: ${secondError.message}`);
+            if (delayedError) {
+              console.error('Error checking delayed session:', delayedError);
+              setError(`Authentication error: ${delayedError.message}`);
               setLoading(false);
               return;
             }
             
-            if (secondAttempt?.session) {
-              console.log('Session created after delay:', secondAttempt.session);
-              console.log('User:', secondAttempt.session.user.email);
+            if (delayedData?.session) {
+              console.log('Session created after delay:', delayedData.session.user.email);
               navigate('/dashboard');
-            } else {
-              // Last resort - try to manually refresh the auth state
-              console.log('No session after delay, trying manual refresh...');
-              
-              // Third try - wait a bit more and try again
-              setTimeout(async () => {
-                try {
-                  console.log('Final attempt to get session...');
-                  const { data: finalAttempt, error: finalError } = await supabase.auth.getSession();
-                  
-                  if (finalError) {
-                    console.error('Final attempt error:', finalError);
-                    setError(`Authentication error: ${finalError.message}`);
-                    setLoading(false);
-                    return;
-                  }
-                  
-                  if (finalAttempt?.session) {
-                    console.log('Session created on final attempt:', finalAttempt.session);
-                    console.log('User:', finalAttempt.session.user.email);
-                    navigate('/dashboard');
-                  } else {
-                    console.error('Failed to create session after multiple attempts');
-                    setError('Authentication failed. Please try again.');
-                    navigate('/login');
-                  }
-                } catch (err) {
-                  console.error('Error in final attempt:', err);
-                  setError(`Error: ${err.message}`);
-                }
-                setLoading(false);
-              }, 3000);
+              return;
             }
+            
+            // Final attempt
+            console.log('No session after delay, making final attempt...');
+            setTimeout(async () => {
+              try {
+                const { data: finalData, error: finalError } = await supabase.auth.getSession();
+                
+                if (finalError) {
+                  console.error('Error in final session check:', finalError);
+                  setError(`Authentication error: ${finalError.message}`);
+                } else if (finalData?.session) {
+                  console.log('Session created in final attempt:', finalData.session.user.email);
+                  navigate('/dashboard');
+                  return;
+                } else {
+                  console.error('Failed to create session after multiple attempts');
+                  setError('Authentication failed. Please try again.');
+                }
+              } catch (err) {
+                console.error('Exception in final attempt:', err);
+                setError(`Unexpected error: ${err.message}`);
+              }
+              setLoading(false);
+            }, 3000);
           } catch (err) {
-            console.error('Error in second attempt:', err);
-            setError(`Error: ${err.message}`);
+            console.error('Exception in delayed session check:', err);
+            setError(`Unexpected error: ${err.message}`);
             setLoading(false);
           }
         }, 3000);
