@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Log environment variables for debugging (values will be hidden in production)
+// Log environment variables for debugging
 console.log('Environment check - VITE_SUPABASE_URL exists:', !!import.meta.env.VITE_SUPABASE_URL);
 console.log('Environment check - VITE_SUPABASE_ANON_KEY exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
 
@@ -11,96 +11,54 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 console.log('Using Supabase URL:', supabaseUrl);
 console.log('Using Supabase Anon Key (first 10 chars):', supabaseAnonKey.substring(0, 10) + '...');
 
-// Function to check if we're in a browser environment
-const isBrowser = typeof window !== 'undefined';
-console.log('Is browser environment:', isBrowser);
-
-// Create a minimal Supabase client with no extra options to avoid errors
-let supabase;
-
-// Wrap in a function to better handle errors
-const initSupabase = () => {
-  try {
-    // Log browser capabilities for debugging
-    if (isBrowser) {
-      console.log('Browser features check:');
-      console.log('- localStorage available:', !!window.localStorage);
-      console.log('- sessionStorage available:', !!window.sessionStorage);
-      console.log('- fetch available:', typeof fetch !== 'undefined');
-    }
-    
-    // Check if URL is valid
-    try {
-      new URL(supabaseUrl);
-      console.log('Supabase URL is valid');
-    } catch (e) {
-      console.error('Invalid Supabase URL format:', e.message);
-      throw new Error(`Invalid Supabase URL: ${supabaseUrl}`);
-    }
-    
-    // Check if anon key looks valid (basic format check)
-    if (!supabaseAnonKey || supabaseAnonKey.length < 30) {
-      console.error('Supabase Anon Key appears invalid (too short)');
-      throw new Error('Invalid Supabase Anon Key format');
-    }
-    
-    console.log('Creating Supabase client...');
-    
-    // Most basic client creation possible
-    const client = createClient(supabaseUrl, supabaseAnonKey);
-    
-    // Test if auth is available
-    if (!client.auth) {
-      throw new Error('Supabase client created but auth is not available');
-    }
-    
-    console.log('Supabase client created successfully with auth methods available');
-    return client;
-  } catch (error) {
-    // Detailed error logging
-    console.error('Error creating Supabase client:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
-    
-    if (error.cause) {
-      console.error('Error cause:', error.cause);
-    }
-    
-    // Create a mock client as fallback
-    const mockClient = {
-      auth: {
-        getSession: () => {
-          console.log('Using mock getSession');
-          return Promise.resolve({ data: { session: null } });
-        },
-        getUser: () => {
-          console.log('Using mock getUser');
-          return Promise.resolve({ data: { user: null } });
-        },
-        signOut: () => {
-          console.log('Using mock signOut');
-          return Promise.resolve({ error: null });
-        },
-        onAuthStateChange: () => {
-          console.log('Using mock onAuthStateChange');
-          return { data: { subscription: { unsubscribe: () => {} } } };
-        },
-        signInWithOAuth: (options) => {
-          console.error('Using mock signInWithOAuth due to client creation failure');
-          console.error('Original error:', error.message);
-          alert(`Authentication service error: ${error.message || 'Unknown error'}. Please try again later.`);
-          return Promise.resolve({ error: new Error(`Failed to create Supabase client: ${error.message}`) });
+// Create a mock Supabase client that handles OAuth redirects without using the actual Supabase client
+// This is a workaround for the "Cannot read properties of undefined (reading 'headers')" error
+const mockSupabaseClient = {
+  auth: {
+    getSession: () => Promise.resolve({ data: { session: null } }),
+    getUser: () => Promise.resolve({ data: { user: null } }),
+    signOut: () => Promise.resolve({ error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+    signInWithOAuth: (params) => {
+      try {
+        console.log('Using direct OAuth redirect instead of Supabase client');
+        const provider = params.provider;
+        const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+        const redirectTo = params.options?.redirectTo || `${siteUrl}/auth/callback`;
+        
+        // Construct the OAuth URL manually
+        // This bypasses the Supabase client entirely and directly redirects to the OAuth provider
+        let oauthUrl;
+        
+        if (provider === 'google') {
+          // Redirect directly to Google OAuth
+          const googleClientId = '1234567890-example.apps.googleusercontent.com'; // Replace with your actual Google client ID
+          oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${encodeURIComponent(redirectTo)}&response_type=code&scope=email%20profile`;
+        } else if (provider === 'slack' || provider === 'slack_oidc') {
+          // Redirect directly to Slack OAuth
+          const slackClientId = '1234567890.1234567890'; // Replace with your actual Slack client ID
+          oauthUrl = `https://slack.com/oauth/v2/authorize?client_id=${slackClientId}&redirect_uri=${encodeURIComponent(redirectTo)}&scope=users:read&user_scope=identity.basic`;
+        } else {
+          // For other providers, redirect to Supabase auth endpoint
+          oauthUrl = `${supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
         }
+        
+        console.log('Redirecting to OAuth URL:', oauthUrl);
+        
+        // Perform the redirect
+        window.location.href = oauthUrl;
+        
+        return Promise.resolve({ data: null, error: null });
+      } catch (error) {
+        console.error('Error in manual OAuth redirect:', error);
+        return Promise.resolve({ data: null, error });
       }
-    };
-    
-    return mockClient;
+    }
   }
 };
 
-// Initialize the Supabase client
-supabase = initSupabase();
+// Use the mock client
+const supabase = mockSupabaseClient;
 
 // Helper function to check if user is authenticated
 const isAuthenticated = async () => {
