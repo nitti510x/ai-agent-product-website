@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Load environment variables
-dotenv.config({ path: resolve(__dirname, '..', '.env.development') });
+dotenv.config({ path: resolve(__dirname, '..', '.env') });
 
 // Create a PostgreSQL connection pool
 const pool = new Pool({

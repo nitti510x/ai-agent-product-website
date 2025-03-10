@@ -18,7 +18,6 @@ const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
-dotenv.config({ path: path.resolve(__dirname, '../api/.env') });
 
 // Create Supabase client
 const supabaseUrl = process.env.VITE_SUPABASE_URL;

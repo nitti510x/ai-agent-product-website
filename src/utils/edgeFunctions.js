@@ -2,24 +2,7 @@ import { supabase } from '../config/supabase';
 
 // Base URL for Supabase Edge Functions
 const getEdgeFunctionUrl = (functionName) => {
-  // In development, you might want to use a local server
-  // For production, use the Supabase Edge Functions URL
-  const useLocalApi = import.meta.env.VITE_USE_LOCAL_API === 'true';
-  
-  if (import.meta.env.DEV && useLocalApi) {
-    console.log(`Using local API for ${functionName}`);
-    // Map Supabase function names to local API endpoints
-    const endpointMap = {
-      'stripe-customers': 'customers',
-      'stripe-payment-methods': 'payment-methods',
-      'stripe-subscriptions': 'subscriptions'
-    };
-    
-    const endpoint = endpointMap[functionName] || functionName.replace('stripe-', '');
-    return `http://localhost:3001/api/${endpoint}`;
-  }
-  
-  // Default to Supabase Edge Functions
+  // Always use Supabase Edge Functions
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   console.log(`Using Supabase edge function for ${functionName}: ${supabaseUrl}/functions/v1/${functionName}`);
   return `${supabaseUrl}/functions/v1/${functionName}`;
@@ -239,51 +222,9 @@ export const stripeCustomers = {
 export const stripePaymentMethods = {
   list: async () => {
     try {
-      const response = await callEdgeFunction('stripe-payment-methods');
-      console.log('Payment methods response:', response);
-      
-      // For local API, the response is already in the correct format
-      if (import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_API === 'true') {
-        return response;
-      }
-      
-      // For Supabase Edge Functions, the response format might be different
-      return response;
+      return await callEdgeFunction('stripe-payment-methods');
     } catch (error) {
       console.error('Error in stripePaymentMethods.list:', error);
-      
-      // Fallback implementation for development
-      if (import.meta.env.DEV && error.message.includes('Failed to fetch')) {
-        console.log('Using fallback implementation for payment methods list');
-        
-        // Get user ID from supabase auth
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !session.user) {
-          console.error('No authenticated user found');
-          return { payment_methods: [], default_payment_method: null };
-        }
-        
-        const userId = session.user.id;
-        console.log('Getting payment methods for user:', userId);
-        
-        // Retrieve payment methods from localStorage
-        const storageKey = `payment_methods_${userId}`;
-        const storedMethods = localStorage.getItem(storageKey);
-        
-        if (storedMethods) {
-          try {
-            const methods = JSON.parse(storedMethods);
-            console.log('Retrieved payment methods from localStorage:', methods);
-            return methods;
-          } catch (e) {
-            console.error('Error parsing stored payment methods:', e);
-          }
-        }
-        
-        // Return empty array if no stored methods found
-        return { payment_methods: [], default_payment_method: null };
-      }
-      
       throw error;
     }
   },
@@ -296,91 +237,9 @@ export const stripePaymentMethods = {
         body: { paymentMethodId } 
       });
       console.log('Payment method attached successfully:', response);
-      
-      // For local API, the response includes the payment_method object
-      if (import.meta.env.DEV && import.meta.env.VITE_USE_LOCAL_API === 'true' && response.payment_method) {
-        return response.payment_method;
-      }
-      
       return response;
     } catch (error) {
       console.error('Error in stripePaymentMethods.attach:', error);
-      
-      // Fallback implementation for development
-      if (import.meta.env.DEV && error.message.includes('Failed to fetch')) {
-        console.log('Using fallback implementation for payment method attach');
-        
-        // Get user ID from supabase auth
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !session.user) {
-          console.error('No authenticated user found');
-          throw new Error('User authentication required');
-        }
-        
-        const userId = session.user.id;
-        console.log('Attaching payment method for user:', userId);
-        
-        // Create a mock payment method
-        const newPaymentMethod = {
-          id: paymentMethodId,
-          card: {
-            brand: 'visa',
-            last4: '4242',
-            exp_month: 12,
-            exp_year: 2030
-          },
-          is_default: true,
-          created_at: new Date().toISOString()
-        };
-        
-        // Retrieve existing payment methods
-        const storageKey = `payment_methods_${userId}`;
-        const storedMethods = localStorage.getItem(storageKey);
-        let methods = [];
-        
-        if (storedMethods) {
-          try {
-            methods = JSON.parse(storedMethods);
-            // Set all existing methods to non-default
-            methods = methods.map(method => ({
-              ...method,
-              is_default: false
-            }));
-          } catch (e) {
-            console.error('Error parsing stored payment methods:', e);
-          }
-        }
-        
-        // Add the new payment method
-        methods.push(newPaymentMethod);
-        
-        // Save to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(methods));
-        console.log('Saved payment methods to localStorage:', methods);
-        
-        return newPaymentMethod;
-      }
-      
-      // Try to extract more detailed error information
-      if (error.message && error.message.includes('API error')) {
-        try {
-          // Try to extract JSON from the error message
-          const jsonMatch = error.message.match(/\{.*\}/);
-          if (jsonMatch) {
-            try {
-              const errorData = JSON.parse(jsonMatch[0]);
-              if (errorData.details) {
-                throw new Error(`Failed to attach payment method: ${errorData.details}`);
-              }
-            } catch (parseError) {
-              // JSON parsing failed, continue with original error
-            }
-          }
-        } catch (extractError) {
-          // Error extraction failed, continue with original error
-        }
-      }
-      
       throw error;
     }
   },
@@ -390,46 +249,6 @@ export const stripePaymentMethods = {
       return await callEdgeFunction(`stripe-payment-methods/${paymentMethodId}`, { method: 'DELETE' });
     } catch (error) {
       console.error('Error in stripePaymentMethods.detach:', error);
-      
-      // Fallback implementation for development
-      if (import.meta.env.DEV && error.message.includes('Failed to fetch')) {
-        console.log('Using fallback implementation for payment method detach');
-        
-        // Get user ID from supabase auth
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !session.user) {
-          console.error('No authenticated user found');
-          throw new Error('User authentication required');
-        }
-        
-        const userId = session.user.id;
-        console.log('Detaching payment method for user:', userId);
-        
-        // Retrieve existing payment methods
-        const storageKey = `payment_methods_${userId}`;
-        const storedMethods = localStorage.getItem(storageKey);
-        
-        if (storedMethods) {
-          try {
-            let methods = JSON.parse(storedMethods);
-            
-            // Remove the specified payment method
-            methods = methods.filter(method => method.id !== paymentMethodId);
-            
-            // Save updated list to localStorage
-            localStorage.setItem(storageKey, JSON.stringify(methods));
-            console.log('Updated payment methods in localStorage after detach:', methods);
-            
-            return { success: true, id: paymentMethodId };
-          } catch (e) {
-            console.error('Error updating stored payment methods:', e);
-          }
-        }
-        
-        // Return success even if no methods were found
-        return { success: true, id: paymentMethodId };
-      }
-      
       throw error;
     }
   },
@@ -440,63 +259,6 @@ export const stripePaymentMethods = {
       return await stripePaymentMethods.attach(paymentMethodId);
     } catch (error) {
       console.error('Error in stripePaymentMethods.setDefault:', error);
-      
-      // Fallback implementation for development
-      if (import.meta.env.DEV && error.message.includes('Failed to fetch')) {
-        console.log('Using fallback implementation for payment method setDefault');
-        
-        // Get user ID from supabase auth
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !session.user) {
-          console.error('No authenticated user found');
-          throw new Error('User authentication required');
-        }
-        
-        const userId = session.user.id;
-        console.log('Setting default payment method for user:', userId);
-        
-        // Retrieve existing payment methods
-        const storageKey = `payment_methods_${userId}`;
-        const storedMethods = localStorage.getItem(storageKey);
-        
-        if (storedMethods) {
-          try {
-            let methods = JSON.parse(storedMethods);
-            
-            // Update default status for all methods
-            methods = methods.map(method => ({
-              ...method,
-              is_default: method.id === paymentMethodId
-            }));
-            
-            // Save updated list to localStorage
-            localStorage.setItem(storageKey, JSON.stringify(methods));
-            console.log('Updated payment methods in localStorage after setDefault:', methods);
-            
-            // Return the updated payment method
-            const updatedMethod = methods.find(method => method.id === paymentMethodId);
-            if (updatedMethod) {
-              return updatedMethod;
-            }
-          } catch (e) {
-            console.error('Error updating stored payment methods:', e);
-          }
-        }
-        
-        // Fallback response if method not found
-        return {
-          id: paymentMethodId,
-          card: {
-            brand: 'visa',
-            last4: '4242',
-            exp_month: 12,
-            exp_year: 2030
-          },
-          is_default: true,
-          created_at: new Date().toISOString()
-        };
-      }
-      
       throw error;
     }
   }

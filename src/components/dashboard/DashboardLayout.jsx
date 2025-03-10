@@ -86,11 +86,6 @@ function DashboardLayout({ children }) {
   // Billing section menu items
   const billingMenuItems = [
     {
-      path: '/dashboard/billing',
-      label: 'Subscription Plans',
-      icon: <FiCreditCard className="mr-2" />
-    },
-    {
       path: '/dashboard/billing/payment',
       label: 'Payment Methods',
       icon: <FiDollarSign className="mr-2" />
@@ -104,6 +99,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/billing/invoices',
       label: 'Invoices',
       icon: <FiFileText className="mr-2" />
+    },
+    {
+      path: '/dashboard/billing',
+      label: 'Subscription Plans',
+      icon: <FiCreditCard className="mr-2" />
     }
   ];
   
@@ -294,13 +294,13 @@ function DashboardLayout({ children }) {
       </div>
       
       {/* Dashboard Footer */}
-      <footer className="border-t border-gray-700/40 bg-[#1A1E23] w-full">
+      <footer className="sticky bottom-0 border-t border-gray-700/40 bg-[#1A1E23] w-full mt-auto">
         <div className="max-w-[1440px] mx-auto px-8">
           <div className="flex flex-wrap items-center justify-between pt-4 pb-3 px-2">
             <div className="flex items-center space-x-2">
               <FaRobot className="text-primary" size={18} />
               <span className="text-white text-sm font-medium">geniusOS</span>
-              <span className="text-gray-400 text-xs px-2">© {new Date().getFullYear()}</span>
+              <span className="text-gray-400 text-xs px-2"> {new Date().getFullYear()}</span>
             </div>
             
             <div className="flex items-center space-x-8 text-sm">

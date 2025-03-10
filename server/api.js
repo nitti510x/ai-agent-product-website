@@ -3,22 +3,13 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import swaggerUi from 'swagger-ui-express';
-import fs from 'fs';
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: resolve(__dirname, '..', '.env.development') });
-} else {
-  dotenv.config();
-}
-
-// Load swagger document
-const swaggerDocument = JSON.parse(fs.readFileSync(resolve(__dirname, 'swagger.json'), 'utf8'));
+// Load environment variables from main .env file
+dotenv.config({ path: resolve(__dirname, '..', '.env') });
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -34,16 +25,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// PostgreSQL connection has been removed - now using agent.ops.geniusos.co endpoint
-
-// API routes for plans have been removed - now using agent.ops.geniusos.co endpoint
-
-// All API routes have been removed - now using agent.ops.geniusos.co endpoint
-// Payment methods should be accessed via https://agent.ops.geniusos.co/payment-methods/
-
 // Redirect any API requests to the external API
 app.use('/api/*', (req, res) => {
   const externalApiBase = 'https://agent.ops.geniusos.co';
@@ -53,14 +34,6 @@ app.use('/api/*', (req, res) => {
   
   res.redirect(307, `${externalApiBase}${path}`);
 });
-
-// POST /api/payment-methods endpoint removed - now using external API
-
-// DELETE /api/payment-methods/:id endpoint removed - now using external API
-
-// POST /api/payment-methods/:id/default endpoint removed - now using external API
-
-// All subscription routes removed - now using external API
 
 // Health check endpoint for Railway
 app.get('/api/health', (req, res) => {
@@ -72,8 +45,7 @@ app.get('/api', (req, res) => {
   res.json({
     name: 'GeniusOS API',
     version: '1.0.0',
-    description: 'API for GeniusOS subscription plans and user management',
-    documentation: `http://localhost:${port}/api-docs`
+    description: 'API for GeniusOS subscription plans and user management'
   });
 });
 
@@ -95,7 +67,6 @@ if (process.env.NODE_ENV === 'production') {
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-  console.log(`API documentation available at http://localhost:${port}/api-docs`);
   if (process.env.NODE_ENV === 'production') {
     console.log(`Frontend application served from the same server`);
   }

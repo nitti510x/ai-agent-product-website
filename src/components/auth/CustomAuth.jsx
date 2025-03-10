@@ -341,7 +341,7 @@ export default function CustomAuth() {
         {(view === 'sign_in' || view === 'sign_up') && (
           <button 
             onClick={handleSlackLogin}
-            className="w-full flex items-center justify-center gap-3 bg-[#2E2E2E] text-white py-3 px-4 rounded-xl mb-4 font-bold hover:bg-[#3d3d3d] transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-[#F7F7F7] text-gray-800 py-3 px-4 rounded-xl mb-4 font-bold hover:bg-gray-100 transition-colors"
             id="slack-login-button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" alt="Slack Logo">
@@ -351,7 +351,7 @@ export default function CustomAuth() {
               <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"/>
               <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"/>
             </svg>
-            {view === 'sign_up' ? 'Sign up with Slack' : 'Continue with Slack'}
+            <span className="font-bold">{view === 'sign_up' ? 'Sign up with Slack' : 'Continue with Slack'}</span>
           </button>
         )}
         
