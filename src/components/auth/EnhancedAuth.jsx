@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useNavigate } from 'react-router-dom';
-import { useNotification } from '../../contexts/NotificationContext';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const EnhancedAuth = () => {
   const navigate = useNavigate();
-  const { showNotification } = useNotification();
+  const { showNotification } = useNotifications();
   const [supabaseClient, setSupabaseClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,7 +34,7 @@ const EnhancedAuth = () => {
       } catch (err) {
         console.error('Error initializing authentication:', err);
         setError('Failed to initialize authentication. Please try again later.');
-        showNotification('Authentication Error', 'Failed to initialize authentication system. Please try again later.', 'error');
+        showNotification && showNotification('Authentication Error', 'Failed to initialize authentication system. Please try again later.', 'error');
       } finally {
         setLoading(false);
       }
