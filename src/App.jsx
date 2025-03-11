@@ -34,11 +34,7 @@ function App() {
             <Route path="/auth/callback" element={<RedirectHandler />} />
             <Route 
               path="/dashboard/*" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
+              element={<Dashboard />} 
             />
           </Routes>
           <ChatBot />

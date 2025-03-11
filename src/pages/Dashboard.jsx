@@ -39,6 +39,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loginProvider, setLoginProvider] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -49,6 +50,37 @@ function Dashboard() {
       const loginProvider = getLoginProvider(user);
       setLoginProvider(loginProvider);
       console.log('User logged in via:', loginProvider);
+      
+      // Get user avatar
+      if (user) {
+        // Try to get avatar from user metadata
+        let avatarUrl = null;
+        
+        // Check user_metadata for avatar
+        if (user.user_metadata?.avatar_url) {
+          avatarUrl = user.user_metadata.avatar_url;
+        } else if (user.user_metadata?.picture) {
+          avatarUrl = user.user_metadata.picture;
+        }
+        
+        // For Slack users, the avatar might be in a different location
+        if (!avatarUrl && user.identities) {
+          const slackIdentity = user.identities.find(id => 
+            id.provider === 'slack' || id.provider === 'slack_oidc'
+          );
+          if (slackIdentity?.identity_data?.user?.image_48) {
+            avatarUrl = slackIdentity.identity_data.user.image_48;
+          }
+        }
+        
+        // Set the avatar URL if found
+        if (avatarUrl) {
+          console.log('Found user avatar:', avatarUrl);
+          setUserAvatar(avatarUrl);
+        } else {
+          console.log('No avatar found for user');
+        }
+      }
     });
   }, []);
 
@@ -124,7 +156,15 @@ function Dashboard() {
                 to="/dashboard/account" 
                 className="flex items-center text-gray-400 hover:text-primary transition-colors"
               >
-                <FiUser className="w-5 h-5 mr-1" />
+                {userAvatar ? (
+                  <img 
+                    src={userAvatar} 
+                    alt="User Avatar" 
+                    className="w-8 h-8 rounded-full mr-2 border border-gray-700"
+                  />
+                ) : (
+                  <FiUser className="w-5 h-5 mr-1" />
+                )}
                 <span className="text-sm">
                   My Account
                 </span>
