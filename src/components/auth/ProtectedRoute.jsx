@@ -1,30 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useSupabase } from '../../contexts/SupabaseContext';
 
 const ProtectedRoute = ({ children }) => {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { session, loading } = useSupabase();
   const location = useLocation();
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        // Dynamically import supabase only when needed
-        const { supabase } = await import('../../config/supabase');
-        
-        // Check if user is authenticated
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-      } catch (error) {
-        console.error('Error checking authentication session:', error);
-        setSession(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-  }, []);
 
   if (loading) {
     // Show loading spinner or skeleton
