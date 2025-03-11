@@ -18,6 +18,7 @@ function Profile() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loginProvider, setLoginProvider] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(null);
 
   useEffect(() => {
     loadUserProfile();
@@ -34,6 +35,8 @@ function Profile() {
         return;
       }
       
+      console.log('Profile - User data:', user);
+      
       // Determine login provider
       const provider = getLoginProvider(user);
       setLoginProvider(provider);
@@ -43,6 +46,83 @@ function Profile() {
         name: user.user_metadata?.full_name || user.user_metadata?.name || 'User',
         email: user.email,
       });
+      
+      // Get user avatar
+      let avatarUrl = null;
+      
+      // Check user_metadata for avatar
+      if (user.user_metadata?.avatar_url) {
+        avatarUrl = user.user_metadata.avatar_url;
+        console.log('Found avatar_url in user_metadata:', avatarUrl);
+      } else if (user.user_metadata?.picture) {
+        avatarUrl = user.user_metadata.picture;
+        console.log('Found picture in user_metadata:', avatarUrl);
+      }
+      
+      // For Slack users, the avatar might be in a different location
+      if (!avatarUrl && user.identities) {
+        const slackIdentity = user.identities.find(id => 
+          id.provider === 'slack' || id.provider === 'slack_oidc'
+        );
+        
+        if (slackIdentity?.identity_data?.user?.image_48) {
+          avatarUrl = slackIdentity.identity_data.user.image_48;
+          console.log('Found Slack avatar:', avatarUrl);
+        }
+        
+        // Check Google identity too
+        const googleIdentity = user.identities.find(id => id.provider === 'google');
+        
+        if (!avatarUrl && googleIdentity?.identity_data?.picture) {
+          avatarUrl = googleIdentity.identity_data.picture;
+          console.log('Found Google avatar in identity_data:', avatarUrl);
+        }
+      }
+      
+      // Set the avatar URL if found
+      if (avatarUrl) {
+        console.log('Setting user avatar to:', avatarUrl);
+        setUserAvatar(avatarUrl);
+      } else {
+        console.log('No avatar found for user');
+        
+        // Try to extract from localStorage as a last resort
+        try {
+          const supabaseItems = Object.keys(localStorage)
+            .filter(key => key.includes('supabase'))
+            .reduce((obj, key) => {
+              try {
+                obj[key] = JSON.parse(localStorage.getItem(key));
+              } catch (e) {
+                obj[key] = localStorage.getItem(key);
+              }
+              return obj;
+            }, {});
+          
+          console.log('Supabase items in localStorage:', supabaseItems);
+          
+          // Try to find avatar in localStorage
+          const sbSession = localStorage.getItem('sb-' + import.meta.env.VITE_SUPABASE_URL.split('//')[1].split('.')[0] + '-auth-token');
+          if (sbSession) {
+            try {
+              const sessionData = JSON.parse(sbSession);
+              console.log('Session data from localStorage:', sessionData);
+              
+              if (sessionData?.user?.user_metadata?.avatar_url) {
+                setUserAvatar(sessionData.user.user_metadata.avatar_url);
+                console.log('Found avatar in localStorage session:', sessionData.user.user_metadata.avatar_url);
+              } else if (sessionData?.user?.user_metadata?.picture) {
+                setUserAvatar(sessionData.user.user_metadata.picture);
+                console.log('Found picture in localStorage session:', sessionData.user.user_metadata.picture);
+              }
+            } catch (e) {
+              console.error('Error parsing localStorage session:', e);
+            }
+          }
+        } catch (e) {
+          console.error('Error checking localStorage:', e);
+        }
+      }
       
     } catch (error) {
       console.error('Error loading user profile:', error);
@@ -145,6 +225,23 @@ function Profile() {
         {/* Basic Information */}
         <div className="bg-dark-lighter p-6 rounded-xl">
           <h2 className="text-xl font-bold text-white mb-6">Basic Information</h2>
+          
+          {/* User Avatar */}
+          <div className="flex flex-col items-center mb-6">
+            {userAvatar ? (
+              <img 
+                src={userAvatar} 
+                alt="User Avatar" 
+                className="w-24 h-24 rounded-full mb-3 border-2 border-primary"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-dark-card flex items-center justify-center mb-3 border-2 border-primary">
+                <FiUser className="w-12 h-12 text-gray-400" />
+              </div>
+            )}
+            <p className="text-lg font-medium text-gray-100">{userData.name}</p>
+          </div>
+          
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">

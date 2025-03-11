@@ -47,21 +47,42 @@ function Login() {
     const initializeSupabase = async () => {
       setIsLoading(true);
       
-      // Clear any stale auth data first
-      try {
-        const authKeys = Object.keys(localStorage).filter(key => 
-          key.includes('supabase') || key.includes('auth')
-        );
-        console.log('Login page - Clearing potential stale auth keys:', authKeys);
-        authKeys.forEach(key => localStorage.removeItem(key));
-      } catch (e) {
-        console.error('Error clearing localStorage:', e);
-      }
-      
+      // Don't clear auth data on initial load - this might be causing the issue
+      // We want to preserve any existing session
       console.log('Login page - Creating Supabase client');
       console.log('Login page - Using URL:', supabaseUrl);
       console.log('Login page - Using site URL:', siteUrl);
       console.log('Login page - Using redirect URL:', redirectUrl);
+      
+      // Check for existing auth data in localStorage
+      try {
+        const authKeys = Object.keys(localStorage).filter(key => 
+          key.includes('supabase') || key.includes('auth')
+        );
+        console.log('Login page - Existing auth keys:', authKeys);
+        
+        // Try to read session data from localStorage
+        const sbSession = localStorage.getItem('sb-' + supabaseUrl.split('//')[1].split('.')[0] + '-auth-token');
+        if (sbSession) {
+          try {
+            const sessionData = JSON.parse(sbSession);
+            console.log('Login page - Found existing session in localStorage:', sessionData);
+            
+            // Check if session has expired
+            if (sessionData?.expires_at && new Date(sessionData.expires_at * 1000) > new Date()) {
+              console.log('Login page - Session is still valid, expires:', new Date(sessionData.expires_at * 1000));
+            } else {
+              console.log('Login page - Session has expired or no expiry found');
+            }
+          } catch (e) {
+            console.error('Error parsing localStorage session:', e);
+          }
+        } else {
+          console.log('Login page - No session found in localStorage');
+        }
+      } catch (e) {
+        console.error('Error checking localStorage:', e);
+      }
       
       try {
         // Create client options with proper headers
@@ -95,9 +116,13 @@ function Login() {
         if (sessionError) {
           console.error('Login page - Error checking session:', sessionError);
         } else if (data?.session) {
-          console.log('Login page - Session exists, redirecting to dashboard');
+          console.log('Login page - Session exists:', data.session);
+          console.log('Login page - User:', data.session.user);
+          console.log('Login page - Redirecting to dashboard');
           window.location.href = '/dashboard';
           return;
+        } else {
+          console.log('Login page - No active session found');
         }
         
         setSupabaseClient(client);
@@ -115,11 +140,6 @@ function Login() {
               detectSessionInUrl: true,
               storage: createCustomStorage(),
               redirectTo: redirectUrl
-            },
-            global: {
-              headers: {
-                'X-Client-Info': 'supabase-js/2.0.0',
-              },
             }
           });
           console.log('Login page - Created client with minimal options');
@@ -143,6 +163,7 @@ function Login() {
       // Clear all auth-related localStorage items
       Object.keys(localStorage).forEach(key => {
         if (key.includes('supabase') || key.includes('auth')) {
+          console.log('Login page - Removing auth key:', key);
           localStorage.removeItem(key);
         }
       });
@@ -152,6 +173,11 @@ function Login() {
       console.error('Error clearing auth data:', e);
       setError('Failed to clear authentication data. Please try refreshing the page.');
     }
+  };
+  
+  // Handle direct navigation to dashboard (bypass auth)
+  const handleDirectDashboard = () => {
+    window.location.href = '/dashboard';
   };
   
   return (
@@ -200,12 +226,26 @@ function Login() {
             />
             <div className="mt-6 text-center text-sm text-gray-400">
               <p>Having trouble logging in?</p>
-              <button 
-                onClick={handleClearAuthAndRetry}
-                className="mt-2 text-emerald-500 hover:text-emerald-400"
-              >
-                Clear Auth Data & Retry
-              </button>
+              <div className="flex flex-col mt-2 space-y-2">
+                <button 
+                  onClick={handleClearAuthAndRetry}
+                  className="text-emerald-500 hover:text-emerald-400"
+                >
+                  Clear Auth Data & Retry
+                </button>
+                <button 
+                  onClick={handleDirectDashboard}
+                  className="text-blue-500 hover:text-blue-400"
+                >
+                  Go Directly to Dashboard (Bypass Auth)
+                </button>
+                <a 
+                  href="/test-auth.html"
+                  className="text-purple-500 hover:text-purple-400"
+                >
+                  Use Test Auth Page
+                </a>
+              </div>
             </div>
           </>
         ) : (
