@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../config/supabase';
 
 function RedirectHandler() {
   const navigate = useNavigate();
   const [status, setStatus] = useState('Processing authentication...');
   const [error, setError] = useState(null);
+  const [supabaseClient, setSupabaseClient] = useState(null);
 
   useEffect(() => {
+    // Load Supabase client
+    const loadSupabase = async () => {
+      try {
+        const { supabase } = await import('../../config/supabase');
+        setSupabaseClient(supabase);
+        return supabase;
+      } catch (error) {
+        console.error('Error loading Supabase client:', error);
+        setError('Failed to initialize authentication system. Please try again later.');
+        return null;
+      }
+    };
+    
     // Function to handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
@@ -59,159 +72,125 @@ function RedirectHandler() {
           return null;
         };
         
-        // Get tokens from URL
-        const tokens = extractTokensFromUrl();
-        if (tokens) {
-          console.log('Authentication tokens found in URL');
-          
-          // If there's an error in the tokens, show it
-          if (tokens.error) {
-            console.error('Error in authentication response:', tokens.error);
-            setError(`Authentication error: ${tokens.error_description || tokens.error}`);
-            setTimeout(() => navigate('/login'), 3000);
-            return;
-          }
+        // Get URL parameters
+        const urlParams = extractTokensFromUrl();
+        console.log('URL parameters extracted:', urlParams);
+        
+        // Check for error in URL parameters
+        if (urlParams && urlParams.error) {
+          console.error('OAuth error from provider:', urlParams.error);
+          console.error('Error description:', urlParams.error_description);
+          throw new Error(urlParams.error_description || urlParams.error);
         }
         
-        // First check if supabase client is available
-        if (!supabase || !supabase.auth) {
-          console.error('Supabase client not available');
-          setError('Authentication service unavailable. Please try again later.');
-          
-          // Try to redirect back to login after a delay
-          setTimeout(() => navigate('/login'), 3000);
+        // Load Supabase client
+        const supabase = await loadSupabase();
+        if (!supabase) {
+          throw new Error('Failed to initialize authentication system');
+        }
+        
+        // Check if we already have a session
+        setStatus('Checking authentication session...');
+        const { data: sessionData } = await supabase.auth.getSession();
+        console.log('Session data:', sessionData);
+        
+        if (sessionData?.session) {
+          console.log('User is already authenticated, redirecting to dashboard');
+          navigate('/dashboard');
           return;
         }
         
-        // Try to get the session - don't clear localStorage here
-        try {
-          setStatus('Checking for active session...');
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        // If we have an access_token in the URL, we can use it to set the session
+        if (urlParams && urlParams.access_token) {
+          console.log('Found access_token in URL, setting session');
+          setStatus('Setting up your session...');
           
-          if (sessionError) {
-            console.error('Error getting session:', sessionError);
-            setError(`Session error: ${sessionError.message}`);
-            setTimeout(() => navigate('/login'), 3000);
-            return;
+          const { data, error } = await supabase.auth.setSession({
+            access_token: urlParams.access_token,
+            refresh_token: urlParams.refresh_token,
+          });
+          
+          if (error) {
+            console.error('Error setting session:', error);
+            throw error;
           }
           
-          if (sessionData?.session) {
-            console.log('Session exists, redirecting to dashboard');
-            console.log('User ID:', sessionData.session.user.id);
-            console.log('User metadata:', sessionData.session.user.user_metadata);
-            
-            // Store avatar URL in localStorage for easy access
-            try {
-              if (sessionData.session.user?.user_metadata?.avatar_url) {
-                localStorage.setItem('userAvatarUrl', sessionData.session.user.user_metadata.avatar_url);
-                console.log('Stored avatar URL in localStorage:', sessionData.session.user.user_metadata.avatar_url);
-              } else if (sessionData.session.user?.user_metadata?.picture) {
-                localStorage.setItem('userAvatarUrl', sessionData.session.user.user_metadata.picture);
-                console.log('Stored picture URL in localStorage:', sessionData.session.user.user_metadata.picture);
-              }
-            } catch (e) {
-              console.error('Error storing avatar URL in localStorage:', e);
-            }
-            
+          console.log('Session set successfully:', data);
+          navigate('/dashboard');
+          return;
+        }
+        
+        // If we have a code parameter, we need to exchange it for a token
+        if (urlParams && urlParams.code) {
+          console.log('Found code in URL, exchanging for token');
+          setStatus('Finalizing your login...');
+          
+          // The code exchange is handled automatically by Supabase
+          // We just need to wait for the session to be established
+          
+          // Wait for a short time to allow Supabase to process the code
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Check if we have a session now
+          const { data: sessionAfterCode } = await supabase.auth.getSession();
+          console.log('Session after code exchange:', sessionAfterCode);
+          
+          if (sessionAfterCode?.session) {
+            console.log('Authentication successful, redirecting to dashboard');
             navigate('/dashboard');
             return;
           }
-        } catch (err) {
-          console.error('Exception checking session:', err);
-          // Continue with the process, as we might still be able to recover
         }
         
-        // If we have tokens in the URL but no session yet, let's wait a moment
-        // for Supabase to process it
-        if (tokens || window.location.hash || window.location.search) {
-          setStatus('Processing authentication data...');
-          
-          // Wait a short time for Supabase to process the authentication
-          setTimeout(async () => {
-            try {
-              // Try getting the session again after a delay
-              const { data: delayedSession, error: delayedError } = await supabase.auth.getSession();
-              
-              if (delayedError) {
-                console.error('Error getting delayed session:', delayedError);
-                setError(`Session error: ${delayedError.message}`);
-                setTimeout(() => navigate('/login'), 3000);
-                return;
-              }
-              
-              if (delayedSession?.session) {
-                console.log('Session established after delay, redirecting to dashboard');
-                console.log('User ID:', delayedSession.session.user.id);
-                console.log('User metadata:', delayedSession.session.user.user_metadata);
-                
-                // Store avatar URL in localStorage for easy access
-                try {
-                  if (delayedSession.session.user?.user_metadata?.avatar_url) {
-                    localStorage.setItem('userAvatarUrl', delayedSession.session.user.user_metadata.avatar_url);
-                    console.log('Stored avatar URL in localStorage:', delayedSession.session.user.user_metadata.avatar_url);
-                  } else if (delayedSession.session.user?.user_metadata?.picture) {
-                    localStorage.setItem('userAvatarUrl', delayedSession.session.user.user_metadata.picture);
-                    console.log('Stored picture URL in localStorage:', delayedSession.session.user.user_metadata.picture);
-                  }
-                } catch (e) {
-                  console.error('Error storing avatar URL in localStorage:', e);
-                }
-                
-                navigate('/dashboard');
-              } else {
-                console.error('No session established after delay');
-                setError('Authentication failed. Please try again.');
-                setTimeout(() => navigate('/login'), 3000);
-              }
-            } catch (err) {
-              console.error('Error checking delayed session:', err);
-              setError(`Error: ${err.message}`);
-              setTimeout(() => navigate('/login'), 3000);
-            }
-          }, 2000);
+        // If we reach here, we don't have a valid session yet
+        console.log('No valid session established, checking for user');
+        
+        // Try to get the user one more time
+        const { data: userData } = await supabase.auth.getUser();
+        console.log('User data:', userData);
+        
+        if (userData?.user) {
+          console.log('User is authenticated, redirecting to dashboard');
+          navigate('/dashboard');
         } else {
-          // No auth data in URL
-          console.error('No authentication data found in URL');
-          setError('No authentication data found. Please try logging in again.');
+          console.log('No authenticated user found, redirecting to login');
+          setError('Authentication failed. Please try again.');
           setTimeout(() => navigate('/login'), 3000);
         }
       } catch (err) {
-        console.error('Unhandled exception in auth callback:', err);
-        setError(`Unhandled error: ${err.message}`);
+        console.error('Authentication error:', err);
+        setError(err.message || 'Authentication failed. Please try again.');
         setTimeout(() => navigate('/login'), 3000);
       }
     };
-
+    
+    // Execute the callback handler
     handleAuthCallback();
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-dark flex items-center justify-center">
-      <div className="bg-dark-lighter p-8 rounded-xl shadow-xl w-full max-w-md text-center">
-        <h2 className="text-2xl font-bold text-gray-100 mb-6">
-          {error ? 'Authentication Error' : 'Completing Login'}
+    <div className="min-h-screen flex items-center justify-center bg-dark p-4">
+      <div className="w-full max-w-md bg-dark-lighter rounded-xl shadow-xl overflow-hidden p-8 text-center">
+        <div className="mb-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-secondary mx-auto"></div>
+        </div>
+        
+        <h2 className="text-xl font-semibold text-white mb-2">
+          {error ? 'Authentication Error' : 'Completing Your Sign In'}
         </h2>
         
         {error ? (
-          <div className="text-red-500 mb-4">{error}</div>
+          <p className="text-red-400 mb-4">{error}</p>
         ) : (
-          <div className="text-gray-300 mb-4">{status}</div>
+          <p className="text-gray-400 mb-4">{status}</p>
         )}
         
-        <div className="mt-4">
-          <button
-            onClick={() => navigate('/login')}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded"
-          >
-            Return to Login
-          </button>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="ml-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-          >
-            Go to Dashboard
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/login')}
+          className="mt-4 px-4 py-2 bg-secondary hover:bg-secondary-dark text-white rounded transition-colors"
+        >
+          Return to Login
+        </button>
       </div>
     </div>
   );

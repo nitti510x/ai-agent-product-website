@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { supabase } from '../../config/supabase';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
@@ -16,11 +15,25 @@ const EnhancedAuth = () => {
   const [success, setSuccess] = useState(null);
   const [view, setView] = useState('sign_in'); // sign_in, sign_up, forgot_password
   const [animateIn, setAnimateIn] = useState(false);
+  const [supabaseClient, setSupabaseClient] = useState(null);
   const navigate = useNavigate();
 
   // Animation effect when component mounts
   useEffect(() => {
     setAnimateIn(true);
+    
+    // Lazily load the Supabase client
+    const loadSupabase = async () => {
+      try {
+        const { supabase } = await import('../../config/supabase');
+        setSupabaseClient(supabase);
+      } catch (error) {
+        console.error('Error loading Supabase client:', error);
+        setError('Failed to initialize authentication system. Please try again later.');
+      }
+    };
+    
+    loadSupabase();
   }, []);
 
   // Animation effect when view changes
@@ -41,7 +54,11 @@ const EnhancedAuth = () => {
     setError(null);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      if (!supabaseClient) {
+        throw new Error('Authentication system not initialized. Please try again.');
+      }
+      
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       });
@@ -50,7 +67,8 @@ const EnhancedAuth = () => {
       
       navigate('/dashboard');
     } catch (error) {
-      setError(error.message || 'An error occurred during sign in');
+      console.error('Sign in error:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -62,36 +80,48 @@ const EnhancedAuth = () => {
     setError(null);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
+      if (!supabaseClient) {
+        throw new Error('Authentication system not initialized. Please try again.');
+      }
+      
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
       });
       
       if (error) throw error;
       
-      setSuccess('Check your email for the confirmation link');
+      setSuccess('Registration successful! Please check your email for a confirmation link.');
+      setView('sign_in');
     } catch (error) {
-      setError(error.message || 'An error occurred during sign up');
+      console.error('Sign up error:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetPassword = async (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     
     try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      if (!supabaseClient) {
+        throw new Error('Authentication system not initialized. Please try again.');
+      }
+      
+      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       });
       
       if (error) throw error;
       
-      setSuccess('Check your email for the password reset link');
+      setSuccess('Password reset instructions sent to your email.');
+      setView('sign_in');
     } catch (error) {
-      setError(error.message || 'An error occurred during password reset');
+      console.error('Password reset error:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -102,30 +132,23 @@ const EnhancedAuth = () => {
     setError(null);
     
     try {
-      // Get the site URL from environment variables or fallback to window.location.origin
-      const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-      console.log(`Using redirect URL: ${siteUrl}/auth/callback`);
-      
-      // Check if supabase.auth is available
-      if (!supabase.auth || typeof supabase.auth.signInWithOAuth !== 'function') {
-        console.error('Supabase auth methods not available');
-        throw new Error('Authentication service is currently unavailable');
+      if (!supabaseClient) {
+        throw new Error('Authentication system not initialized. Please try again.');
       }
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${siteUrl}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       
       if (error) throw error;
       
-      // OAuth flow will redirect the user
+      // The redirect will happen automatically
     } catch (error) {
-      console.error('OAuth sign-in error:', error);
-      setError(error.message || `An error occurred during ${provider} sign in`);
-    } finally {
+      console.error(`${provider} sign in error:`, error);
+      setError(error.message);
       setLoading(false);
     }
   };
@@ -226,7 +249,7 @@ const EnhancedAuth = () => {
         )}
         
         {/* Forms */}
-        <form onSubmit={view === 'sign_in' ? handleSignIn : view === 'sign_up' ? handleSignUp : handleResetPassword}>
+        <form onSubmit={view === 'sign_in' ? handleSignIn : view === 'sign_up' ? handleSignUp : handleForgotPassword}>
           {/* Email Field */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400 mb-1">Email address</label>
