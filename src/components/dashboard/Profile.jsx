@@ -61,6 +61,7 @@ function Profile() {
       
       // For Slack users, the avatar might be in a different location
       if (!avatarUrl && user.identities) {
+        // Try to find Slack identity
         const slackIdentity = user.identities.find(id => 
           id.provider === 'slack' || id.provider === 'slack_oidc'
         );
@@ -68,6 +69,12 @@ function Profile() {
         if (slackIdentity?.identity_data?.user?.image_48) {
           avatarUrl = slackIdentity.identity_data.user.image_48;
           console.log('Found Slack avatar:', avatarUrl);
+        } else if (slackIdentity?.identity_data?.image_48) {
+          avatarUrl = slackIdentity.identity_data.image_48;
+          console.log('Found Slack avatar in identity_data root:', avatarUrl);
+        } else if (slackIdentity?.identity_data?.image_url) {
+          avatarUrl = slackIdentity.identity_data.image_url;
+          console.log('Found Slack image_url:', avatarUrl);
         }
         
         // Check Google identity too
@@ -76,6 +83,9 @@ function Profile() {
         if (!avatarUrl && googleIdentity?.identity_data?.picture) {
           avatarUrl = googleIdentity.identity_data.picture;
           console.log('Found Google avatar in identity_data:', avatarUrl);
+        } else if (!avatarUrl && googleIdentity?.identity_data?.avatar_url) {
+          avatarUrl = googleIdentity.identity_data.avatar_url;
+          console.log('Found Google avatar_url in identity_data:', avatarUrl);
         }
       }
       
@@ -231,8 +241,13 @@ function Profile() {
             {userAvatar ? (
               <img 
                 src={userAvatar} 
-                alt="User Avatar" 
-                className="w-24 h-24 rounded-full mb-3 border-2 border-primary"
+                alt={userData.name || "User"} 
+                className="w-24 h-24 rounded-full mb-3 border-2 border-primary object-cover"
+                onError={(e) => {
+                  console.error('Error loading avatar image:', e);
+                  e.target.onerror = null;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=10B981&color=fff`;
+                }}
               />
             ) : (
               <div className="w-24 h-24 rounded-full bg-dark-card flex items-center justify-center mb-3 border-2 border-primary">
