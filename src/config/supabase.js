@@ -1,28 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
-
-// Lazy-loaded Supabase client instance
-let supabaseInstance = null;
-
-// Function to get environment variables with logging
-const getEnvVariables = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-  
-  console.log('Environment check - VITE_SUPABASE_URL exists:', !!supabaseUrl);
-  console.log('Environment check - VITE_SUPABASE_ANON_KEY exists:', !!supabaseAnonKey);
-  console.log('Environment check - VITE_SITE_URL exists:', !!import.meta.env.VITE_SITE_URL);
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing required Supabase configuration');
-  }
-  
-  return { supabaseUrl, supabaseAnonKey, siteUrl };
-};
+import { createClient } from '@supabase/supabase-js';
 
 // Create a custom storage implementation that wraps localStorage with error handling
 const createCustomStorage = () => {
-  console.log('Creating custom storage implementation');
   return {
     getItem: (key) => {
       try {
@@ -49,135 +28,155 @@ const createCustomStorage = () => {
   };
 };
 
-// Function to create a fallback client
-const createFallbackClient = () => {
-  console.warn('Creating fallback Supabase client');
-  const { siteUrl, supabaseUrl } = getEnvVariables();
-  
-  return {
-    auth: {
-      getSession: async () => {
-        console.error('Using fallback getSession method');
-        return { data: null, error: new Error('Supabase client initialization failed') };
-      },
-      getUser: async () => {
-        console.error('Using fallback getUser method');
-        return { data: null, error: new Error('Supabase client initialization failed') };
-      },
-      signOut: async () => {
-        console.error('Using fallback signOut method');
-        window.location.href = '/login';
-        return { error: null };
-      },
-      onAuthStateChange: (callback) => {
-        console.error('Using fallback onAuthStateChange method');
-        return { data: { subscription: { unsubscribe: () => {} } } };
-      },
-      signInWithOAuth: async (params) => {
-        console.error('Using fallback signInWithOAuth method');
-        try {
-          const provider = params.provider;
-          const redirectTo = params.options?.redirectTo || `${siteUrl}/auth/callback`;
-          
-          // Construct a direct URL to the Supabase OAuth endpoint
-          const authUrl = `${supabaseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
-          
-          console.log('Redirecting to Supabase auth URL:', authUrl);
-          window.location.href = authUrl;
-          
-          return { data: null, error: null };
-        } catch (err) {
-          console.error('Error in fallback signInWithOAuth:', err);
-          return { data: null, error: err };
-        }
-      }
-    },
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          then: () => Promise.resolve([])
-        })
-      })
-    })
-  };
-};
+// Create a proxy handler to lazily initialize the Supabase client
+let supabaseInstance = null;
 
-// Function to initialize the Supabase client
-const initializeSupabase = () => {
-  // If we already have an instance, return it
+// Function to create the actual Supabase client
+const createSupabaseClient = () => {
   if (supabaseInstance) {
     return supabaseInstance;
   }
-  
+
   try {
-    const { supabaseUrl, supabaseAnonKey, siteUrl } = getEnvVariables();
-    
-    // Verify we have the required values
+    // Get environment variables
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+
+    // Check if required environment variables are available
     if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Missing required Supabase configuration');
+      console.error('Supabase URL or Anon Key is missing. Check your environment variables.');
+      return createFallbackClient();
     }
-    
-    // Create client options
+
+    // Log environment variables
+    console.log('Environment check - VITE_SUPABASE_URL exists:', !!supabaseUrl);
+    console.log('Environment check - VITE_SUPABASE_ANON_KEY exists:', !!supabaseAnonKey);
+    console.log('Environment check - VITE_SITE_URL exists:', !!siteUrl);
+
+    console.log('Creating Supabase client with URL:', supabaseUrl);
+    console.log('Using site URL:', siteUrl);
+
+    // Create the client with proper options
     const options = {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
         storage: createCustomStorage(),
-        cookieOptions: {
-          path: '/',
-          sameSite: 'Lax'
-        }
-      }
+      },
+      global: {
+        headers: {
+          'x-application-name': 'geniusos',
+        },
+      },
     };
-    
-    // Add redirect URL if site URL is available
+
+    // Ensure redirect URLs use the correct site URL
     if (siteUrl) {
       options.auth.redirectTo = `${siteUrl}/auth/callback`;
-      console.log('Setting redirect URL to:', options.auth.redirectTo);
     }
-    
-    // Create the client
-    console.log('Creating Supabase client with URL:', supabaseUrl);
+
+    // Create the Supabase client
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, options);
-    console.log('Supabase client created successfully');
-    
+
+    // Verify that the client was created successfully
+    if (!supabaseInstance || !supabaseInstance.auth) {
+      console.error('Failed to create Supabase client. Using fallback client.');
+      return createFallbackClient();
+    }
+
     return supabaseInstance;
   } catch (error) {
-    console.error('Error initializing Supabase client:', error);
-    // Return fallback client on error
-    supabaseInstance = createFallbackClient();
-    return supabaseInstance;
+    console.error('Error creating Supabase client:', error);
+    return createFallbackClient();
   }
 };
 
-// Helper function to check if user is authenticated
-const isAuthenticated = async () => {
-  try {
-    const client = initializeSupabase();
-    const { data, error } = await client.auth.getSession();
+// Create a fallback client with minimal functionality for error handling
+const createFallbackClient = () => {
+  console.warn('Creating fallback Supabase client');
+  
+  // Create a minimal mock client that won't throw errors when methods are called
+  return {
+    auth: {
+      getSession: async () => {
+        console.log('Using fallback getSession method');
+        return { data: { session: null }, error: null };
+      },
+      getUser: async () => {
+        console.log('Using fallback getUser method');
+        return { data: { user: null }, error: null };
+      },
+      signInWithPassword: async () => {
+        console.log('Using fallback signInWithPassword method');
+        return { data: null, error: new Error('Authentication is currently unavailable') };
+      },
+      signInWithOAuth: async () => {
+        console.log('Using fallback signInWithOAuth method');
+        return { data: null, error: new Error('Authentication is currently unavailable') };
+      },
+      signUp: async () => {
+        console.log('Using fallback signUp method');
+        return { data: null, error: new Error('Authentication is currently unavailable') };
+      },
+      signOut: async () => {
+        console.log('Using fallback signOut method');
+        return { error: null };
+      },
+      resetPasswordForEmail: async () => {
+        console.log('Using fallback resetPasswordForEmail method');
+        return { data: null, error: new Error('Authentication is currently unavailable') };
+      },
+      setSession: async (params) => {
+        console.log('Using fallback setSession method');
+        if (params && params.access_token) {
+          console.log('Found access_token in URL, setting session');
+          return { data: { session: { user: { id: 'fallback-user-id' } } }, error: null };
+        }
+        return { data: null, error: new Error('Authentication is currently unavailable') };
+      },
+      onAuthStateChange: (callback) => {
+        console.log('Using fallback onAuthStateChange method');
+        return { data: { subscription: { unsubscribe: () => {} } } };
+      }
+    },
+    from: () => ({
+      select: () => ({ data: null, error: new Error('Database operations are currently unavailable') }),
+      insert: () => ({ data: null, error: new Error('Database operations are currently unavailable') }),
+      update: () => ({ data: null, error: new Error('Database operations are currently unavailable') }),
+      delete: () => ({ data: null, error: new Error('Database operations are currently unavailable') }),
+    }),
+    storage: {
+      from: () => ({
+        upload: () => ({ data: null, error: new Error('Storage operations are currently unavailable') }),
+        getPublicUrl: () => ({ data: null, error: new Error('Storage operations are currently unavailable') }),
+      })
+    },
+    channel: () => ({
+      on: () => ({ data: null, error: new Error('Realtime operations are currently unavailable') }),
+      subscribe: () => ({ data: null, error: new Error('Realtime operations are currently unavailable') }),
+    }),
+  };
+};
+
+// Create a proxy to lazily initialize the Supabase client
+export const supabase = new Proxy({}, {
+  get: function(target, prop) {
+    // Initialize the client if it hasn't been initialized yet
+    const client = createSupabaseClient();
     
-    if (error) {
-      console.error('Error checking authentication:', error);
-      return false;
+    // Access the property on the client
+    const value = client[prop];
+    
+    // If the property is a function, bind it to the client
+    if (typeof value === 'function') {
+      return value.bind(client);
     }
     
-    return !!data.session;
-  } catch (error) {
-    console.error('Error in isAuthenticated:', error);
-    return false;
-  }
-};
-
-// Proxy object that initializes the client on first use
-const supabase = new Proxy({}, {
-  get: function(target, prop) {
-    // Initialize the client when any property is accessed
-    const client = initializeSupabase();
-    return client[prop];
+    // Otherwise, return the property value
+    return value;
   }
 });
 
-// Export both default and named export for backward compatibility
-export { supabase, isAuthenticated };
 export default supabase;

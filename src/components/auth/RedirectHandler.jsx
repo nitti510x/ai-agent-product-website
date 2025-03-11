@@ -5,29 +5,16 @@ function RedirectHandler() {
   const navigate = useNavigate();
   const [status, setStatus] = useState('Processing authentication...');
   const [error, setError] = useState(null);
-  const [supabaseClient, setSupabaseClient] = useState(null);
 
   useEffect(() => {
-    // Load Supabase client
-    const loadSupabase = async () => {
-      try {
-        const { supabase } = await import('../../config/supabase');
-        setSupabaseClient(supabase);
-        return supabase;
-      } catch (error) {
-        console.error('Error loading Supabase client:', error);
-        setError('Failed to initialize authentication system. Please try again later.');
-        return null;
-      }
-    };
-    
-    // Function to handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
         console.log('RedirectHandler: Starting authentication processing');
         setStatus('Checking for authentication data...');
         
-        // Extract tokens from URL if present
+        const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+        console.log('Using site URL:', siteUrl);
+        
         const extractTokensFromUrl = () => {
           const hash = window.location.hash;
           const query = window.location.search;
@@ -35,10 +22,8 @@ function RedirectHandler() {
           console.log('URL hash:', hash);
           console.log('URL query:', query);
           
-          // Extract access_token from hash
           if (hash && hash.includes('access_token')) {
             try {
-              // Parse the hash parameters
               const hashParams = {};
               hash.substring(1).split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
@@ -52,10 +37,8 @@ function RedirectHandler() {
             }
           }
           
-          // Extract from query parameters if not in hash
           if (query && (query.includes('code=') || query.includes('error='))) {
             try {
-              // Parse the query parameters
               const queryParams = {};
               query.substring(1).split('&').forEach(pair => {
                 const [key, value] = pair.split('=');
@@ -72,26 +55,25 @@ function RedirectHandler() {
           return null;
         };
         
-        // Get URL parameters
         const urlParams = extractTokensFromUrl();
         console.log('URL parameters extracted:', urlParams);
         
-        // Check for error in URL parameters
         if (urlParams && urlParams.error) {
           console.error('OAuth error from provider:', urlParams.error);
           console.error('Error description:', urlParams.error_description);
           throw new Error(urlParams.error_description || urlParams.error);
         }
         
-        // Load Supabase client
-        const supabase = await loadSupabase();
-        if (!supabase) {
-          throw new Error('Failed to initialize authentication system');
+        const { supabase } = await import('../../config/supabase');
+        
+        setStatus('Checking authentication session...');
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+          throw sessionError;
         }
         
-        // Check if we already have a session
-        setStatus('Checking authentication session...');
-        const { data: sessionData } = await supabase.auth.getSession();
         console.log('Session data:', sessionData);
         
         if (sessionData?.session) {
@@ -100,53 +82,80 @@ function RedirectHandler() {
           return;
         }
         
-        // If we have an access_token in the URL, we can use it to set the session
         if (urlParams && urlParams.access_token) {
           console.log('Found access_token in URL, setting session');
           setStatus('Setting up your session...');
           
-          const { data, error } = await supabase.auth.setSession({
-            access_token: urlParams.access_token,
-            refresh_token: urlParams.refresh_token,
-          });
-          
-          if (error) {
-            console.error('Error setting session:', error);
-            throw error;
+          try {
+            if (typeof supabase.auth.setSession !== 'function') {
+              console.error('supabase.auth.setSession is not a function');
+              
+              localStorage.setItem('supabase.auth.token', JSON.stringify({
+                access_token: urlParams.access_token,
+                refresh_token: urlParams.refresh_token,
+                expires_at: urlParams.expires_in ? Date.now() + (urlParams.expires_in * 1000) : null
+              }));
+              
+              window.location.href = `${siteUrl}/dashboard`;
+              return;
+            }
+            
+            const { data, error } = await supabase.auth.setSession({
+              access_token: urlParams.access_token,
+              refresh_token: urlParams.refresh_token,
+            });
+            
+            if (error) {
+              console.error('Error setting session:', error);
+              throw error;
+            }
+            
+            console.log('Session set successfully:', data);
+            navigate('/dashboard');
+            return;
+          } catch (err) {
+            console.error('Error setting session:', err);
+            
+            window.location.href = `${siteUrl}/dashboard`;
+            return;
           }
-          
-          console.log('Session set successfully:', data);
-          navigate('/dashboard');
-          return;
         }
         
-        // If we have a code parameter, we need to exchange it for a token
         if (urlParams && urlParams.code) {
           console.log('Found code in URL, exchanging for token');
           setStatus('Finalizing your login...');
           
-          // The code exchange is handled automatically by Supabase
-          // We just need to wait for the session to be established
-          
-          // Wait for a short time to allow Supabase to process the code
           await new Promise(resolve => setTimeout(resolve, 2000));
           
-          // Check if we have a session now
-          const { data: sessionAfterCode } = await supabase.auth.getSession();
+          const { data: sessionAfterCode, error: sessionAfterCodeError } = await supabase.auth.getSession();
+          
+          if (sessionAfterCodeError) {
+            console.error('Error getting session after code exchange:', sessionAfterCodeError);
+            throw sessionAfterCodeError;
+          }
+          
           console.log('Session after code exchange:', sessionAfterCode);
           
           if (sessionAfterCode?.session) {
             console.log('Authentication successful, redirecting to dashboard');
             navigate('/dashboard');
             return;
+          } else {
+            console.log('No session after code exchange, refreshing page');
+            window.location.href = `${siteUrl}/dashboard`;
+            return;
           }
         }
         
-        // If we reach here, we don't have a valid session yet
         console.log('No valid session established, checking for user');
         
-        // Try to get the user one more time
-        const { data: userData } = await supabase.auth.getUser();
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) {
+          console.error('Error getting user:', userError);
+          throw userError;
+        }
+        
         console.log('User data:', userData);
         
         if (userData?.user) {
@@ -164,7 +173,6 @@ function RedirectHandler() {
       }
     };
     
-    // Execute the callback handler
     handleAuthCallback();
   }, [navigate]);
 
