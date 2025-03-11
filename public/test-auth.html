@@ -65,6 +65,7 @@
     <button id="sign-in-google">Sign In with Google</button>
     <button id="sign-in-slack">Sign In with Slack</button>
     <button id="sign-out">Sign Out</button>
+    <button id="go-to-dashboard" style="background-color: #3B82F6;">Go to Dashboard</button>
     <pre id="client-output">Click a button to start testing</pre>
   </div>
 
@@ -284,6 +285,33 @@
       }
     });
 
+    document.getElementById('go-to-dashboard').addEventListener('click', async () => {
+      try {
+        if (!supabase) {
+          log('client-output', 'Please create the Supabase client first', 'warning');
+          return;
+        }
+        
+        // Check if we have a valid session before redirecting
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          log('client-output', `Error checking session: ${error.message}`, 'error');
+          return;
+        }
+        
+        if (data?.session) {
+          log('client-output', 'Valid session found, redirecting to dashboard...', 'success');
+          // Redirect to dashboard
+          window.location.href = '/dashboard';
+        } else {
+          log('client-output', 'No valid session found. Please sign in first.', 'warning');
+        }
+      } catch (error) {
+        log('client-output', `Exception during dashboard redirect: ${error.message}`, 'error');
+      }
+    });
+
     document.getElementById('view-storage').addEventListener('click', () => {
       try {
         const output = document.getElementById('storage-output');
@@ -350,6 +378,29 @@
         // Wait a moment for client to initialize, then check session
         setTimeout(() => {
           document.getElementById('check-session').click();
+          
+          // Check if we have a valid session and redirect to dashboard if we do
+          setTimeout(async () => {
+            try {
+              if (!supabase) return;
+              
+              const { data, error } = await supabase.auth.getSession();
+              if (error) {
+                log('client-output', `Error checking session for auto-redirect: ${error.message}`, 'error');
+                return;
+              }
+              
+              if (data?.session) {
+                log('client-output', 'Valid session found, auto-redirecting to dashboard in 3 seconds...', 'success');
+                // Give user a chance to see the success message before redirecting
+                setTimeout(() => {
+                  window.location.href = '/dashboard';
+                }, 3000);
+              }
+            } catch (error) {
+              log('client-output', `Exception during auto-redirect check: ${error.message}`, 'error');
+            }
+          }, 2000);
         }, 1000);
       }
     });
