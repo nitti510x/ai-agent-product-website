@@ -2,15 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
-import { initializeUserPaymentMethods } from './utils/edgeFunctions'
-
-// Initialize payment methods for test users with error handling
-try {
-  initializeUserPaymentMethods();
-} catch (error) {
-  console.error('Error initializing payment methods:', error);
-  // Continue with app initialization even if this fails
-}
 
 // Create a global storage access safety wrapper
 if (typeof window !== 'undefined') {
@@ -43,6 +34,32 @@ if (typeof window !== 'undefined') {
       console.warn('Storage remove error prevented:', e);
     }
   };
+  
+  // Check if the current path requires authentication
+  const requiresAuth = () => {
+    const path = window.location.pathname;
+    return path.startsWith('/dashboard') || 
+           path.startsWith('/auth/callback') || 
+           path === '/login' ||
+           path.startsWith('/checkout');
+  };
+  
+  // Only initialize payment methods if we're on an authenticated route
+  if (requiresAuth()) {
+    // Dynamically import to avoid loading on landing page
+    import('./utils/edgeFunctions.js').then(module => {
+      try {
+        // Initialize payment methods only when needed
+        module.initializeUserPaymentMethods().catch(error => {
+          console.error('Error initializing payment methods:', error);
+        });
+      } catch (error) {
+        console.error('Error importing payment methods module:', error);
+      }
+    }).catch(error => {
+      console.error('Error dynamically importing edge functions:', error);
+    });
+  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
