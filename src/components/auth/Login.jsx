@@ -1,64 +1,185 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { useSupabase } from '../../contexts/SupabaseContext';
-import { supabase as directSupabase } from '../../config/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 function Login() {
-  const { supabase } = useSupabase();
-  const clientToUse = supabase || directSupabase;
+  const [supabaseClient, setSupabaseClient] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Clear any stale auth state on login page load
-  useEffect(() => {
-    const clearStaleAuth = async () => {
-      try {
-        // Check if we have a session that might be invalid
-        const { data, error } = await clientToUse.auth.getSession();
-        console.log('Login page - Current session check:', data?.session ? 'Exists' : 'None');
-        
-        if (error) {
-          console.error('Error checking session on login page:', error);
-          // If there's an error, clear local storage auth data
-          try {
-            const authKeys = Object.keys(localStorage).filter(key => 
-              key.includes('supabase') || key.includes('auth')
-            );
-            console.log('Clearing potential stale auth keys:', authKeys);
-            authKeys.forEach(key => localStorage.removeItem(key));
-          } catch (e) {
-            console.error('Error clearing localStorage:', e);
-          }
-        }
-      } catch (err) {
-        console.error('Exception in login page session check:', err);
-      }
-    };
-    
-    clearStaleAuth();
-  }, [clientToUse]);
-
-  // Get the site URL for redirects
+  // Get environment variables for Supabase configuration
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://qdrtpsuqffsdocjrifwm.supabase.co';
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkcnRwc3VxZmZzZG9janJpZndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA0NTM4NTMsImV4cCI6MjA1NjAyOTg1M30._qNhJuoI7nmmJxgCJ7JmqfLRYeTk1Kxr-V_N27sj8XE';
   const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
   const redirectUrl = `${siteUrl}/auth/callback`;
   
-  console.log('Login page - Using redirect URL:', redirectUrl);
-  console.log('Login page - Site URL:', siteUrl);
-
+  // Create a custom storage implementation with error handling
+  const createCustomStorage = () => {
+    return {
+      getItem: (key) => {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          console.error(`Error getting item ${key} from localStorage:`, e);
+          return null;
+        }
+      },
+      setItem: (key, value) => {
+        try {
+          localStorage.setItem(key, value);
+        } catch (e) {
+          console.error(`Error setting item ${key} in localStorage:`, e);
+        }
+      },
+      removeItem: (key) => {
+        try {
+          localStorage.removeItem(key);
+        } catch (e) {
+          console.error(`Error removing item ${key} from localStorage:`, e);
+        }
+      }
+    };
+  };
+  
+  // Initialize Supabase client directly in the component
+  useEffect(() => {
+    const initializeSupabase = async () => {
+      setIsLoading(true);
+      
+      // Clear any stale auth data first
+      try {
+        const authKeys = Object.keys(localStorage).filter(key => 
+          key.includes('supabase') || key.includes('auth')
+        );
+        console.log('Login page - Clearing potential stale auth keys:', authKeys);
+        authKeys.forEach(key => localStorage.removeItem(key));
+      } catch (e) {
+        console.error('Error clearing localStorage:', e);
+      }
+      
+      console.log('Login page - Creating Supabase client');
+      console.log('Login page - Using URL:', supabaseUrl);
+      console.log('Login page - Using site URL:', siteUrl);
+      console.log('Login page - Using redirect URL:', redirectUrl);
+      
+      try {
+        // Create client options with proper headers
+        const options = {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+            storage: createCustomStorage(),
+            storageKey: 'supabase.auth.token',
+            redirectTo: redirectUrl
+          },
+          global: {
+            headers: {
+              'X-Client-Info': 'supabase-js/2.0.0',
+            },
+          }
+        };
+        
+        // Create the client directly
+        const client = createClient(supabaseUrl, supabaseAnonKey, options);
+        console.log('Login page - Supabase client created successfully');
+        
+        // Verify the client was created properly
+        if (!client.auth || typeof client.auth.getSession !== 'function') {
+          throw new Error('Invalid Supabase client - auth methods missing');
+        }
+        
+        // Check for existing session
+        const { data, error: sessionError } = await client.auth.getSession();
+        if (sessionError) {
+          console.error('Login page - Error checking session:', sessionError);
+        } else if (data?.session) {
+          console.log('Login page - Session exists, redirecting to dashboard');
+          window.location.href = '/dashboard';
+          return;
+        }
+        
+        setSupabaseClient(client);
+        setError(null);
+      } catch (err) {
+        console.error('Login page - Error creating Supabase client:', err);
+        setError('Failed to initialize authentication. Please try again or contact support.');
+        
+        // Try with minimal options as fallback
+        try {
+          console.log('Login page - Attempting to create client with minimal options');
+          const minimalClient = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+              persistSession: true,
+              detectSessionInUrl: true,
+              storage: createCustomStorage(),
+              redirectTo: redirectUrl
+            },
+            global: {
+              headers: {
+                'X-Client-Info': 'supabase-js/2.0.0',
+              },
+            }
+          });
+          console.log('Login page - Created client with minimal options');
+          setSupabaseClient(minimalClient);
+          setError(null);
+        } catch (fallbackError) {
+          console.error('Login page - Fallback client creation also failed:', fallbackError);
+          setError('Authentication service unavailable. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initializeSupabase();
+  }, [supabaseUrl, supabaseAnonKey, siteUrl, redirectUrl]);
+  
+  // Handle clearing auth data and retrying
+  const handleClearAuthAndRetry = () => {
+    try {
+      // Clear all auth-related localStorage items
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('supabase') || key.includes('auth')) {
+          localStorage.removeItem(key);
+        }
+      });
+      // Reload the page
+      window.location.reload();
+    } catch (e) {
+      console.error('Error clearing auth data:', e);
+      setError('Failed to clear authentication data. Please try refreshing the page.');
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center">
       <div className="bg-dark-lighter p-8 rounded-xl shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold text-gray-100 mb-6 text-center">
           Welcome to geniusOS AIForce
         </h2>
-        {!import.meta.env.VITE_SUPABASE_URL ? (
-          <div className="text-center text-gray-400">
-            <p className="mb-4">Please connect to Supabase to enable authentication.</p>
-            <p>Click the "Connect to Supabase" button in the top right corner to get started.</p>
+        
+        {isLoading ? (
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+            <p className="text-gray-300">Initializing authentication...</p>
           </div>
-        ) : (
+        ) : error ? (
+          <div className="text-center">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button 
+              onClick={handleClearAuthAndRetry}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded"
+            >
+              Retry
+            </button>
+          </div>
+        ) : supabaseClient ? (
           <>
             <Auth
-              supabaseClient={clientToUse}
+              supabaseClient={supabaseClient}
               appearance={{
                 theme: ThemeSupa,
                 variables: {
@@ -80,22 +201,23 @@ function Login() {
             <div className="mt-6 text-center text-sm text-gray-400">
               <p>Having trouble logging in?</p>
               <button 
-                onClick={() => {
-                  // Clear all auth-related localStorage items
-                  Object.keys(localStorage).forEach(key => {
-                    if (key.includes('supabase') || key.includes('auth')) {
-                      localStorage.removeItem(key);
-                    }
-                  });
-                  // Reload the page
-                  window.location.reload();
-                }}
+                onClick={handleClearAuthAndRetry}
                 className="mt-2 text-emerald-500 hover:text-emerald-400"
               >
                 Clear Auth Data & Retry
               </button>
             </div>
           </>
+        ) : (
+          <div className="text-center text-gray-400">
+            <p className="mb-4">Unable to initialize authentication.</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded"
+            >
+              Refresh Page
+            </button>
+          </div>
         )}
       </div>
     </div>
