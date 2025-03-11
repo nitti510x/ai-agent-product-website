@@ -115,23 +115,17 @@ try {
     throw new Error('Supabase createClient function is not available');
   }
   
-  // Create a minimal client with basic options
+  // Create a minimal client with basic options - FIX: Remove problematic headers
   const options = {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
       storage: createCustomStorage(),
-      storageKey: 'supabase.auth.token',
       cookieOptions: {
         path: '/',
         sameSite: 'Lax'
       }
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'supabase-js/2.0.0',
-      },
     }
   };
   
@@ -143,22 +137,19 @@ try {
   
   // Create the client with additional error handling
   try {
+    // FIX: Simplify client creation to avoid headers error
     supabase = createClient(supabaseUrl, supabaseAnonKey, options);
     console.log('Supabase client created successfully');
   } catch (clientError) {
     console.error('Error during Supabase client creation:', clientError);
-    // Try one more time with a simpler configuration
+    // Try one more time with an even simpler configuration
     try {
       console.log('Attempting to create client with minimal options');
       supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
           persistSession: true,
-          detectSessionInUrl: true
-        },
-        global: {
-          headers: {
-            'X-Client-Info': 'supabase-js/2.0.0',
-          },
+          detectSessionInUrl: true,
+          storage: createCustomStorage()
         }
       });
       console.log('Supabase client created with minimal options');
@@ -182,6 +173,19 @@ try {
       if (session) {
         console.log('User ID:', session.user.id);
         console.log('Provider:', session.user.app_metadata?.provider);
+        
+        // Store avatar URL in localStorage for easy access
+        try {
+          if (session.user?.user_metadata?.avatar_url) {
+            localStorage.setItem('userAvatarUrl', session.user.user_metadata.avatar_url);
+            console.log('Stored avatar URL in localStorage:', session.user.user_metadata.avatar_url);
+          } else if (session.user?.user_metadata?.picture) {
+            localStorage.setItem('userAvatarUrl', session.user.user_metadata.picture);
+            console.log('Stored picture URL in localStorage:', session.user.user_metadata.picture);
+          }
+        } catch (e) {
+          console.error('Error storing avatar URL in localStorage:', e);
+        }
       }
     });
     console.log('Auth state change listener set up successfully');

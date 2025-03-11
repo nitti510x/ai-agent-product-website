@@ -63,6 +63,14 @@ function RedirectHandler() {
         const tokens = extractTokensFromUrl();
         if (tokens) {
           console.log('Authentication tokens found in URL');
+          
+          // If there's an error in the tokens, show it
+          if (tokens.error) {
+            console.error('Error in authentication response:', tokens.error);
+            setError(`Authentication error: ${tokens.error_description || tokens.error}`);
+            setTimeout(() => navigate('/login'), 3000);
+            return;
+          }
         }
         
         // First check if supabase client is available
@@ -75,26 +83,14 @@ function RedirectHandler() {
           return;
         }
         
-        // Try to get the session
+        // Try to get the session - don't clear localStorage here
         try {
+          setStatus('Checking for active session...');
           const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
           
           if (sessionError) {
             console.error('Error getting session:', sessionError);
             setError(`Session error: ${sessionError.message}`);
-            
-            // Clear any potential stale auth data
-            try {
-              const authKeys = Object.keys(localStorage).filter(key => 
-                key.includes('supabase') || key.includes('auth')
-              );
-              console.log('Clearing potential stale auth keys:', authKeys);
-              authKeys.forEach(key => localStorage.removeItem(key));
-            } catch (e) {
-              console.error('Error clearing localStorage:', e);
-            }
-            
-            // Try to redirect back to login after a delay
             setTimeout(() => navigate('/login'), 3000);
             return;
           }
@@ -102,6 +98,21 @@ function RedirectHandler() {
           if (sessionData?.session) {
             console.log('Session exists, redirecting to dashboard');
             console.log('User ID:', sessionData.session.user.id);
+            console.log('User metadata:', sessionData.session.user.user_metadata);
+            
+            // Store avatar URL in localStorage for easy access
+            try {
+              if (sessionData.session.user?.user_metadata?.avatar_url) {
+                localStorage.setItem('userAvatarUrl', sessionData.session.user.user_metadata.avatar_url);
+                console.log('Stored avatar URL in localStorage:', sessionData.session.user.user_metadata.avatar_url);
+              } else if (sessionData.session.user?.user_metadata?.picture) {
+                localStorage.setItem('userAvatarUrl', sessionData.session.user.user_metadata.picture);
+                console.log('Stored picture URL in localStorage:', sessionData.session.user.user_metadata.picture);
+              }
+            } catch (e) {
+              console.error('Error storing avatar URL in localStorage:', e);
+            }
+            
             navigate('/dashboard');
             return;
           }
@@ -130,6 +141,22 @@ function RedirectHandler() {
               
               if (delayedSession?.session) {
                 console.log('Session established after delay, redirecting to dashboard');
+                console.log('User ID:', delayedSession.session.user.id);
+                console.log('User metadata:', delayedSession.session.user.user_metadata);
+                
+                // Store avatar URL in localStorage for easy access
+                try {
+                  if (delayedSession.session.user?.user_metadata?.avatar_url) {
+                    localStorage.setItem('userAvatarUrl', delayedSession.session.user.user_metadata.avatar_url);
+                    console.log('Stored avatar URL in localStorage:', delayedSession.session.user.user_metadata.avatar_url);
+                  } else if (delayedSession.session.user?.user_metadata?.picture) {
+                    localStorage.setItem('userAvatarUrl', delayedSession.session.user.user_metadata.picture);
+                    console.log('Stored picture URL in localStorage:', delayedSession.session.user.user_metadata.picture);
+                  }
+                } catch (e) {
+                  console.error('Error storing avatar URL in localStorage:', e);
+                }
+                
                 navigate('/dashboard');
               } else {
                 console.error('No session established after delay');
@@ -177,6 +204,12 @@ function RedirectHandler() {
             className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded"
           >
             Return to Login
+          </button>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="ml-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          >
+            Go to Dashboard
           </button>
         </div>
       </div>

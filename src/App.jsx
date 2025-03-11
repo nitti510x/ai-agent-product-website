@@ -32,6 +32,7 @@ function App() {
               <Route path="reset-password" element={<EnhancedUpdatePassword />} />
             </Route>
             <Route path="/auth/callback" element={<RedirectHandler />} />
+            {/* We're temporarily allowing direct access to the dashboard for debugging */}
             <Route 
               path="/dashboard/*" 
               element={<Dashboard />} 
