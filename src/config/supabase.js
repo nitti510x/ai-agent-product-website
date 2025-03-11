@@ -127,6 +127,11 @@ try {
         path: '/',
         sameSite: 'Lax'
       }
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'supabase-js/2.0.0',
+      },
     }
   };
   
@@ -136,9 +141,32 @@ try {
     console.log('Setting redirect URL to:', options.auth.redirectTo);
   }
   
-  // Create the client
-  supabase = createClient(supabaseUrl, supabaseAnonKey, options);
-  console.log('Supabase client created successfully');
+  // Create the client with additional error handling
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey, options);
+    console.log('Supabase client created successfully');
+  } catch (clientError) {
+    console.error('Error during Supabase client creation:', clientError);
+    // Try one more time with a simpler configuration
+    try {
+      console.log('Attempting to create client with minimal options');
+      supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          detectSessionInUrl: true
+        },
+        global: {
+          headers: {
+            'X-Client-Info': 'supabase-js/2.0.0',
+          },
+        }
+      });
+      console.log('Supabase client created with minimal options');
+    } catch (fallbackError) {
+      console.error('Fallback client creation also failed:', fallbackError);
+      throw fallbackError;
+    }
+  }
   
   // Verify the client was created properly by checking a method
   if (!supabase.auth || typeof supabase.auth.getSession !== 'function') {

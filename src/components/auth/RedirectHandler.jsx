@@ -14,42 +14,117 @@ function RedirectHandler() {
         console.log('RedirectHandler: Starting authentication processing');
         setStatus('Checking for authentication data...');
         
-        // Check if we have a hash or query parameters that indicate an OAuth callback
-        const hash = window.location.hash;
-        const query = window.location.search;
+        // Extract tokens from URL if present
+        const extractTokensFromUrl = () => {
+          const hash = window.location.hash;
+          const query = window.location.search;
+          
+          console.log('URL hash:', hash);
+          console.log('URL query:', query);
+          
+          // Extract access_token from hash
+          if (hash && hash.includes('access_token')) {
+            try {
+              // Parse the hash parameters
+              const hashParams = {};
+              hash.substring(1).split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                hashParams[key] = decodeURIComponent(value || '');
+              });
+              
+              console.log('Hash parameters found:', Object.keys(hashParams));
+              return hashParams;
+            } catch (err) {
+              console.error('Error parsing hash parameters:', err);
+            }
+          }
+          
+          // Extract from query parameters if not in hash
+          if (query && (query.includes('code=') || query.includes('error='))) {
+            try {
+              // Parse the query parameters
+              const queryParams = {};
+              query.substring(1).split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                queryParams[key] = decodeURIComponent(value || '');
+              });
+              
+              console.log('Query parameters found:', Object.keys(queryParams));
+              return queryParams;
+            } catch (err) {
+              console.error('Error parsing query parameters:', err);
+            }
+          }
+          
+          return null;
+        };
         
-        console.log('URL hash:', hash);
-        console.log('URL query:', query);
+        // Get tokens from URL
+        const tokens = extractTokensFromUrl();
+        if (tokens) {
+          console.log('Authentication tokens found in URL');
+        }
         
-        // First check if we already have a session
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Error getting session:', sessionError);
-          setError(`Session error: ${sessionError.message}`);
+        // First check if supabase client is available
+        if (!supabase || !supabase.auth) {
+          console.error('Supabase client not available');
+          setError('Authentication service unavailable. Please try again later.');
+          
+          // Try to redirect back to login after a delay
+          setTimeout(() => navigate('/login'), 3000);
           return;
         }
         
-        if (sessionData?.session) {
-          console.log('Session exists, redirecting to dashboard');
-          console.log('User ID:', sessionData.session.user.id);
-          navigate('/dashboard');
-          return;
+        // Try to get the session
+        try {
+          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error('Error getting session:', sessionError);
+            setError(`Session error: ${sessionError.message}`);
+            
+            // Clear any potential stale auth data
+            try {
+              const authKeys = Object.keys(localStorage).filter(key => 
+                key.includes('supabase') || key.includes('auth')
+              );
+              console.log('Clearing potential stale auth keys:', authKeys);
+              authKeys.forEach(key => localStorage.removeItem(key));
+            } catch (e) {
+              console.error('Error clearing localStorage:', e);
+            }
+            
+            // Try to redirect back to login after a delay
+            setTimeout(() => navigate('/login'), 3000);
+            return;
+          }
+          
+          if (sessionData?.session) {
+            console.log('Session exists, redirecting to dashboard');
+            console.log('User ID:', sessionData.session.user.id);
+            navigate('/dashboard');
+            return;
+          }
+        } catch (err) {
+          console.error('Exception checking session:', err);
+          // Continue with the process, as we might still be able to recover
         }
         
-        // If no session yet but we have auth data in the URL, let's wait a moment
+        // If we have tokens in the URL but no session yet, let's wait a moment
         // for Supabase to process it
-        if (hash || query) {
+        if (tokens || window.location.hash || window.location.search) {
           setStatus('Processing authentication data...');
           
           // Wait a short time for Supabase to process the authentication
           setTimeout(async () => {
             try {
+              // Try getting the session again after a delay
               const { data: delayedSession, error: delayedError } = await supabase.auth.getSession();
               
               if (delayedError) {
                 console.error('Error getting delayed session:', delayedError);
                 setError(`Session error: ${delayedError.message}`);
+                setTimeout(() => navigate('/login'), 3000);
                 return;
               }
               
@@ -59,20 +134,24 @@ function RedirectHandler() {
               } else {
                 console.error('No session established after delay');
                 setError('Authentication failed. Please try again.');
+                setTimeout(() => navigate('/login'), 3000);
               }
             } catch (err) {
               console.error('Error checking delayed session:', err);
               setError(`Error: ${err.message}`);
+              setTimeout(() => navigate('/login'), 3000);
             }
           }, 2000);
         } else {
           // No auth data in URL
           console.error('No authentication data found in URL');
           setError('No authentication data found. Please try logging in again.');
+          setTimeout(() => navigate('/login'), 3000);
         }
       } catch (err) {
         console.error('Unhandled exception in auth callback:', err);
         setError(`Unhandled error: ${err.message}`);
+        setTimeout(() => navigate('/login'), 3000);
       }
     };
 
@@ -82,21 +161,24 @@ function RedirectHandler() {
   return (
     <div className="min-h-screen bg-dark flex items-center justify-center">
       <div className="bg-dark-lighter p-8 rounded-xl shadow-xl w-full max-w-md text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-        <h2 className="text-xl text-white font-medium">{status}</h2>
+        <h2 className="text-2xl font-bold text-gray-100 mb-6">
+          {error ? 'Authentication Error' : 'Completing Login'}
+        </h2>
+        
         {error ? (
-          <div className="mt-4">
-            <p className="text-red-500">{error}</p>
-            <button 
-              onClick={() => navigate('/login')} 
-              className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-            >
-              Return to Login
-            </button>
-          </div>
+          <div className="text-red-500 mb-4">{error}</div>
         ) : (
-          <p className="text-gray-400 mt-2">You'll be redirected in a moment</p>
+          <div className="text-gray-300 mb-4">{status}</div>
         )}
+        
+        <div className="mt-4">
+          <button
+            onClick={() => navigate('/login')}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded"
+          >
+            Return to Login
+          </button>
+        </div>
       </div>
     </div>
   );
