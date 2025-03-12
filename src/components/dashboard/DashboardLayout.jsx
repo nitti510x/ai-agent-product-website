@@ -11,6 +11,7 @@ import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
+import OrganizationDropdown from './OrganizationDropdown';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -235,6 +236,14 @@ function DashboardLayout({ children }) {
                 <h2 className="text-xl font-bold text-white mb-4 px-2">
                   {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
                 </h2>
+                
+                {/* Organization Dropdown - Show on dashboard and notifications sections */}
+                {(activeSection === 'dashboard' || activeSection === 'notifications') && (
+                  <div className="mb-4 px-2">
+                    <OrganizationDropdown />
+                  </div>
+                )}
+                
                 <nav>
                   <ul className="space-y-1">
                     {/* Section-specific menu items */}
