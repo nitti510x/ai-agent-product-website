@@ -66,11 +66,14 @@ function AgentLogs() {
       // Filter logs by agent system name
       const filteredLogs = Array.isArray(data) ? data.filter(log => log.agent_system_name === agentInfo.systemName) : [];
       
-      setLogs(filteredLogs);
+      // Sort logs by ID in descending order (newest first)
+      const sortedLogs = [...filteredLogs].sort((a, b) => b.id - a.id);
+      
+      setLogs(sortedLogs);
       
       // Select the first log by default if available
-      if (filteredLogs.length > 0 && !selectedLog) {
-        setSelectedLog(filteredLogs[0].id);
+      if (sortedLogs.length > 0 && !selectedLog) {
+        setSelectedLog(sortedLogs[0].id);
       }
     } catch (err) {
       console.error('Error fetching logs:', err);
