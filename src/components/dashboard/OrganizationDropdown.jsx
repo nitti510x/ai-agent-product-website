@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiChevronDown, FiUsers, FiCheck, FiAlertCircle } from 'react-icons/fi';
-import { supabase } from '../../config/supabase';
+import { useOrganization } from '../../contexts/OrganizationContext';
 
 function OrganizationDropdown() {
-  const [organizations, setOrganizations] = useState([]);
-  const [selectedOrg, setSelectedOrg] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    organizations, 
+    selectedOrg, 
+    isLoading, 
+    error, 
+    selectOrganization, 
+    fetchOrganizations 
+  } = useOrganization();
   const [isOpen, setIsOpen] = useState(false);
-  const [error, setError] = useState(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    fetchOrganizations();
-    
     // Add event listener to handle clicks outside the dropdown
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -29,64 +31,13 @@ function OrganizationDropdown() {
     };
   }, []);
 
-  const fetchOrganizations = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      // Get the current user session
-      const { data: sessionData } = await supabase.auth.getSession();
-      
-      if (!sessionData?.session?.user?.id) {
-        throw new Error('User not authenticated');
-      }
-      
-      const userId = sessionData.session.user.id;
-      
-      // Log the user ID for debugging
-      console.log('Fetching organizations for user ID:', userId);
-      
-      // Fetch organizations from the API endpoint
-      const response = await fetch('https://agent.ops.geniusos.co/organizations/user-organizations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ "user_id": userId })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch organizations: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('Organizations data:', data);
-      
-      if (Array.isArray(data) && data.length > 0) {
-        setOrganizations(data);
-        // Set the primary organization as selected by default
-        const primaryOrg = data.find(org => org.is_primary === true);
-        setSelectedOrg(primaryOrg || data[0]);
-      } else {
-        setOrganizations([]);
-      }
-    } catch (err) {
-      console.error('Error fetching organizations:', err);
-      setError('Failed to load organizations');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  const selectOrganization = (org) => {
-    setSelectedOrg(org);
+  const handleSelectOrganization = (org) => {
+    selectOrganization(org);
     setIsOpen(false);
-    // You could add additional logic here to switch context to the selected organization
   };
 
   const retryFetch = () => {
@@ -145,7 +96,7 @@ function OrganizationDropdown() {
             {organizations.map((org) => (
               <li key={org.id}>
                 <button
-                  onClick={() => selectOrganization(org)}
+                  onClick={() => handleSelectOrganization(org)}
                   className="flex items-center justify-between w-full px-4 py-2 text-left hover:bg-[#252A31] text-gray-200"
                 >
                   <div className="flex items-center">

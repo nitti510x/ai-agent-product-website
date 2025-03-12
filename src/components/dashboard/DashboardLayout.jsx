@@ -223,7 +223,17 @@ function DashboardLayout({ children }) {
     }
   };
   
-  // No section navigation buttons needed as they're in the top navigation
+  // Get the current active tab from URL path
+  const getActiveTab = () => {
+    const path = location.pathname;
+    if (path.includes('/activity/')) return 'activity';
+    if (path.includes('/usage/')) return 'usage';
+    if (path.includes('/setup/')) return 'setup';
+    return 'settings'; // Default tab
+  };
+  
+  // Get the current active tab to preserve when switching agents
+  const activeTab = getActiveTab();
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111418]">
@@ -272,11 +282,31 @@ function DashboardLayout({ children }) {
                         <li className="border-t border-white/5 my-3"></li>
                         <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
                         {agentsMenuItems.map((item) => {
-                          const isActive = location.pathname === item.path;
+                          // Extract agent ID from the path
+                          const agentId = item.path.split('/').pop();
+                          // Check if current path contains this agent ID in any form (settings, logs, usage, setup)
+                          const isActive = location.pathname.includes(`/${agentId}`);
+                          
+                          // Generate the correct path based on the current active tab
+                          let targetPath = item.path; // Default to settings path
+                          if (activeTab === 'activity' && isActive) {
+                            targetPath = `/dashboard/activity/${agentId}`;
+                          } else if (activeTab === 'usage' && isActive) {
+                            targetPath = `/dashboard/usage/${agentId}`;
+                          } else if (activeTab === 'setup' && isActive) {
+                            targetPath = `/dashboard/setup/${agentId}`;
+                          } else if (!isActive && location.pathname.includes('/activity/')) {
+                            targetPath = `/dashboard/activity/${agentId}`;
+                          } else if (!isActive && location.pathname.includes('/usage/')) {
+                            targetPath = `/dashboard/usage/${agentId}`;
+                          } else if (!isActive && location.pathname.includes('/setup/')) {
+                            targetPath = `/dashboard/setup/${agentId}`;
+                          }
+                          
                           return (
                             <li key={item.path}>
                               <Link
-                                to={item.path}
+                                to={targetPath}
                                 className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                                   isActive
                                     ? 'bg-emerald-500/20 text-emerald-400'
