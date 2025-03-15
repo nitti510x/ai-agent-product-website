@@ -143,7 +143,30 @@ function AgentLogs() {
     
     try {
       // If it's already an object, use it directly
-      const dataObj = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      let dataObj = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      
+      // For response logs, filter out input_tokens from the JSON data
+      if (selectedLog) {
+        const selectedLogObj = logs.find(log => log.id === selectedLog);
+        if (selectedLogObj && selectedLogObj.log_type === 'response') {
+          // Create a new object without input_tokens
+          if (typeof dataObj === 'object') {
+            // Remove input_tokens from the top level
+            if ('input_tokens' in dataObj) {
+              const { input_tokens, ...filteredData } = dataObj;
+              dataObj = filteredData;
+            }
+            
+            // Also check if input_tokens exists as a property of any nested objects
+            Object.keys(dataObj).forEach(key => {
+              if (typeof dataObj[key] === 'object' && dataObj[key] !== null && 'input_tokens' in dataObj[key]) {
+                const { input_tokens, ...filteredNestedData } = dataObj[key];
+                dataObj[key] = filteredNestedData;
+              }
+            });
+          }
+        }
+      }
       
       return (
         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5 overflow-auto max-h-[400px]">
@@ -286,7 +309,16 @@ function AgentLogs() {
                         <p className="text-xs text-gray-400 mb-1">Caller Agent</p>
                         <p className="text-sm text-white">{log.agent_system_name || 'N/A'}</p>
                       </div>
-                      {log.input_tokens && logType === 'request' && (
+                      {logType === 'response' && (
+                        <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
+                          <div className="flex items-center mb-1">
+                            <FaRobot className="text-emerald-400 w-3 h-3 mr-1" />
+                            <p className="text-xs text-gray-400">Output Tokens</p>
+                          </div>
+                          <p className="text-sm text-white">{log.output_tokens || ''}</p>
+                        </div>
+                      )}
+                      {logType === 'request' && log.input_tokens && (
                         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
                           <div className="flex items-center mb-1">
                             <FiSend className="text-blue-400 w-3 h-3 mr-1" />
@@ -295,24 +327,9 @@ function AgentLogs() {
                           <p className="text-sm text-white">{log.input_tokens}</p>
                         </div>
                       )}
-                      {log.output_tokens !== null && log.output_tokens > 0 && logType === 'response' && (
-                        <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
-                          <div className="flex items-center mb-1">
-                            <FaRobot className="text-emerald-400 w-3 h-3 mr-1" />
-                            <p className="text-xs text-gray-400">Output Tokens</p>
-                          </div>
-                          <p className="text-sm text-white">{log.output_tokens}</p>
-                        </div>
-                      )}
                     </div>
                     
                     <div className="space-y-4">
-                      {/* Log Details */}
-                      <div>
-                        <h3 className="text-sm font-medium text-white mb-2">Log Details</h3>
-                        {renderJsonContent(log.log_detail)}
-                      </div>
-                      
                       {/* Additional metadata if available */}
                       {log.pair_id && (
                         <div>
@@ -331,6 +348,12 @@ function AgentLogs() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* Log Details */}
+                      <div>
+                        <h3 className="text-sm font-medium text-white mb-2">Log Details</h3>
+                        {renderJsonContent(log.log_detail)}
+                      </div>
                     </div>
                   </div>
                 </div>
