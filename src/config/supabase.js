@@ -27,7 +27,7 @@ try {
   // Hardcoded fallback as last resort
   siteUrl = window.location.hostname.includes('localhost') 
     ? 'http://localhost:5173' 
-    : 'https://agentops.geniusos.co';
+    : 'https://opagents.geniusos.co';
   console.log('Using fallback site URL:', siteUrl);
 }
 
