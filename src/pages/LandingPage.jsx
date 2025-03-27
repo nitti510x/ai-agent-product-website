@@ -83,17 +83,17 @@ function LandingPage() {
             <Logo className="h-8" />
             <div className="hidden md:flex space-x-8">
               {navItems.map((item) => (
-                <RouterLink
+                <ScrollLink
                   key={item}
-                  to={`#${item.toLowerCase()}`}
+                  to={item.toLowerCase()}
+                  smooth={true}
+                  duration={500}
+                  spy={true}
+                  offset={-80} // Adjust for fixed nav
                   className="cursor-pointer hover:text-secondary transition-colors hover:shadow-glow-blue"
-                  style={{
-                    scrollMarginTop: '80px', // Adjust for fixed nav
-                    scrollBehavior: 'smooth'
-                  }}
                 >
                   {item}
-                </RouterLink>
+                </ScrollLink>
               ))}
             </div>
             <div className="flex gap-4">
@@ -417,22 +417,9 @@ function LandingPage() {
                 ))}
               </ul>
               <button 
-                onClick={() => handlePlanSelection({
-                  name: 'Business',
-                  price: 79,
-                  features: [
-                    "Unlimited AI Assistants",
-                    "All Social Platforms",
-                    "Enterprise Analytics",
-                    "Unlimited Team Members",
-                    "24/7 Dedicated Support",
-                    "Unlimited AI Generations",
-                    "Custom Integration",
-                    "SLA Guarantee"
-                  ]
-                })}
+                onClick={() => window.location.href = 'mailto:sales@geniusos.co?subject=Enterprise%20Plan%20Inquiry'}
                 className="w-full bg-dark-card hover:bg-dark-lighter text-gray-100 hover:shadow-glow-blue py-2 px-6 rounded-lg transition-all duration-300">
-                Get Started
+                Contact Sales
               </button>
             </div>
 
