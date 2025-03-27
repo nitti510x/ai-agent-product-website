@@ -83,15 +83,17 @@ function LandingPage() {
             <Logo className="h-8" />
             <div className="hidden md:flex space-x-8">
               {navItems.map((item) => (
-                <ScrollLink
+                <RouterLink
                   key={item}
-                  to={item.toLowerCase()}
-                  smooth={true}
-                  duration={500}
+                  to={`#${item.toLowerCase()}`}
                   className="cursor-pointer hover:text-secondary transition-colors hover:shadow-glow-blue"
+                  style={{
+                    scrollMarginTop: '80px', // Adjust for fixed nav
+                    scrollBehavior: 'smooth'
+                  }}
                 >
                   {item}
-                </ScrollLink>
+                </RouterLink>
               ))}
             </div>
             <div className="flex gap-4">
@@ -158,54 +160,8 @@ function LandingPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="relative">
-                {/* Main Slack Screenshot Placeholder */}
-                <div className="relative rounded-xl overflow-hidden shadow-xl bg-dark-lighter border border-gray-700 aspect-video">
-                  <img src="https://geniusos.co/wp-content/uploads/2025/03/slack_app-1024x576.webp" alt="Slack Interface" className="w-full h-full object-cover" />
-                </div>
-
-                {/* Floating Cards for AI Interactions */}
-                <div className="absolute -right-4 -bottom-4 w-64 bg-dark-lighter p-4 rounded-lg border border-gray-700 shadow-xl">
-                  <div className="flex items-center mb-3">
-                    <RiRobot2Line className="w-6 h-6 text-primary mr-2" />
-                    <span className="text-sm font-semibold">AI Assistant</span>
-                  </div>
-                  <div className="bg-dark-card p-3 rounded-lg border border-gray-700 mb-2">
-                    <div className="h-20 flex items-center justify-center">
-                      <p className="text-gray-400 text-sm text-center">AI response placeholder</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Additional Floating Card - Command Example */}
-                <div className="absolute -left-4 top-1/4 w-56 bg-dark-lighter p-3 rounded-lg border border-gray-700 shadow-xl">
-                  <div className="flex items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span className="text-sm font-semibold">Command</span>
-                  </div>
-                  <div className="bg-dark-card p-2 rounded-lg border border-gray-700">
-                    <div className="h-12 flex items-center justify-center">
-                      <p className="text-gray-400 text-xs font-mono">/post create</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Analytics Card */}
-                <div className="absolute -left-8 -bottom-8 w-48 bg-dark-lighter p-3 rounded-lg border border-gray-700 shadow-xl">
-                  <div className="flex items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span className="text-sm font-semibold">Analytics</span>
-                  </div>
-                  <div className="bg-dark-card p-2 rounded-lg border border-gray-700">
-                    <div className="h-16 flex items-center justify-center">
-                      <p className="text-gray-400 text-xs text-center">Performance metrics placeholder</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="relative rounded-xl overflow-hidden shadow-xl bg-dark-lighter border border-gray-700 aspect-video">
+                <img src="https://geniusos.co/wp-content/uploads/2025/03/animated_slack-1.gif" alt="Animated Slack Interface" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -853,11 +809,11 @@ function LandingPage() {
             <div>
               <h4 className="text-lg font-bold text-gray-100 mb-6">Company</h4>
               <ul className="space-y-4">
-                {['About', 'Careers', 'Contact', 'Privacy', 'Terms'].map((item) => (
+                {['About', 'Contact', 'Privacy', 'Terms'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-text-muted hover:text-secondary transition-colors">
+                    <RouterLink to={`/${item.toLowerCase()}`} className="text-text-muted hover:text-secondary transition-colors">
                       {item}
-                    </a>
+                    </RouterLink>
                   </li>
                 ))}
               </ul>
@@ -866,18 +822,18 @@ function LandingPage() {
 
           <div className="border-t border-dark-card mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-text-muted text-sm mb-4 md:mb-0">
-              &copy; 2025 IntelliAgents. All rights reserved.
+              &copy; 2025 OpAgents. All rights reserved.
             </p>
             <div className="flex space-x-8">
-              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              <RouterLink to="/privacy" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              </RouterLink>
+              <RouterLink to="/terms" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Terms of Service
-              </a>
-              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              </RouterLink>
+              <RouterLink to="/cookie-policy" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Cookie Policy
-              </a>
+              </RouterLink>
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ function Logo({ className = "h-8" }) {
               textShadow: '0 0 5px rgba(83, 211, 255, 0.4)'
             }}
           >
-            Agent
+            Op
           </span>
           
           {/* Agents part with bold weight, slight italic, and gradient color without glow */}
@@ -29,7 +29,7 @@ function Logo({ className = "h-8" }) {
               /* Removed text shadow to eliminate fuzziness */
             }}
           >
-            Ops
+            Agents
           </span>
         </div>
       </div>
