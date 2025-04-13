@@ -31,19 +31,17 @@ export function OrganizationProvider({ children }) {
       const email = sessionData.session.user.email;
       setUserEmail(email);
       
-      // Use the apiUrl helper to get the correct API endpoint based on environment
-      const endpoint = `${apiUrl()}/organizations/user-organizations`;
+      // Use the correct API endpoint format for fetching organizations by user ID
+      const endpoint = `${apiUrl()}/organizations/user/${userId}`;
       
       console.log(`Fetching organizations from: ${endpoint}`);
       
       // Fetch organizations from the API endpoint
       const response = await fetch(endpoint, {
-        method: 'POST',
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json'
-        },
-        body: JSON.stringify({ "user_id": userId })
+        }
       });
       
       if (!response.ok) {
@@ -54,10 +52,16 @@ export function OrganizationProvider({ children }) {
       console.log('Organizations data:', data);
       
       if (Array.isArray(data) && data.length > 0) {
-        setOrganizations(data);
-        // Set the primary organization as selected by default
-        const primaryOrg = data.find(org => org.is_primary === true);
-        setSelectedOrg(primaryOrg || data[0]);
+        // Sort organizations by is_primary (primary organizations first)
+        const sortedOrgs = [...data].sort((a, b) => {
+          if (a.is_primary === b.is_primary) return 0;
+          return a.is_primary ? -1 : 1; // Primary orgs first
+        });
+        
+        setOrganizations(sortedOrgs);
+        // Set the primary organization as selected by default, or the first one if no primary exists
+        const primaryOrg = sortedOrgs.find(org => org.is_primary === true);
+        setSelectedOrg(primaryOrg || sortedOrgs[0]);
       } else {
         setOrganizations([]);
       }

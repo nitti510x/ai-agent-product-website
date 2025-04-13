@@ -27,14 +27,14 @@ GeniusOS AI Agents Platform provides a subscription-based service for accessing 
 The application uses a modern serverless architecture with clear separation of concerns:
 
 - **Frontend**: React application with Vite
-- **External API**: All primary data operations use `agent.ops.geniusos.co`
+- **External API**: All primary data operations use `https://db.api.geniusos.co`
 - **Authentication**: Supabase Auth for SSO users only
 - **Payments**: Stripe integration via Supabase Edge Functions only
 
 ### Data Flow Architecture
 
 1. **Primary Data Source**: 
-   - All application data (plans, subscriptions, tokens, etc.) is served from the external API at `agent.ops.geniusos.co`
+   - All application data (plans, subscriptions, tokens, etc.) is served from the external API at `https://db.api.geniusos.co`
    - The Railway PostgreSQL database stores plans and subscription data, accessed via the external API
 
 2. **Supabase Usage (LIMITED SCOPE)**:
@@ -43,7 +43,9 @@ The application uses a modern serverless architecture with clear separation of c
      - Stripe payment processing via Edge Functions
    - No application data is stored in or retrieved from Supabase
 
-> **IMPORTANT**: This application should NEVER implement any API services locally. All data operations (plans, subscriptions, tokens, etc.) MUST be accessed through the external API service at `agent.ops.geniusos.co`. This is a critical architectural requirement.
+> **IMPORTANT**: This application should NEVER implement any API services locally. All data operations (plans, subscriptions, tokens, etc.) MUST be accessed through the external API service at `https://db.api.geniusos.co`. This is a critical architectural requirement.
+
+> **⚠️ CRITICAL WARNING ⚠️**: NEVER modify the code to use local API endpoints (like http://127.0.0.1:XXXX) in production or development code. Always use the external API endpoint `https://db.api.geniusos.co` through the apiUrl() helper function. Local endpoints should only be used for testing in isolated environments and should never be committed to the codebase. This is a strict architectural requirement to maintain data integrity and security.
 
 ## Features
 
@@ -57,7 +59,7 @@ The application uses a modern serverless architecture with clear separation of c
 ## Tech Stack
 
 - **Frontend**: React, Tailwind CSS
-- **External API**: `agent.ops.geniusos.co` for all data operations
+- **External API**: `https://db.api.geniusos.co` for all data operations
 - **Authentication**: Supabase Auth
 - **UI Components**: Custom components with FaRobot icons from react-icons/fa6
 - **Styling**: Tailwind CSS with custom color scheme (#1A1E23 for content panels, #1F242B for sidebar)
@@ -99,7 +101,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 # Stripe Configuration
 VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 
-# Railway PostgreSQL (accessed via agent.ops.geniusos.co, not directly)
+# Railway PostgreSQL (accessed via https://db.api.geniusos.co, not directly)
 DATABASE_URL=postgresql://postgres:password@host:port/railway
 ```
 
@@ -209,7 +211,7 @@ For local development, use the Stripe CLI:
 
 ### API Endpoints
 
-All primary application data is accessed through the external API at `agent.ops.geniusos.co`:
+All primary application data is accessed through the external API at `https://db.api.geniusos.co`:
 
 - `GET /api/plans` - Get all active subscription plans
 - `GET /api/plans/{id}` - Get a specific plan by ID

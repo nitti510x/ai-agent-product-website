@@ -183,7 +183,7 @@ function Dashboard() {
       <nav className="bg-dark-lighter border-b border-dark-card">
         <div className="max-w-[1440px] mx-auto px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold text-gray-100">
+            <Link to="/dashboard" className="text-2xl font-bold text-gray-100">
               <Logo className="h-8" />
             </Link>
             <div className="flex items-center space-x-6">
