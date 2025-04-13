@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../config/supabase';
 import { FiSave, FiAlertCircle, FiBriefcase, FiPenTool, FiTarget, FiCheckCircle, FiGlobe, FiTag, FiMessageSquare, FiAward, FiUsers, FiPackage, FiLayers } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
@@ -10,15 +9,21 @@ function OrganizationProfile() {
   const [organization, setOrganization] = useState({
     org_name: '',
     org_slogan: '',
-    org_industry: '',
+    org_industry_niche: '',
     org_location: '',
     org_website_url: '',
-    org_brand_values: '',
+    org_email: '',
+    org_phone: '',
+    org_hashtags: '',
+    org_post_cta: '',
+    org_core_brand_values: '',
+    org_mission_statement: '',
+    org_unique_selling_prop: '',
     org_brand_voice: '',
-    org_brand_messaging: '',
     org_target_audience: '',
     org_primary_services: '',
-    org_secondary_services: '',
+    org_top_selling: '',
+    org_brand_colors: '',
   });
 
   useEffect(() => {
@@ -27,31 +32,42 @@ function OrganizationProfile() {
 
   const getOrganizationProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Get the organization ID - for now using a hardcoded ID
+      const organizationId = 'a1ff3780-5716-49ef-86f6-720c925041b0';
       
-      if (!user) throw new Error('No user logged in');
+      // Call the local API endpoint
+      const response = await fetch(`http://127.0.0.1:49615/organizations/${organizationId}`, {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json'
+        }
+      });
       
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      if (!response.ok) {
+        throw new Error(`Failed to load organization profile: ${response.status} ${response.statusText}`);
+      }
       
-      if (error) throw error;
+      const data = await response.json();
       
       if (data) {
         setOrganization({
           org_name: data.org_name || '',
           org_slogan: data.org_slogan || '',
-          org_industry: data.org_industry || '',
+          org_industry_niche: data.org_industry_niche || '',
           org_location: data.org_location || '',
           org_website_url: data.org_website_url || '',
-          org_brand_values: data.org_brand_values || '',
+          org_email: data.org_email || '',
+          org_phone: data.org_phone || '',
+          org_hashtags: data.org_hashtags || '',
+          org_post_cta: data.org_post_cta || '',
+          org_core_brand_values: data.org_core_brand_values || '',
+          org_mission_statement: data.org_mission_statement || '',
+          org_unique_selling_prop: data.org_unique_selling_prop || '',
           org_brand_voice: data.org_brand_voice || '',
-          org_brand_messaging: data.org_brand_messaging || '',
           org_target_audience: data.org_target_audience || '',
           org_primary_services: data.org_primary_services || '',
-          org_secondary_services: data.org_secondary_services || '',
+          org_top_selling: data.org_top_selling || '',
+          org_brand_colors: data.org_brand_colors || '',
         });
       }
     } catch (error) {
@@ -67,29 +83,41 @@ function OrganizationProfile() {
     try {
       setLoading(true);
       
-      const { data: { user } } = await supabase.auth.getUser();
+      // Get the organization ID - for now using a hardcoded ID
+      const organizationId = 'a1ff3780-5716-49ef-86f6-720c925041b0';
       
-      if (!user) throw new Error('No user logged in');
-      
-      const { error } = await supabase
-        .from('organizations')
-        .update({
+      // Call the local API endpoint
+      const response = await fetch(`http://127.0.0.1:49615/organizations/${organizationId}`, {
+        method: 'PUT',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           org_name: organization.org_name,
           org_slogan: organization.org_slogan,
-          org_industry: organization.org_industry,
+          org_industry_niche: organization.org_industry_niche,
           org_location: organization.org_location,
           org_website_url: organization.org_website_url,
-          org_brand_values: organization.org_brand_values,
+          org_email: organization.org_email,
+          org_phone: organization.org_phone,
+          org_hashtags: organization.org_hashtags,
+          org_post_cta: organization.org_post_cta,
+          org_core_brand_values: organization.org_core_brand_values,
+          org_mission_statement: organization.org_mission_statement,
+          org_unique_selling_prop: organization.org_unique_selling_prop,
           org_brand_voice: organization.org_brand_voice,
-          org_brand_messaging: organization.org_brand_messaging,
           org_target_audience: organization.org_target_audience,
           org_primary_services: organization.org_primary_services,
-          org_secondary_services: organization.org_secondary_services,
+          org_top_selling: organization.org_top_selling,
+          org_brand_colors: organization.org_brand_colors,
           updated_at: new Date(),
         })
-        .eq('user_id', user.id);
+      });
       
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Failed to update organization profile: ${response.status} ${response.statusText}`);
+      }
       
       setMessage({
         type: 'success',
@@ -216,9 +244,9 @@ function OrganizationProfile() {
                   </div>
                 </div>
 
-                {/* Industry */}
+                {/* Industry Niche */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_industry">
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_industry_niche">
                     Industry
                   </label>
                   <div className="relative">
@@ -228,11 +256,11 @@ function OrganizationProfile() {
                     <input
                       type="text"
                       className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
-                      id="org_industry"
-                      name="org_industry"
-                      value={organization.org_industry}
+                      id="org_industry_niche"
+                      name="org_industry_niche"
+                      value={organization.org_industry_niche}
                       onChange={handleChange}
-                      placeholder="e.g., Technology, Healthcare, Education"
+                      placeholder="e.g., IT and Business Process Outsourcing (BPO)"
                     />
                   </div>
                 </div>
@@ -278,6 +306,48 @@ function OrganizationProfile() {
                     />
                   </div>
                 </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_email">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiMessageSquare className="text-emerald-400" />
+                    </div>
+                    <input
+                      type="email"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_email"
+                      name="org_email"
+                      value={organization.org_email}
+                      onChange={handleChange}
+                      placeholder="yourorganization@email.com"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_phone">
+                    Phone
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiMessageSquare className="text-emerald-400" />
+                    </div>
+                    <input
+                      type="tel"
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_phone"
+                      name="org_phone"
+                      value={organization.org_phone}
+                      onChange={handleChange}
+                      placeholder="+1 (123) 456-7890"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -285,10 +355,10 @@ function OrganizationProfile() {
             <div className="mb-8">
               <h3 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Brand Identity</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Brand Values */}
+                {/* Core Brand Values */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_values">
-                    Brand Values
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_core_brand_values">
+                    Core Brand Values
                   </label>
                   <div className="relative">
                     <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
@@ -296,12 +366,12 @@ function OrganizationProfile() {
                     </div>
                     <textarea
                       className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
-                      id="org_brand_values"
-                      name="org_brand_values"
-                      value={organization.org_brand_values}
+                      id="org_core_brand_values"
+                      name="org_core_brand_values"
+                      value={organization.org_core_brand_values}
                       onChange={handleChange}
                       rows="3"
-                      placeholder="What values does your brand stand for? (e.g., Innovation, Sustainability, Inclusivity)"
+                      placeholder="What are the core values of your brand?"
                     ></textarea>
                   </div>
                 </div>
@@ -327,10 +397,10 @@ function OrganizationProfile() {
                   </div>
                 </div>
 
-                {/* Brand Messaging - Full width */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_messaging">
-                    Brand Messaging
+                {/* Mission Statement */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_mission_statement">
+                    Mission Statement
                   </label>
                   <div className="relative">
                     <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
@@ -338,12 +408,33 @@ function OrganizationProfile() {
                     </div>
                     <textarea
                       className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
-                      id="org_brand_messaging"
-                      name="org_brand_messaging"
-                      value={organization.org_brand_messaging}
+                      id="org_mission_statement"
+                      name="org_mission_statement"
+                      value={organization.org_mission_statement}
                       onChange={handleChange}
                       rows="3"
-                      placeholder="Key messages your brand communicates (e.g., We make technology accessible to everyone)"
+                      placeholder="What is your organization's mission?"
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Unique Selling Proposition */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_unique_selling_prop">
+                    Unique Selling Proposition
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiTarget className="text-emerald-400" />
+                    </div>
+                    <textarea
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_unique_selling_prop"
+                      name="org_unique_selling_prop"
+                      value={organization.org_unique_selling_prop}
+                      onChange={handleChange}
+                      rows="3"
+                      placeholder="What sets your organization apart from others?"
                     ></textarea>
                   </div>
                 </div>
@@ -395,11 +486,11 @@ function OrganizationProfile() {
                     ></textarea>
                   </div>
                 </div>
-                
-                {/* Secondary Services */}
+
+                {/* Top Selling */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_secondary_services">
-                    Secondary Services/Products
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_top_selling">
+                    Top Selling
                   </label>
                   <div className="relative">
                     <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
@@ -407,12 +498,75 @@ function OrganizationProfile() {
                     </div>
                     <textarea
                       className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
-                      id="org_secondary_services"
-                      name="org_secondary_services"
-                      value={organization.org_secondary_services}
+                      id="org_top_selling"
+                      name="org_top_selling"
+                      value={organization.org_top_selling}
                       onChange={handleChange}
                       rows="3"
-                      placeholder="What additional services or products do you offer?"
+                      placeholder="What are your top selling services or products?"
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Hashtags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_hashtags">
+                    Hashtags
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiTag className="text-emerald-400" />
+                    </div>
+                    <textarea
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_hashtags"
+                      name="org_hashtags"
+                      value={organization.org_hashtags}
+                      onChange={handleChange}
+                      rows="3"
+                      placeholder="What hashtags does your organization use?"
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Post CTA */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_post_cta">
+                    Post CTA
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiTarget className="text-emerald-400" />
+                    </div>
+                    <textarea
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_post_cta"
+                      name="org_post_cta"
+                      value={organization.org_post_cta}
+                      onChange={handleChange}
+                      rows="3"
+                      placeholder="What is the call-to-action for your posts?"
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Brand Colors */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1" htmlFor="org_brand_colors">
+                    Brand Colors
+                  </label>
+                  <div className="relative">
+                    <div className="absolute top-3 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiTag className="text-emerald-400" />
+                    </div>
+                    <textarea
+                      className="pl-10 w-full bg-[#1E2228] border-2 border-[#2f3946] focus:border-emerald-400 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none transition-colors duration-300"
+                      id="org_brand_colors"
+                      name="org_brand_colors"
+                      value={organization.org_brand_colors}
+                      onChange={handleChange}
+                      rows="3"
+                      placeholder="What are your organization's brand colors?"
                     ></textarea>
                   </div>
                 </div>
