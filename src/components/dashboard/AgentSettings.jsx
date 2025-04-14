@@ -31,7 +31,16 @@ function AgentSettings() {
       'team': 'Image Creator',
       'analytics': 'Copy Creator',
       'metrics': 'LinkedIn Poster',
-      'wordpress': 'WordPress Blogger'
+      'wordpress': 'WordPress Blogger',
+      'slack_app_agent': 'Slack App',
+      'social_media_manager_agent': 'Social Media Manager',
+      'ai_content_manager_agent': 'AI Content Manager',
+      'market_research_agent': 'Market Research',
+      'content_writer_agent': 'Content Writer',
+      'image_generator_agent': 'Image Generator',
+      'echo_prompt_agent': 'ECHO Prompt',
+      'workflow_helper_agent': 'Workflow Helper',
+      'linkedin_influencer_agent': 'LinkedIn Influencer'
     };
     return agents[agentId] || 'AI Agent';
   };
@@ -325,7 +334,7 @@ function AgentSettings() {
                     </label>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-gray-400">
+                <p className="mt-3 text-xs text-gray-500">
                   {settings.enabled
                     ? 'Agent is currently active and will respond to requests'
                     : 'Agent is disabled and will not respond to any requests'}
@@ -442,7 +451,7 @@ function AgentSettings() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-sm font-medium text-white">Temperature: {settings.temperature}</label>
-                    <span className="text-xs text-gray-400">Controls randomness</span>
+                    <span className="text-xs text-gray-500">Controls randomness</span>
                   </div>
                   <input
                     type="range"
@@ -464,7 +473,7 @@ function AgentSettings() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-sm font-medium text-white">Top P: {settings.topP}</label>
-                    <span className="text-xs text-gray-400">Controls diversity</span>
+                    <span className="text-xs text-gray-500">Controls diversity</span>
                   </div>
                   <input
                     type="range"
@@ -541,8 +550,6 @@ function AgentSettings() {
             </div>
           </div>
         </div>
-
-
       </form>
     </div>
   );

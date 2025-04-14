@@ -1,23 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { FiClock, FiMessageCircle, FiUser, FiSend, FiAlertCircle, FiSettings, FiActivity, FiBarChart2, FiHelpCircle, FiArrowLeft } from 'react-icons/fi';
 import { FaRobot } from 'react-icons/fa6';
 import { BiBot } from 'react-icons/bi';
 import AgentLogs from './AgentLogs';
+import { apiUrl } from '../../config/api';
 
 function AgentActivity() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const [selectedActivity, setSelectedActivity] = useState(null);
+  const [agentName, setAgentName] = useState('AI Agent');
+  const [loading, setLoading] = useState(true);
 
-  // Get agent name based on ID
-  const getAgentName = () => {
+  // Fetch agent details from API
+  useEffect(() => {
+    const fetchAgentDetails = async () => {
+      try {
+        const response = await fetch(`${apiUrl()}/agents/active`, {
+          method: 'GET',
+          headers: { 'accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const agent = data.agents.find(a => a.system_name === agentId);
+          if (agent) {
+            setAgentName(agent.name);
+          } else {
+            // Fallback to legacy mapping if agent not found in API
+            setAgentName(getLegacyAgentName());
+          }
+        } else {
+          // Fallback to legacy mapping if API call fails
+          setAgentName(getLegacyAgentName());
+        }
+      } catch (error) {
+        console.error('Error fetching agent details:', error);
+        // Fallback to legacy mapping if API call fails
+        setAgentName(getLegacyAgentName());
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAgentDetails();
+  }, [agentId]);
+
+  // Legacy agent name mapping for backward compatibility
+  const getLegacyAgentName = () => {
     const agents = {
       'support': 'Slack App',
       'team': 'Image Creator',
       'analytics': 'Copy Creator',
       'metrics': 'LinkedIn Poster',
-      'wordpress': 'WordPress Blogger'
+      'wordpress': 'WordPress Blogger',
+      'slack_app_agent': 'Slack App',
+      'social_media_manager_agent': 'Social Media Manager',
+      'ai_content_manager_agent': 'AI Content Manager',
+      'market_research_agent': 'Market Research',
+      'content_writer_agent': 'Content Writer',
+      'image_generator_agent': 'Image Generator',
+      'echo_prompt_agent': 'ECHO Prompt',
+      'workflow_helper_agent': 'Workflow Helper',
+      'linkedin_influencer_agent': 'LinkedIn Influencer'
     };
     return agents[agentId] || 'AI Agent';
   };
@@ -41,7 +87,7 @@ function AgentActivity() {
       {/* Page title and action buttons */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-xl font-bold text-white">{getAgentName()}</h2>
+          <h2 className="text-xl font-bold text-white">{loading ? 'Loading...' : agentName}</h2>
           <p className="text-gray-400 text-sm mt-1">Configure and monitor your AI assistant</p>
         </div>
       </div>
@@ -95,7 +141,7 @@ function AgentActivity() {
       </div>
 
       {/* Content based on active tab */}
-      {activeTab === 'logs' && <AgentLogs />}
+      {activeTab === 'logs' && <AgentLogs agentId={agentId} />}
       
       {/* Other tabs content would go here */}
     </div>
