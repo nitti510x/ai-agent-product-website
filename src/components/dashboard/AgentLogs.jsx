@@ -148,13 +148,13 @@ function AgentLogs({ agentId: propAgentId }) {
         return { 
           icon: <FiSend className="w-4 h-4" />, 
           color: 'bg-blue-500/20 text-blue-400',
-          label: 'User Request'
+          label: 'Request'
         };
       case 'response':
         return { 
-          icon: <BiBot className="w-4 h-4" />, 
+          icon: <FaRobot className="w-4 h-4" />, 
           color: 'bg-emerald-500/20 text-emerald-400',
-          label: 'AI Response'
+          label: 'Response'
         };
       case 'error':
         return { 
@@ -164,9 +164,9 @@ function AgentLogs({ agentId: propAgentId }) {
         };
       default:
         return { 
-          icon: <FiMessageCircle className="w-4 h-4" />, 
+          icon: <BiBot className="w-4 h-4" />, 
           color: 'bg-gray-500/20 text-gray-400',
-          label: 'Activity'
+          label: 'Info'
         };
     }
   };
@@ -359,6 +359,11 @@ function AgentLogs({ agentId: propAgentId }) {
                           <FiClock className="w-3 h-3 mr-1" />
                           {formatTimestamp(log.created_at)}
                         </span>
+                        {log.agent_system_name && (
+                          <span className="text-[10px] text-gray-400">
+                            {log.agent_system_name}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center">
                         <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
@@ -366,7 +371,7 @@ function AgentLogs({ agentId: propAgentId }) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-white font-medium truncate">
-                            User Request
+                            {typeInfo.label}
                           </p>
                         </div>
                       </div>
@@ -393,6 +398,11 @@ function AgentLogs({ agentId: propAgentId }) {
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(request.created_at)}
                           </span>
+                          {request.agent_system_name && (
+                            <span className="text-[10px] text-gray-400">
+                              {request.agent_system_name}
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center">
                           <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
@@ -400,7 +410,7 @@ function AgentLogs({ agentId: propAgentId }) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs text-white font-medium truncate">
-                              User Request
+                              Request
                             </p>
                           </div>
                         </div>
@@ -425,6 +435,11 @@ function AgentLogs({ agentId: propAgentId }) {
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(log.created_at)}
                           </span>
+                          {log.agent_system_name && (
+                            <span className="text-[10px] text-gray-400">
+                              {log.agent_system_name}
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center">
                           <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
@@ -455,6 +470,11 @@ function AgentLogs({ agentId: propAgentId }) {
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(pair.timestamp)}
                           </span>
+                          {request.agent_system_name && (
+                            <span className="text-[10px] text-gray-400">
+                              {request.agent_system_name}
+                            </span>
+                          )}
                         </div>
                         
                         <div className="flex w-full space-x-1">
@@ -469,7 +489,7 @@ function AgentLogs({ agentId: propAgentId }) {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-white font-medium truncate">
-                                  User
+                                  Request
                                 </p>
                               </div>
                             </div>
@@ -511,6 +531,11 @@ function AgentLogs({ agentId: propAgentId }) {
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(pair.timestamp)}
                           </span>
+                          {request.agent_system_name && (
+                            <span className="text-[10px] text-gray-400">
+                              {request.agent_system_name}
+                            </span>
+                          )}
                         </div>
                         
                         <div className="flex w-full space-x-1">
@@ -525,7 +550,7 @@ function AgentLogs({ agentId: propAgentId }) {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-white font-medium truncate">
-                                  User
+                                  Request
                                 </p>
                               </div>
                             </div>
@@ -542,7 +567,7 @@ function AgentLogs({ agentId: propAgentId }) {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-white font-medium truncate">
-                                  AI
+                                  Response
                                 </p>
                               </div>
                             </div>
