@@ -173,22 +173,78 @@ function AgentLogs({ agentId: propAgentId }) {
 
   // Get truncated prompt from log details
   const getTruncatedPrompt = (log) => {
-    if (!log.log_detail) return 'No message';
-    
     try {
-      const detailObj = typeof log.log_detail === 'string' ? JSON.parse(log.log_detail) : log.log_detail;
-      if (detailObj.prompt) {
-        return detailObj.prompt.length > 60 ? detailObj.prompt.substring(0, 60) + '...' : detailObj.prompt;
-      } else if (detailObj.message) {
-        return detailObj.message.length > 60 ? detailObj.message.substring(0, 60) + '...' : detailObj.message;
-      } else if (detailObj.error) {
-        return detailObj.error.length > 60 ? detailObj.error.substring(0, 60) + '...' : detailObj.error;
+      if (!log.log_detail) return 'No details available';
+      
+      if (typeof log.log_detail === 'string') {
+        try {
+          const parsed = JSON.parse(log.log_detail);
+          if (parsed.message) return parsed.message.substring(0, 50) + '...';
+          if (parsed.title) return parsed.title.substring(0, 50) + '...';
+          return 'Log details available';
+        } catch (e) {
+          return log.log_detail.substring(0, 50) + '...';
+        }
       }
-      return 'No message content';
-    } catch (e) {
-      console.error('Error parsing log detail:', e);
-      return 'Invalid log format';
+      
+      if (log.log_detail.message) return log.log_detail.message.substring(0, 50) + '...';
+      if (log.log_detail.title) return log.log_detail.title.substring(0, 50) + '...';
+      if (log.log_detail.source_api) return `API: ${log.log_detail.source_api}`;
+      
+      return 'Log details available';
+    } catch (error) {
+      return 'Error parsing log details';
     }
+  };
+
+  // Group logs by pair_id
+  const groupLogsByPairId = () => {
+    // Create a map to group logs by pair_id
+    const pairMap = new Map();
+    
+    // First pass: organize logs by pair_id
+    logs.forEach(log => {
+      if (!log.pair_id) {
+        // Handle logs without pair_id (standalone logs)
+        pairMap.set(log.id, { 
+          id: log.id,
+          timestamp: log.created_at,
+          standalone: true,
+          log: log 
+        });
+      } else if (pairMap.has(log.pair_id)) {
+        // Add to existing pair
+        const pair = pairMap.get(log.pair_id);
+        if (log.log_type === 'request') {
+          pair.request = log;
+        } else if (log.log_type === 'response') {
+          pair.response = log;
+        } else if (log.log_type === 'error') {
+          pair.error = log;
+        }
+      } else {
+        // Create new pair
+        const pair = { 
+          id: log.pair_id,
+          timestamp: log.created_at,
+          standalone: false
+        };
+        
+        if (log.log_type === 'request') {
+          pair.request = log;
+        } else if (log.log_type === 'response') {
+          pair.response = log;
+        } else if (log.log_type === 'error') {
+          pair.error = log;
+        }
+        
+        pairMap.set(log.pair_id, pair);
+      }
+    });
+    
+    // Convert map to array and sort by timestamp (newest first)
+    return Array.from(pairMap.values())
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   };
 
   // Render JSON data in a formatted way
@@ -285,35 +341,217 @@ function AgentLogs({ agentId: propAgentId }) {
               <h4 className="text-sm font-medium text-white">Recent Activity</h4>
             </div>
             <div className="overflow-auto max-h-[600px]">
-              {logs.map(log => {
-                const logType = log.log_type || 'info';
-                const typeInfo = getLogTypeInfo(logType);
-                
-                return (
-                  <button
-                    key={log.id}
-                    onClick={() => setSelectedLog(log.id)}
-                    className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === log.id ? 'bg-dark-lighter/70' : ''}`}
-                  >
-                    <div className="flex items-start">
-                      <div className={`p-1.5 rounded-md ${typeInfo.color} mr-3 mt-0.5`}>
-                        {typeInfo.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-white font-medium mb-1 truncate">
-                          {typeInfo.label}
-                        </p>
-                        <p className="text-xs text-gray-400 truncate">
-                          {getTruncatedPrompt(log)}
-                        </p>
-                        <div className="flex items-center mt-1 text-[10px] text-gray-500">
+              {groupLogsByPairId().map(pair => {
+                if (pair.standalone) {
+                  // Handle standalone logs (no pair)
+                  const log = pair.log;
+                  const logType = log.log_type || 'info';
+                  const typeInfo = getLogTypeInfo(logType);
+                  
+                  return (
+                    <button
+                      key={log.id}
+                      onClick={() => setSelectedLog(log.id)}
+                      className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === log.id ? 'bg-dark-lighter/70' : ''}`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] text-gray-500 flex items-center">
                           <FiClock className="w-3 h-3 mr-1" />
                           {formatTimestamp(log.created_at)}
+                        </span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
+                          {typeInfo.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-white font-medium truncate">
+                            User Request
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  </button>
-                );
+                    </button>
+                  );
+                } else {
+                  // Handle request-response pairs
+                  const request = pair.request;
+                  const response = pair.response;
+                  const error = pair.error;
+                  
+                  // If we only have a request (no response or error yet)
+                  if (request && !response && !error) {
+                    const typeInfo = getLogTypeInfo('request');
+                    
+                    return (
+                      <button
+                        key={request.id}
+                        onClick={() => setSelectedLog(request.id)}
+                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id ? 'bg-dark-lighter/70' : ''}`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-500 flex items-center">
+                            <FiClock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(request.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
+                            {typeInfo.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-white font-medium truncate">
+                              User Request
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  }
+                  
+                  // If we only have a response or error (no request)
+                  if (!request && (response || error)) {
+                    const log = response || error;
+                    const logType = log.log_type || 'info';
+                    const typeInfo = getLogTypeInfo(logType);
+                    
+                    return (
+                      <button
+                        key={log.id}
+                        onClick={() => setSelectedLog(log.id)}
+                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === log.id ? 'bg-dark-lighter/70' : ''}`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-500 flex items-center">
+                            <FiClock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(log.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
+                            {typeInfo.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-white font-medium truncate">
+                              {typeInfo.label}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  }
+                  
+                  // Handle request with error (no successful response)
+                  if (request && error && !response) {
+                    const requestInfo = getLogTypeInfo('request');
+                    const errorInfo = getLogTypeInfo('error');
+                    
+                    return (
+                      <div
+                        key={pair.id}
+                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id || selectedLog === error.id ? 'bg-dark-lighter/70' : ''}`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-500 flex items-center">
+                            <FiClock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(pair.timestamp)}
+                          </span>
+                        </div>
+                        
+                        <div className="flex w-full space-x-1">
+                          {/* Request (left side) */}
+                          <button
+                            onClick={() => setSelectedLog(request.id)}
+                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === request.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
+                          >
+                            <div className="flex items-center">
+                              <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
+                                {requestInfo.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-white font-medium truncate">
+                                  User
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                          
+                          {/* Error (right side) */}
+                          <button
+                            onClick={() => setSelectedLog(error.id)}
+                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === error.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
+                          >
+                            <div className="flex items-center">
+                              <div className={`p-1 rounded-md ${errorInfo.color} mr-1.5`}>
+                                {errorInfo.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-red-400 font-medium truncate">
+                                  Error
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Both request and response exist, show them in a 50/50 split
+                  if (request && response) {
+                    const requestInfo = getLogTypeInfo('request');
+                    const responseInfo = getLogTypeInfo('response');
+                    
+                    return (
+                      <div
+                        key={pair.id}
+                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id || selectedLog === response.id ? 'bg-dark-lighter/70' : ''}`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] text-gray-500 flex items-center">
+                            <FiClock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(pair.timestamp)}
+                          </span>
+                        </div>
+                        
+                        <div className="flex w-full space-x-1">
+                          {/* Request (left side) */}
+                          <button
+                            onClick={() => setSelectedLog(request.id)}
+                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === request.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
+                          >
+                            <div className="flex items-center">
+                              <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
+                                {requestInfo.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-white font-medium truncate">
+                                  User
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                          
+                          {/* Response (right side) */}
+                          <button
+                            onClick={() => setSelectedLog(response.id)}
+                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === response.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
+                          >
+                            <div className="flex items-center">
+                              <div className={`p-1 rounded-md ${responseInfo.color} mr-1.5`}>
+                                {responseInfo.icon}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-white font-medium truncate">
+                                  AI
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+                }
               })}
             </div>
           </div>
