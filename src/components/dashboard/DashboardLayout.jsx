@@ -286,7 +286,7 @@ function DashboardLayout({ children }) {
   return (
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
-        <div className="container mx-auto px-8 max-w-[1440px] page-content flex-grow">
+        <div className="container mx-auto px-8 pb-4 max-w-[1440px] page-content flex-grow">
           <div className="flex flex-col md:flex-row gap-4 pb-0">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}

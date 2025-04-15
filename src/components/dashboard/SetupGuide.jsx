@@ -389,7 +389,7 @@ function SetupGuide() {
   const activeTab = getActiveTab();
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>

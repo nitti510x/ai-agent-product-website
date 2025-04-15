@@ -181,7 +181,7 @@ function Dashboard() {
   return (
       <div className="min-h-screen bg-dark">
       <nav className="bg-dark-lighter border-b border-dark-card">
-        <div className="max-w-[1440px] mx-auto px-8 py-4">
+        <div className="max-w-[1440px] mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <Link to="/dashboard" className="text-2xl font-bold text-gray-100">
               <Logo className="h-8" />

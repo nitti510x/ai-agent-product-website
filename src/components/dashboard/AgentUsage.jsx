@@ -129,7 +129,7 @@ function AgentUsage({ agentId: propAgentId }) {
   const activeTab = getActiveTab();
 
   return (
-    <div className="w-full p-0">
+    <div className="w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
