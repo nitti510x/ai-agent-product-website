@@ -138,7 +138,9 @@ function AgentLogs({ agentId: propAgentId }) {
   // Format timestamp to readable format
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleString();
+    const dateStr = date.toLocaleDateString();
+    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    return { dateStr, timeStr };
   };
 
   // Get log type icon and color
@@ -391,10 +393,13 @@ function AgentLogs({ agentId: propAgentId }) {
                       className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === log.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] text-gray-500 flex items-center">
-                          <FiClock className="w-3 h-3 mr-1" />
-                          {formatTimestamp(log.created_at)}
-                        </span>
+                        <div className="text-[10px] text-gray-500 flex flex-col">
+                          <div className="flex items-center">
+                            <FiClock className="w-3 h-3 mr-1" />
+                            {formatTimestamp(log.created_at).dateStr}
+                          </div>
+                          <div>{formatTimestamp(log.created_at).timeStr}</div>
+                        </div>
                         <div className="flex items-center">
                           <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
                             {typeInfo.icon}
@@ -407,15 +412,19 @@ function AgentLogs({ agentId: propAgentId }) {
                       
                       <div className="flex items-center justify-between">
                         {log.input_tokens !== undefined && (
-                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
-                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                          <span className="text-[10px] text-gray-500 flex items-center">
                             {log.input_tokens} Tokens
                           </span>
                         )}
                         <div className="flex items-center">
                           {log.user_email_id && (
-                            <span className="text-[10px] text-blue-400">
+                            <span className="text-[10px] text-gray-500">
                               {log.user_email_id}
+                            </span>
+                          )}
+                          {log.agent_system_name && (
+                            <span className="text-[10px] text-gray-400">
+                              {log.agent_system_name}
                             </span>
                           )}
                         </div>
@@ -439,10 +448,13 @@ function AgentLogs({ agentId: propAgentId }) {
                         className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] text-gray-500 flex items-center">
-                            <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(pair.timestamp)}
-                          </span>
+                          <div className="text-[10px] text-gray-500 flex flex-col">
+                            <div className="flex items-center">
+                              <FiClock className="w-3 h-3 mr-1" />
+                              {formatTimestamp(request.created_at).dateStr}
+                            </div>
+                            <div>{formatTimestamp(request.created_at).timeStr}</div>
+                          </div>
                           <div className="flex items-center">
                             <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
                               {typeInfo.icon}
@@ -455,20 +467,14 @@ function AgentLogs({ agentId: propAgentId }) {
                         
                         <div className="flex items-center justify-between">
                           {request.input_tokens && (
-                            <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
-                              <FaRobot className="w-2.5 h-2.5 mr-1" />
+                            <span className="text-[10px] text-gray-500 flex items-center">
                               {request.input_tokens} Tokens
                             </span>
                           )}
                           <div className="flex items-center">
                             {request.user_email_id && (
-                              <span className="text-[10px] text-blue-400 mr-2">
+                              <span className="text-[10px] text-gray-500">
                                 {request.user_email_id}
-                              </span>
-                            )}
-                            {request.agent_system_name && (
-                              <span className="text-[10px] text-gray-400">
-                                {request.agent_system_name}
                               </span>
                             )}
                           </div>
@@ -490,10 +496,13 @@ function AgentLogs({ agentId: propAgentId }) {
                         className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === log.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] text-gray-500 flex items-center">
-                            <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(pair.timestamp)}
-                          </span>
+                          <div className="text-[10px] text-gray-500 flex flex-col">
+                            <div className="flex items-center">
+                              <FiClock className="w-3 h-3 mr-1" />
+                              {formatTimestamp(pair.timestamp).dateStr}
+                            </div>
+                            <div>{formatTimestamp(pair.timestamp).timeStr}</div>
+                          </div>
                           <div className="flex items-center">
                             <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
                               {typeInfo.icon}
@@ -506,14 +515,14 @@ function AgentLogs({ agentId: propAgentId }) {
                         
                         <div className="flex items-center justify-between">
                           {log.input_tokens !== undefined && (
-                            <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                            <span className="text-[10px] text-gray-500 flex items-center">
                               <FaRobot className="w-2.5 h-2.5 mr-1" />
                               {log.input_tokens} Tokens
                             </span>
                           )}
                           <div className="flex items-center">
                             {log.user_email_id && (
-                              <span className="text-[10px] text-blue-400">
+                              <span className="text-[10px] text-gray-500">
                                 {log.user_email_id}
                               </span>
                             )}
@@ -534,10 +543,13 @@ function AgentLogs({ agentId: propAgentId }) {
                         className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id || selectedLog === error.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] text-gray-500 flex items-center">
-                            <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(pair.timestamp)}
-                          </span>
+                          <div className="text-[10px] text-gray-500 flex flex-col">
+                            <div className="flex items-center">
+                              <FiClock className="w-3 h-3 mr-1" />
+                              {formatTimestamp(pair.timestamp).dateStr}
+                            </div>
+                            <div>{formatTimestamp(pair.timestamp).timeStr}</div>
+                          </div>
                           <div className="flex space-x-2">
                             {/* Request button */}
                             <button
@@ -548,7 +560,7 @@ function AgentLogs({ agentId: propAgentId }) {
                                 <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
                                   {requestInfo.icon}
                                 </div>
-                                <span className="text-xs text-white font-medium">
+                                <span className="text-xs text-white font-medium w-16">
                                   Request
                                 </span>
                               </div>
@@ -563,7 +575,7 @@ function AgentLogs({ agentId: propAgentId }) {
                                 <div className={`p-1 rounded-md ${errorInfo.color} mr-1.5`}>
                                   {errorInfo.icon}
                                 </div>
-                                <span className="text-xs text-red-400 font-medium">
+                                <span className="text-xs text-red-400 font-medium w-16">
                                   Error
                                 </span>
                               </div>
@@ -572,13 +584,12 @@ function AgentLogs({ agentId: propAgentId }) {
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
-                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                          <span className="text-[10px] text-gray-500 flex items-center">
                             {(request.input_tokens || 0) + (error.output_tokens || 0)} Tokens
                           </span>
                           <div className="flex items-center">
                             {request.user_email_id && (
-                              <span className="text-[10px] text-blue-400">
+                              <span className="text-[10px] text-gray-500">
                                 {request.user_email_id}
                               </span>
                             )}
@@ -599,10 +610,13 @@ function AgentLogs({ agentId: propAgentId }) {
                         className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id || selectedLog === response.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] text-gray-500 flex items-center">
-                            <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(pair.timestamp)}
-                          </span>
+                          <div className="text-[10px] text-gray-500 flex flex-col">
+                            <div className="flex items-center">
+                              <FiClock className="w-3 h-3 mr-1" />
+                              {formatTimestamp(pair.timestamp).dateStr}
+                            </div>
+                            <div>{formatTimestamp(pair.timestamp).timeStr}</div>
+                          </div>
                           <div className="flex space-x-2">
                             {/* Request button */}
                             <button
@@ -613,7 +627,7 @@ function AgentLogs({ agentId: propAgentId }) {
                                 <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
                                   {requestInfo.icon}
                                 </div>
-                                <span className="text-xs text-white font-medium">
+                                <span className="text-xs text-white font-medium w-16">
                                   Request
                                 </span>
                               </div>
@@ -628,7 +642,7 @@ function AgentLogs({ agentId: propAgentId }) {
                                 <div className={`p-1 rounded-md ${responseInfo.color} mr-1.5`}>
                                   {responseInfo.icon}
                                 </div>
-                                <span className="text-xs text-white font-medium">
+                                <span className="text-xs text-white font-medium w-16">
                                   Response
                                 </span>
                               </div>
@@ -637,13 +651,12 @@ function AgentLogs({ agentId: propAgentId }) {
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
-                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                          <span className="text-[10px] text-gray-500 flex items-center">
                             {(request.input_tokens || 0) + (response.output_tokens || 0)} Tokens
                           </span>
                           <div className="flex items-center">
                             {request.user_email_id && (
-                              <span className="text-[10px] text-blue-400">
+                              <span className="text-[10px] text-gray-500">
                                 {request.user_email_id}
                               </span>
                             )}
@@ -664,14 +677,14 @@ function AgentLogs({ agentId: propAgentId }) {
                 const typeInfo = getLogTypeInfo(logType);
                 
                 return (
-                  <div key={log.id} className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
+                  <div key={log.id} className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col">
                     <div className="p-4 border-b border-white/5 flex items-center">
                       <div className={`p-2 rounded-md ${typeInfo.color} mr-3`}>
                         {typeInfo.icon}
                       </div>
                       <div className="flex-1">
                         <h4 className="text-sm font-medium text-white">{typeInfo.label}</h4>
-                        <p className="text-xs text-gray-400">{formatTimestamp(log.created_at)}</p>
+                        <p className="text-xs text-gray-400">{formatTimestamp(log.created_at).dateStr} {formatTimestamp(log.created_at).timeStr}</p>
                       </div>
                       <button 
                         onClick={() => setSelectedLog(null)}
@@ -681,11 +694,11 @@ function AgentLogs({ agentId: propAgentId }) {
                       </button>
                     </div>
                     
-                    <div className="p-4 flex-1 overflow-auto">
+                    <div className="p-4 overflow-auto">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
                           <p className="text-xs text-gray-400 mb-1">Timestamp</p>
-                          <p className="text-sm text-white">{formatTimestamp(log.created_at)}</p>
+                          <p className="text-sm text-white">{formatTimestamp(log.created_at).dateStr} {formatTimestamp(log.created_at).timeStr}</p>
                         </div>
                         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
                           <p className="text-xs text-gray-400 mb-1">Caller Agent</p>
@@ -746,8 +759,8 @@ function AgentLogs({ agentId: propAgentId }) {
                 );
               })
             ) : (
-              <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
-                <div className="flex flex-col items-center justify-center p-8 h-full">
+              <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col">
+                <div className="flex flex-col items-center justify-center p-8">
                   <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-full mb-4">
                     <FiMessageCircle size={48} className="text-emerald-400" />
                   </div>
