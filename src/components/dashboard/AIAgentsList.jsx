@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSettings, FiActivity, FiBarChart2, FiHelpCircle } from 'react-icons/fi';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiRobot2Line, RiPulseLine } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiRobot2Line, RiPulseLine, RiQuillPenLine, RiLayoutGridFill, RiAiGenerate, RiMagicLine, RiSparkling2Line } from 'react-icons/ri';
 import { IoDiamond } from 'react-icons/io5';
-import { FaRobot } from 'react-icons/fa6';
+import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
 import { apiUrl } from '../../config/api';
 import { useOrganization } from '../../contexts/OrganizationContext';
 
@@ -56,15 +56,15 @@ function AIAgentsList() {
       case 'social_media_manager_agent':
         return <RiPulseLine className="w-8 h-8" />;
       case 'ai_content_manager_agent':
-        return <RiFileTextLine className="w-8 h-8" />;
+        return <FaBrain className="w-8 h-8" />;
       case 'market_research_agent':
         return <RiSearchLine className="w-8 h-8" />;
       case 'content_writer_agent':
-        return <RiFileTextLine className="w-8 h-8" />;
+        return <RiQuillPenLine className="w-8 h-8" />;
       case 'image_generator_agent':
         return <RiImageLine className="w-8 h-8" />;
       case 'echo_prompt_agent':
-        return <RiRobot2Line className="w-8 h-8" />;
+        return <FaWandMagicSparkles className="w-8 h-8" />;
       case 'workflow_helper_agent':
         return <RiFlowChart className="w-8 h-8" />;
       case 'linkedin_influencer_agent':
@@ -283,13 +283,23 @@ function AIAgentsList() {
                     )}
                     
                     {/* Always show Setup Guide link for all agents */}
-                    <Link
-                      to={`/dashboard/setup/${agent.system_name}`}
-                      className="flex items-center mt-2 text-gray-400 hover:text-blue-400 transition-colors text-xs justify-center"
-                    >
-                      <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
-                      Setup Guide
-                    </Link>
+                    {isDisabled ? (
+                      <Link
+                        to={`/dashboard/agents/${agent.system_name}`}
+                        className="flex items-center mt-2 text-purple-400 hover:text-purple-300 transition-colors text-xs justify-center"
+                      >
+                        <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
+                        Learn More
+                      </Link>
+                    ) : (
+                      <Link
+                        to={`/dashboard/setup/${agent.system_name}`}
+                        className="flex items-center mt-2 text-gray-400 hover:text-blue-400 transition-colors text-xs justify-center"
+                      >
+                        <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
+                        Setup Guide
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

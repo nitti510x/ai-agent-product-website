@@ -86,6 +86,26 @@ function DashboardLayout({ children }) {
     return 'text-[#f6e05e]'; // Default gold for starter/basic plans
   };
   
+  // Function to get the background style for the plan badge
+  const getPlanBadgeStyle = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#231a2e] border-b border-purple-400/30';
+    } else if (planName.includes('business')) {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#1e2a3a] border-b border-blue-400/30';
+    } else {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#25231a] border-b border-[#f6e05e]/30';
+    }
+  };
+  
+  // Function to get the text color for the plan name
+  const getPlanTextColor = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) return 'text-purple-400';
+    if (planName.includes('business')) return 'text-blue-400';
+    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
+  };
+  
   // Determine active section based on URL path
   useEffect(() => {
     const path = location.pathname;
@@ -298,14 +318,14 @@ function DashboardLayout({ children }) {
                 {/* Organization Dropdown - Show on dashboard and notifications sections */}
                 {(activeSection === 'dashboard' || activeSection === 'notifications') && (
                   <div className="px-2 py-4">
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-1.5">
                       <OrganizationDropdown />
                     </div>
-                    <div className="flex justify-center mt-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2d3748] text-[#f6e05e] border border-[#f6e05e]/20">
-                        <FiStar className={`mr-1 ${getPlanStarColor()}`} />
-                        {getPlanName()} Plan
-                      </span>
+                    <div className={`w-full px-3 py-1 text-xs font-medium ${getPlanBadgeStyle()} rounded-md`}>
+                      <div className="flex items-center justify-center">
+                        <FiStar className={`mr-1.5 ${getPlanStarColor()}`} />
+                        <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+                      </div>
                     </div>
                   </div>
                 )}
