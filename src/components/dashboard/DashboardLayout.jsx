@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  FiHome, FiActivity, FiBarChart2, FiSettings, FiSlack, FiImage, 
-  FiFileText, FiUsers, FiCreditCard, FiDollarSign, FiClock,
+  FiHome, FiActivity, FiBarChart2, FiSettings, FiFileText,
+  FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
   FiBell, FiCheckCircle, FiStar
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
-import { FaRobot } from 'react-icons/fa';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill } from 'react-icons/ri';
+import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
@@ -58,21 +58,29 @@ function DashboardLayout({ children }) {
       case 'slack_app_agent':
         return <RiSlackFill className="mr-2" />;
       case 'social_media_manager_agent':
-        return <RiFacebookBoxFill className="mr-2" />;
+        return <RiPulseLine className="mr-2" />;
       case 'ai_content_manager_agent':
-        return <RiFileTextLine className="mr-2" />;
+        return <FaBrain className="mr-2" />;
       case 'market_research_agent':
-        return <FaRobot className="mr-2" />;
+        return <RiSearchLine className="mr-2" />;
       case 'content_writer_agent':
-        return <RiFileTextLine className="mr-2" />;
+        return <RiQuillPenLine className="mr-2" />;
       case 'image_generator_agent':
         return <RiImageLine className="mr-2" />;
       case 'echo_prompt_agent':
-        return <FaRobot className="mr-2" />;
+        return <FaWandMagicSparkles className="mr-2" />;
       case 'workflow_helper_agent':
-        return <FaRobot className="mr-2" />;
+        return <RiFlowChart className="mr-2" />;
       case 'linkedin_influencer_agent':
         return <RiLinkedinBoxFill className="mr-2" />;
+      case 'facebook_influencer_agent':
+        return <RiFacebookBoxFill className="mr-2" />;
+      case 'instagram_influencer_agent':
+        return <RiInstagramLine className="mr-2" />;
+      case 'twitter_marketer_agent':
+        return <RiTwitterXFill className="mr-2" />;
+      case 'wordpress_blogger_agent':
+        return <RiWordpressFill className="mr-2" />;
       default:
         return <FaRobot className="mr-2" />;
     }

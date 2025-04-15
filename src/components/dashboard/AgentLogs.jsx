@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { FiClock, FiMessageCircle, FiUser, FiSend, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
+import { FiClock, FiMessageCircle, FiUser, FiSend, FiAlertCircle, FiRefreshCw, FiX } from 'react-icons/fi';
 import { FaRobot } from 'react-icons/fa6';
 import { BiBot } from 'react-icons/bi';
 import { useOrganization } from '../../contexts/OrganizationContext';
@@ -14,7 +14,7 @@ function AgentLogs({ agentId: propAgentId }) {
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedLog, setSelectedLog] = useState(null);
+  const [selectedLog, setSelectedLog] = useState(null); // Initialize selectedLog as null to ensure the instructional panel shows by default
   const [agentInfo, setAgentInfo] = useState({ name: 'AI Agent', systemName: '' });
 
   // Fetch agent details from API
@@ -123,10 +123,10 @@ function AgentLogs({ agentId: propAgentId }) {
       
       setLogs(sortedLogs);
       
-      // Select the first log by default if available
-      if (sortedLogs.length > 0 && !selectedLog) {
-        setSelectedLog(sortedLogs[0].id);
-      }
+      // Don't auto-select the first log anymore
+      // if (sortedLogs.length > 0 && !selectedLog) {
+      //   setSelectedLog(sortedLogs[0].id);
+      // }
     } catch (err) {
       console.error('Error fetching logs:', err);
       setError(`Failed to load logs: ${err.message}`);
@@ -331,16 +331,52 @@ function AgentLogs({ agentId: propAgentId }) {
           <p className="text-red-400">{error}</p>
         </div>
       ) : logs.length === 0 ? (
-        <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md h-64 flex items-center justify-center">
-          <p className="text-gray-400">No logs found for this agent</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md h-64 flex items-center justify-center">
+            <p className="text-gray-400">No logs found for this agent</p>
+          </div>
+          
+          <div className="lg:col-span-2">
+            <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
+              <div className="flex flex-col items-center justify-center p-8 h-full">
+                <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-full mb-4">
+                  <FiMessageCircle size={48} className="text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-medium text-white mb-2">No Logs Available</h3>
+                <p className="text-gray-400 text-center max-w-md mb-4">
+                  This agent doesn't have any activity logs yet. Once the agent is used, logs will appear here.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
+                  <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                    <div className="p-2 rounded-md bg-blue-500/20 text-blue-400 mr-3">
+                      <FiSend size={20} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-white">Request Logs</h4>
+                      <p className="text-xs text-gray-400">View user inputs and prompts</p>
+                    </div>
+                  </div>
+                  <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                    <div className="p-2 rounded-md bg-emerald-500/20 text-emerald-400 mr-3">
+                      <FaRobot size={20} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-white">Response Logs</h4>
+                      <p className="text-xs text-gray-400">View AI outputs and results</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md">
             <div className="p-4 border-b border-white/5">
               <h4 className="text-sm font-medium text-white">Recent Activity</h4>
             </div>
-            <div className="overflow-auto max-h-[600px]">
+            <div className="overflow-auto max-h-[600px] p-2">
               {groupLogsByPairId().map(pair => {
                 if (pair.standalone) {
                   // Handle standalone logs (no pair)
@@ -352,27 +388,36 @@ function AgentLogs({ agentId: propAgentId }) {
                     <button
                       key={log.id}
                       onClick={() => setSelectedLog(log.id)}
-                      className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === log.id ? 'bg-dark-lighter/70' : ''}`}
+                      className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === log.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                     >
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center justify-between mb-2">
                         <span className="text-[10px] text-gray-500 flex items-center">
                           <FiClock className="w-3 h-3 mr-1" />
                           {formatTimestamp(log.created_at)}
                         </span>
-                        {log.agent_system_name && (
-                          <span className="text-[10px] text-gray-400">
-                            {log.agent_system_name}
+                        <div className="flex items-center">
+                          <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
+                            {typeInfo.icon}
+                          </div>
+                          <span className="text-xs text-white font-medium">
+                            {typeInfo.label}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        {log.input_tokens !== undefined && (
+                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                            {log.input_tokens} Tokens
                           </span>
                         )}
-                      </div>
-                      <div className="flex items-center">
-                        <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
-                          {typeInfo.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-white font-medium truncate">
-                            {typeInfo.label}
-                          </p>
+                        <div className="flex items-center">
+                          {log.user_email_id && (
+                            <span className="text-[10px] text-blue-400">
+                              {log.user_email_id}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </button>
@@ -391,27 +436,41 @@ function AgentLogs({ agentId: propAgentId }) {
                       <button
                         key={request.id}
                         onClick={() => setSelectedLog(request.id)}
-                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id ? 'bg-dark-lighter/70' : ''}`}
+                        className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] text-gray-500 flex items-center">
                             <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(request.created_at)}
+                            {formatTimestamp(pair.timestamp)}
                           </span>
-                          {request.agent_system_name && (
-                            <span className="text-[10px] text-gray-400">
-                              {request.agent_system_name}
+                          <div className="flex items-center">
+                            <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
+                              {typeInfo.icon}
+                            </div>
+                            <span className="text-xs text-white font-medium">
+                              Request
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          {request.input_tokens && (
+                            <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                              <FaRobot className="w-2.5 h-2.5 mr-1" />
+                              {request.input_tokens} Tokens
                             </span>
                           )}
-                        </div>
-                        <div className="flex items-center">
-                          <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
-                            {typeInfo.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-white font-medium truncate">
-                              Request
-                            </p>
+                          <div className="flex items-center">
+                            {request.user_email_id && (
+                              <span className="text-[10px] text-blue-400 mr-2">
+                                {request.user_email_id}
+                              </span>
+                            )}
+                            {request.agent_system_name && (
+                              <span className="text-[10px] text-gray-400">
+                                {request.agent_system_name}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </button>
@@ -428,27 +487,36 @@ function AgentLogs({ agentId: propAgentId }) {
                       <button
                         key={log.id}
                         onClick={() => setSelectedLog(log.id)}
-                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === log.id ? 'bg-dark-lighter/70' : ''}`}
+                        className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === log.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] text-gray-500 flex items-center">
                             <FiClock className="w-3 h-3 mr-1" />
-                            {formatTimestamp(log.created_at)}
+                            {formatTimestamp(pair.timestamp)}
                           </span>
-                          {log.agent_system_name && (
-                            <span className="text-[10px] text-gray-400">
-                              {log.agent_system_name}
+                          <div className="flex items-center">
+                            <div className={`p-1 rounded-md ${typeInfo.color} mr-1.5`}>
+                              {typeInfo.icon}
+                            </div>
+                            <span className="text-xs text-white font-medium">
+                              {typeInfo.label}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          {log.input_tokens !== undefined && (
+                            <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                              <FaRobot className="w-2.5 h-2.5 mr-1" />
+                              {log.input_tokens} Tokens
                             </span>
                           )}
-                        </div>
-                        <div className="flex items-center">
-                          <div className={`p-1.5 rounded-md ${typeInfo.color} mr-2`}>
-                            {typeInfo.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs text-white font-medium truncate">
-                              {typeInfo.label}
-                            </p>
+                          <div className="flex items-center">
+                            {log.user_email_id && (
+                              <span className="text-[10px] text-blue-400">
+                                {log.user_email_id}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </button>
@@ -463,54 +531,58 @@ function AgentLogs({ agentId: propAgentId }) {
                     return (
                       <div
                         key={pair.id}
-                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id || selectedLog === error.id ? 'bg-dark-lighter/70' : ''}`}
+                        className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id || selectedLog === error.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] text-gray-500 flex items-center">
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(pair.timestamp)}
                           </span>
-                          {request.agent_system_name && (
-                            <span className="text-[10px] text-gray-400">
-                              {request.agent_system_name}
-                            </span>
-                          )}
+                          <div className="flex space-x-2">
+                            {/* Request button */}
+                            <button
+                              onClick={() => setSelectedLog(request.id)}
+                              className={`text-left px-2 py-1 rounded-lg ${selectedLog === request.id ? 'bg-blue-500/20 border border-blue-500/30' : 'bg-dark-lighter/30 hover:bg-dark-lighter/50 border border-white/5 hover:border-blue-500/20'} transition-all duration-200`}
+                            >
+                              <div className="flex items-center">
+                                <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
+                                  {requestInfo.icon}
+                                </div>
+                                <span className="text-xs text-white font-medium">
+                                  Request
+                                </span>
+                              </div>
+                            </button>
+                            
+                            {/* Error button */}
+                            <button
+                              onClick={() => setSelectedLog(error.id)}
+                              className={`text-left px-2 py-1 rounded-lg ${selectedLog === error.id ? 'bg-red-500/20 border border-red-500/30' : 'bg-dark-lighter/30 hover:bg-dark-lighter/50 border border-white/5 hover:border-red-500/20'} transition-all duration-200`}
+                            >
+                              <div className="flex items-center">
+                                <div className={`p-1 rounded-md ${errorInfo.color} mr-1.5`}>
+                                  {errorInfo.icon}
+                                </div>
+                                <span className="text-xs text-red-400 font-medium">
+                                  Error
+                                </span>
+                              </div>
+                            </button>
+                          </div>
                         </div>
                         
-                        <div className="flex w-full space-x-1">
-                          {/* Request (left side) */}
-                          <button
-                            onClick={() => setSelectedLog(request.id)}
-                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === request.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
-                                {requestInfo.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-white font-medium truncate">
-                                  Request
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                          
-                          {/* Error (right side) */}
-                          <button
-                            onClick={() => setSelectedLog(error.id)}
-                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === error.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`p-1 rounded-md ${errorInfo.color} mr-1.5`}>
-                                {errorInfo.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-red-400 font-medium truncate">
-                                  Error
-                                </p>
-                              </div>
-                            </div>
-                          </button>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                            {(request.input_tokens || 0) + (error.output_tokens || 0)} Tokens
+                          </span>
+                          <div className="flex items-center">
+                            {request.user_email_id && (
+                              <span className="text-[10px] text-blue-400">
+                                {request.user_email_id}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -524,54 +596,58 @@ function AgentLogs({ agentId: propAgentId }) {
                     return (
                       <div
                         key={pair.id}
-                        className={`w-full text-left p-3 border-b border-white/5 hover:bg-dark-lighter/50 transition-colors ${selectedLog === request.id || selectedLog === response.id ? 'bg-dark-lighter/70' : ''}`}
+                        className={`w-full text-left p-3 mb-2 rounded-lg border ${selectedLog === request.id || selectedLog === response.id ? 'bg-dark-lighter/70 border-emerald-500/30' : 'border-white/5 hover:bg-dark-lighter/50 hover:border-white/10'} transition-all duration-200`}
                       >
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-[10px] text-gray-500 flex items-center">
                             <FiClock className="w-3 h-3 mr-1" />
                             {formatTimestamp(pair.timestamp)}
                           </span>
-                          {request.agent_system_name && (
-                            <span className="text-[10px] text-gray-400">
-                              {request.agent_system_name}
-                            </span>
-                          )}
+                          <div className="flex space-x-2">
+                            {/* Request button */}
+                            <button
+                              onClick={() => setSelectedLog(request.id)}
+                              className={`text-left px-2 py-1 rounded-lg ${selectedLog === request.id ? 'bg-blue-500/20 border border-blue-500/30' : 'bg-dark-lighter/30 hover:bg-dark-lighter/50 border border-white/5 hover:border-blue-500/20'} transition-all duration-200`}
+                            >
+                              <div className="flex items-center">
+                                <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
+                                  {requestInfo.icon}
+                                </div>
+                                <span className="text-xs text-white font-medium">
+                                  Request
+                                </span>
+                              </div>
+                            </button>
+                            
+                            {/* Response button */}
+                            <button
+                              onClick={() => setSelectedLog(response.id)}
+                              className={`text-left px-2 py-1 rounded-lg ${selectedLog === response.id ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-dark-lighter/30 hover:bg-dark-lighter/50 border border-white/5 hover:border-emerald-500/20'} transition-all duration-200`}
+                            >
+                              <div className="flex items-center">
+                                <div className={`p-1 rounded-md ${responseInfo.color} mr-1.5`}>
+                                  {responseInfo.icon}
+                                </div>
+                                <span className="text-xs text-white font-medium">
+                                  Response
+                                </span>
+                              </div>
+                            </button>
+                          </div>
                         </div>
                         
-                        <div className="flex w-full space-x-1">
-                          {/* Request (left side) */}
-                          <button
-                            onClick={() => setSelectedLog(request.id)}
-                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === request.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`p-1 rounded-md ${requestInfo.color} mr-1.5`}>
-                                {requestInfo.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-white font-medium truncate">
-                                  Request
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                          
-                          {/* Response (right side) */}
-                          <button
-                            onClick={() => setSelectedLog(response.id)}
-                            className={`flex-1 text-left px-2 py-1.5 rounded ${selectedLog === response.id ? 'bg-dark-lighter' : 'hover:bg-dark-lighter/50'} transition-colors`}
-                          >
-                            <div className="flex items-center">
-                              <div className={`p-1 rounded-md ${responseInfo.color} mr-1.5`}>
-                                {responseInfo.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-white font-medium truncate">
-                                  Response
-                                </p>
-                              </div>
-                            </div>
-                          </button>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-emerald-400 flex items-center bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-sm">
+                            <FaRobot className="w-2.5 h-2.5 mr-1" />
+                            {(request.input_tokens || 0) + (response.output_tokens || 0)} Tokens
+                          </span>
+                          <div className="flex items-center">
+                            {request.user_email_id && (
+                              <span className="text-[10px] text-blue-400">
+                                {request.user_email_id}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -581,7 +657,7 @@ function AgentLogs({ agentId: propAgentId }) {
             </div>
           </div>
           
-          <div className="md:col-span-2">
+          <div className="lg:col-span-2">
             {selectedLog ? (
               logs.filter(log => log.id === selectedLog).map(log => {
                 const logType = log.log_type || 'info';
@@ -590,13 +666,19 @@ function AgentLogs({ agentId: propAgentId }) {
                 return (
                   <div key={log.id} className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
                     <div className="p-4 border-b border-white/5 flex items-center">
-                      <div className={`p-1.5 rounded-md ${typeInfo.color} mr-3`}>
+                      <div className={`p-2 rounded-md ${typeInfo.color} mr-3`}>
                         {typeInfo.icon}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h4 className="text-sm font-medium text-white">{typeInfo.label}</h4>
                         <p className="text-xs text-gray-400">{formatTimestamp(log.created_at)}</p>
                       </div>
+                      <button 
+                        onClick={() => setSelectedLog(null)}
+                        className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/5 transition-colors"
+                      >
+                        <FiX size={16} />
+                      </button>
                     </div>
                     
                     <div className="p-4 flex-1 overflow-auto">
@@ -606,12 +688,12 @@ function AgentLogs({ agentId: propAgentId }) {
                           <p className="text-sm text-white">{formatTimestamp(log.created_at)}</p>
                         </div>
                         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
-                          <p className="text-xs text-gray-400 mb-1">Agent</p>
+                          <p className="text-xs text-gray-400 mb-1">Caller Agent</p>
                           <p className="text-sm text-white">{agentInfo.name}</p>
                         </div>
                         <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
-                          <p className="text-xs text-gray-400 mb-1">Caller Agent</p>
-                          <p className="text-sm text-white">{log.agent_system_name || 'N/A'}</p>
+                          <p className="text-xs text-gray-400 mb-1">User Email</p>
+                          <p className="text-sm text-white">{log.user_email_id || 'N/A'}</p>
                         </div>
                         {logType === 'response' && (
                           <div className="bg-dark-lighter/50 p-3 rounded-lg border border-white/5">
@@ -664,8 +746,36 @@ function AgentLogs({ agentId: propAgentId }) {
                 );
               })
             ) : (
-              <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md h-64 flex items-center justify-center">
-                <p className="text-gray-400">Select a log to view details</p>
+              <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
+                <div className="flex flex-col items-center justify-center p-8 h-full">
+                  <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-full mb-4">
+                    <FiMessageCircle size={48} className="text-emerald-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2">Select a Log</h3>
+                  <p className="text-gray-400 text-center max-w-md mb-4">
+                    Click on any request or response from the activity list to view detailed information.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
+                    <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                      <div className="p-2 rounded-md bg-blue-500/20 text-blue-400 mr-3">
+                        <FiSend size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-white">Request Details</h4>
+                        <p className="text-xs text-gray-400">View input parameters and tokens</p>
+                      </div>
+                    </div>
+                    <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                      <div className="p-2 rounded-md bg-emerald-500/20 text-emerald-400 mr-3">
+                        <FaRobot size={20} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-white">Response Details</h4>
+                        <p className="text-xs text-gray-400">View AI outputs and results</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

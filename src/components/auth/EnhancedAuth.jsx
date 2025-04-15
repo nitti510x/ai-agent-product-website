@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
@@ -18,7 +18,11 @@ const EnhancedAuth = () => {
   const [animateIn, setAnimateIn] = useState(false);
   const [supabaseClient, setSupabaseClient] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { showNotification } = useNotifications();
+
+  // Get the redirect path from location state (if available)
+  const from = location.state?.from?.pathname || '/dashboard';
 
   // Animation effect when component mounts
   useEffect(() => {
@@ -75,7 +79,7 @@ const EnhancedAuth = () => {
         if (error) throw error;
         
         // Redirect to dashboard on successful login
-        navigate('/dashboard');
+        navigate(from);
       } else if (view === 'sign_up') {
         const { error } = await supabaseClient.auth.signUp({
           email,

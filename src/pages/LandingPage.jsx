@@ -1,6 +1,4 @@
-import React from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Link as ScrollLink } from 'react-scroll';
+import React, { useCallback } from 'react';
 import Logo from '../components/Logo';
 import { useSubscription } from '../contexts/SubscriptionContext';
 
@@ -51,28 +49,27 @@ import {
 
 function LandingPage() {
   const navItems = ['Features', 'Pricing', 'Integration', 'Support'];
-  const navigate = useNavigate();
   const { selectPlan, selectFreeTrial } = useSubscription();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [showFreeTrialPopup, setShowFreeTrialPopup] = React.useState(false);
   const pricingSectionRef = React.useRef(null);
 
   // Function to handle plan selection and redirect to checkout
-  const handlePlanSelection = (plan) => {
+  const handlePlanSelection = useCallback((plan) => {
     selectPlan({
       name: plan.name,
       price: plan.price,
       interval: plan.interval || 'month',
       features: plan.features
     });
-    navigate('/checkout');
-  };
+    window.location.href = '/checkout';
+  }, [selectPlan]);
 
   // Function to handle free trial selection
-  const handleFreeTrialSelection = () => {
+  const handleFreeTrialSelection = useCallback(() => {
     selectFreeTrial();
-    navigate('/checkout');
-  };
+    window.location.href = '/checkout';
+  }, [selectFreeTrial]);
 
   return (
     <div className="bg-dark text-text-light">
@@ -83,23 +80,22 @@ function LandingPage() {
             <Logo className="h-8" />
             <div className="hidden md:flex space-x-8">
               {navItems.map((item) => (
-                <ScrollLink
+                <a
                   key={item}
-                  to={item.toLowerCase()}
-                  smooth={true}
-                  duration={500}
-                  spy={true}
-                  offset={-80} // Adjust for fixed nav
+                  href={`#${item.toLowerCase()}`}
                   className="cursor-pointer hover:text-secondary transition-colors hover:shadow-glow-blue"
                 >
                   {item}
-                </ScrollLink>
+                </a>
               ))}
             </div>
             <div className="flex gap-4">
-              <RouterLink to="/login" className="btn-primary hover:shadow-glow-strong transition-all duration-300">
+              <a 
+                href="/login" 
+                className="btn-primary hover:shadow-glow-strong transition-all duration-300"
+              >
                 Login
-              </RouterLink>
+              </a>
               <a 
                 href="https://slack.com/oauth/v2/authorize?client_id=8454604752182.8465324270118&scope=app_mentions:read,channels:history,chat:write,files:write,im:history,im:write,im:read&user_scope=identity.basic,identity.email,identity.team" 
                 className="flex items-center px-6 py-2 bg-transparent hover:bg-gray-900 text-white font-bold rounded-lg border border-white/70 hover:border-white transition-all duration-300 hover:shadow-glow-light"
@@ -531,7 +527,7 @@ function LandingPage() {
                     <div className="flex-shrink-0 w-full md:w-auto">
                       <button 
                         onClick={handleFreeTrialSelection}
-                        className="w-full md:w-auto px-8 py-4 text-dark font-bold rounded-lg shadow-glow-sm transition-all duration-300 flex items-center justify-center"
+                        className="w-full md:w-auto px-8 py-4 text-dark font-bold rounded-lg shadow-glow-sm transition-all duration-300 flex items-center"
                         style={{backgroundColor: '#00FFA3', color: '#111'}}
                       >
                         <span className="mr-2">Start Free Trial</span>
@@ -772,9 +768,18 @@ function LandingPage() {
               <ul className="space-y-4">
                 {['Features', 'Pricing', 'Integrations', 'Enterprise', 'Security'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-text-muted hover:text-secondary transition-colors">
-                      {item}
-                    </a>
+                    {item === 'Features' || item === 'Pricing' || item === 'Integrations' ? (
+                      <a
+                        href={`#${item === 'Integrations' ? 'integration' : item.toLowerCase()}`}
+                        className="cursor-pointer hover:text-secondary transition-colors"
+                      >
+                        {item}
+                      </a>
+                    ) : (
+                      <a href="#" className="text-text-muted hover:text-secondary transition-colors">
+                        {item}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -796,11 +801,20 @@ function LandingPage() {
             <div>
               <h4 className="text-lg font-bold text-gray-100 mb-6">Company</h4>
               <ul className="space-y-4">
-                {['About', 'Contact', 'Privacy', 'Terms'].map((item) => (
+                {['About', 'Contact', 'Privacy', 'Terms', 'Support'].map((item) => (
                   <li key={item}>
-                    <RouterLink to={`/${item.toLowerCase()}`} className="text-text-muted hover:text-secondary transition-colors">
-                      {item}
-                    </RouterLink>
+                    {item === 'Support' ? (
+                      <a
+                        href="#support"
+                        className="cursor-pointer hover:text-secondary transition-colors"
+                      >
+                        {item}
+                      </a>
+                    ) : (
+                      <a href="#" className="text-text-muted hover:text-secondary transition-colors">
+                        {item}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -812,15 +826,15 @@ function LandingPage() {
               &copy; 2025 OpAgents. All rights reserved.
             </p>
             <div className="flex space-x-8">
-              <RouterLink to="/privacy" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Privacy Policy
-              </RouterLink>
-              <RouterLink to="/terms" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              </a>
+              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Terms of Service
-              </RouterLink>
-              <RouterLink to="/cookie-policy" className="text-text-muted hover:text-secondary transition-colors text-sm">
+              </a>
+              <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">
                 Cookie Policy
-              </RouterLink>
+              </a>
             </div>
           </div>
         </div>

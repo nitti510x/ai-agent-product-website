@@ -87,6 +87,12 @@ The application uses a modern serverless architecture with clear separation of c
    npm run dev
    ```
 
+> **⚠️ IMPORTANT**: Always run the development server on port 5173. This port is specifically configured for OAuth redirects and other services. If you encounter the error "Port 5173 is already in use", make sure to kill any existing processes using that port before starting the server:
+> ```bash
+> npx kill-port 5173
+> npm run dev
+> ```
+
 ## Configuration
 
 ### Environment Variables
