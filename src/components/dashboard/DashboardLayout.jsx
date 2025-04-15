@@ -14,6 +14,7 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
 import { apiUrl } from '../../config/api';
+import { useOrganization } from '../../contexts/OrganizationContext';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -22,6 +23,7 @@ function DashboardLayout({ children }) {
   const { unreadCount } = useNotifications();
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { getPlanName } = useOrganization();
   
   // Fetch agents from API
   useEffect(() => {
@@ -277,7 +279,7 @@ function DashboardLayout({ children }) {
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
         <div className="max-w-[1440px] w-full mx-auto px-8 page-content flex-grow">
-          <div className="flex flex-col md:flex-row gap-8 pb-0">
+          <div className="flex flex-col md:flex-row gap-4 pb-0">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
               <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
@@ -287,7 +289,7 @@ function DashboardLayout({ children }) {
                 
                 {/* Organization Dropdown - Show on dashboard and notifications sections */}
                 {(activeSection === 'dashboard' || activeSection === 'notifications') && (
-                  <div className="mb-4 px-2">
+                  <div className="mb-4 pl-2 pr-4">
                     <OrganizationDropdown />
                   </div>
                 )}
@@ -398,6 +400,21 @@ function DashboardLayout({ children }) {
             </div>
             
             <div className="flex-1">
+              <span style={{
+                display: 'inline-block',
+                background: '#2d3748', // dark neutral background
+                color: '#f6e05e',     // gold text for visibility
+                borderRadius: '12px',
+                padding: '2px 12px',
+                fontWeight: 'bold',
+                fontSize: '0.85em',
+                letterSpacing: '0.02em',
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+              }}>
+                {getPlanName()}
+              </span>
               {children}
             </div>
           </div>

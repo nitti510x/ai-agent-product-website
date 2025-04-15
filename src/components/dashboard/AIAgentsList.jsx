@@ -132,11 +132,11 @@ function AIAgentsList() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="py-4 px-4">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Your AI Assistants</h1>
-          <p className="text-gray-400">Manage and monitor your active AI integrations</p>
+          <h1 className="text-xl font-bold text-white">Your AI Assistants</h1>
+          <p className="text-gray-400 text-sm">Track your AI assistants' usage and performance</p>
         </div>
         
         {/* Slack App Button - Now on the right side */}

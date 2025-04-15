@@ -83,7 +83,7 @@ function OrganizationDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="flex items-center space-x-2 bg-[#1F242B] hover:bg-[#252A31] text-white px-3 py-2 rounded-lg transition-colors"
+        className="flex items-center space-x-2 bg-[#1F242B] hover:bg-[#252A31] text-white px-4 py-2 rounded-lg transition-colors"
       >
         <FiUsers className="text-emerald-400" />
         <span className="max-w-[150px] truncate">{selectedOrg?.org_name || 'Select Organization'}</span>

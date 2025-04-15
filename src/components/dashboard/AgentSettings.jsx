@@ -211,7 +211,7 @@ function AgentSettings() {
   const activeTab = getActiveTab();
   
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto py-4 px-4">
       {/* Page title and action buttons */}
       <div className="flex justify-between items-center mb-6">
         <div>

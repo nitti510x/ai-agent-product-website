@@ -10,10 +10,17 @@ export function OrganizationProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const [subscription, setSubscription] = useState(null);
 
   useEffect(() => {
     fetchOrganizations();
   }, []);
+
+  useEffect(() => {
+    if (selectedOrg && selectedOrg.id) {
+      fetchSubscription(selectedOrg.id);
+    }
+  }, [selectedOrg]);
 
   const fetchOrganizations = async () => {
     try {
@@ -73,9 +80,39 @@ export function OrganizationProvider({ children }) {
     }
   };
 
+  const fetchSubscription = async (orgId) => {
+    console.log('Fetching subscription for orgId:', orgId);
+    try {
+      const response = await fetch(`https://db.api.geniusos.co/subscriptions/organization/${orgId}`, {
+        headers: {
+          'Accept': 'application/json',
+          // Add any necessary authentication headers here
+        }
+      });
+      const data = await response.json();
+      console.log('Fetched subscription data:', data);
+      setSubscription(data);
+      // Store subscription data in local storage for global access
+      localStorage.setItem('subscriptionData', JSON.stringify(data));
+      localStorage.setItem('subscriptionOrgId', orgId);
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+    }
+  };
+
   const selectOrganization = (org) => {
     setSelectedOrg(org);
+    console.log('Organization selected:', org);
     // You could add additional logic here to switch context to the selected organization
+  };
+
+  const getPlanName = () => {
+    if (!subscription) return 'Loading Plan...';
+    // If subscription is the API response
+    if (subscription.plan && subscription.plan.name) return subscription.plan.name.replace('Annual', '').trim();
+    // If subscription is just the plan object
+    if (subscription.name) return subscription.name.replace('Annual', '').trim();
+    return 'Unknown Plan';
   };
 
   const value = {
@@ -84,8 +121,10 @@ export function OrganizationProvider({ children }) {
     isLoading,
     error,
     userEmail,
+    subscription,
     selectOrganization,
-    fetchOrganizations
+    fetchOrganizations,
+    getPlanName
   };
 
   return (
