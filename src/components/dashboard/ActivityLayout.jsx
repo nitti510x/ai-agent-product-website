@@ -35,11 +35,6 @@ function ActivityLayout({ children }) {
       icon: <FiLinkedin className="mr-2" />
     },
     {
-      path: '/dashboard/activity/wordpress',
-      label: 'WordPress',
-      icon: <RiWordpressFill className="mr-2" />
-    },
-    {
       path: '/dashboard/activity/facebook',
       label: 'Facebook',
       icon: <FiFacebook className="mr-2" />
@@ -65,8 +60,6 @@ function ActivityLayout({ children }) {
   return (
     <>
       <div className="max-w-[1440px] mx-auto px-8 page-content">
-        {/* Title header removed */}
-        
         <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-64 shrink-0">
           <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">

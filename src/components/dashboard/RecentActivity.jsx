@@ -147,7 +147,7 @@ function RecentActivity() {
   );
 
   return (
-    <div>
+    <div className="py-4 px-4">
       {/* Page title */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -231,71 +231,108 @@ function RecentActivity() {
       </div>
 
       {/* Activity list */}
-      <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md">
-        {loading && page === 1 ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading activities...</p>
-          </div>
-        ) : filteredActivities.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-400">No activities found.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-white/5">
-            {filteredActivities.map((activity) => (
-              <div key={activity.id} className="p-4 hover:bg-dark-lighter transition-colors">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    {getAgentIcon(activity.agentType)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-white font-medium truncate">{activity.agentName}</h3>
-                      <div className="flex items-center">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          activity.status === 'success' ? 'bg-emerald-400/20 text-emerald-400' : 'bg-red-500/20 text-red-500'
-                        }`}>
-                          {activity.status === 'success' ? 'Success' : 'Error'}
-                        </span>
-                      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md">
+          {loading && page === 1 ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-400">Loading activities...</p>
+            </div>
+          ) : filteredActivities.length === 0 ? (
+            <div className="p-8 text-center">
+              <p className="text-gray-400">No activities found.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {filteredActivities.map((activity) => (
+                <div key={activity.id} className="p-4 hover:bg-dark-lighter transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      {getAgentIcon(activity.agentType)}
                     </div>
-                    <p className="text-gray-400 text-sm mt-1">{activity.action}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center text-xs text-gray-500">
-                        <FiClock className="mr-1" />
-                        {formatDate(activity.timestamp)}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-white font-medium truncate">{activity.agentName}</h3>
+                        <div className="flex items-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            activity.status === 'success' ? 'bg-emerald-400/20 text-emerald-400' : 'bg-red-500/20 text-red-500'
+                          }`}>
+                            {activity.status === 'success' ? 'Success' : 'Error'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center text-xs text-emerald-400">
-                        <FaRobot className="mr-1" />
-                        {activity.tokensUsed} tokens used
+                      <p className="text-gray-400 text-sm mt-1">{activity.action}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center text-xs text-gray-500">
+                          <FiClock className="mr-1" />
+                          {formatDate(activity.timestamp)}
+                        </div>
+                        <div className="flex items-center text-xs text-emerald-400">
+                          <FaRobot className="mr-1" />
+                          {activity.tokensUsed} tokens used
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+          
+          {/* Load more button */}
+          {hasMore && !loading && (
+            <div className="p-4 text-center border-t border-white/5">
+              <button
+                onClick={handleLoadMore}
+                className="px-4 py-2 bg-dark-lighter border border-white/10 text-gray-300 rounded-lg hover:bg-dark hover:border-white/20 transition-all duration-300 text-sm font-medium"
+              >
+                {loading && page > 1 ? (
+                  <span className="flex items-center">
+                    <span className="animate-spin w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full mr-2"></span>
+                    Loading...
+                  </span>
+                ) : (
+                  'Load More'
+                )}
+              </button>
+            </div>
+          )}
+        </div>
         
-        {/* Load more button */}
-        {hasMore && !loading && (
-          <div className="p-4 text-center border-t border-white/5">
-            <button
-              onClick={handleLoadMore}
-              className="px-4 py-2 bg-dark-lighter border border-white/10 text-gray-300 rounded-lg hover:bg-dark hover:border-white/20 transition-all duration-300 text-sm font-medium"
-            >
-              {loading && page > 1 ? (
-                <span className="flex items-center">
-                  <span className="animate-spin w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full mr-2"></span>
-                  Loading...
-                </span>
-              ) : (
-                'Load More'
-              )}
-            </button>
+        {/* Details Panel */}
+        <div className="lg:col-span-2">
+          <div className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md flex flex-col h-full">
+            <div className="flex flex-col items-center justify-center p-8 h-full">
+              <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-full mb-4">
+                <FiClock size={48} className="text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Select an Activity</h3>
+              <p className="text-gray-400 text-center max-w-md mb-4">
+                Click on any activity from the list to view detailed information.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
+                <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                  <div className="p-2 rounded-md bg-blue-500/20 text-blue-400 mr-3">
+                    <FiFilter size={20} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-white">Activity Details</h4>
+                    <p className="text-xs text-gray-400">View request parameters and results</p>
+                  </div>
+                </div>
+                <div className="bg-dark-lighter/30 border border-white/5 rounded-lg p-4 flex items-center">
+                  <div className="p-2 rounded-md bg-emerald-500/20 text-emerald-400 mr-3">
+                    <FaRobot size={20} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-white">Token Usage</h4>
+                    <p className="text-xs text-gray-400">View detailed token consumption</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

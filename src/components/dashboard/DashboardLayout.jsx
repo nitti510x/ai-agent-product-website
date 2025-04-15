@@ -1,23 +1,118 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  FiHome, FiActivity, FiBarChart2, FiSettings, FiSlack, FiImage, 
-  FiFileText, FiUsers, FiCreditCard, FiDollarSign, FiClock,
+  FiHome, FiActivity, FiBarChart2, FiSettings, FiFileText,
+  FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
-  FiBell, FiCheckCircle
+  FiBell, FiCheckCircle, FiStar
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
-import { FaRobot } from 'react-icons/fa';
+import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
+import { apiUrl } from '../../config/api';
+import { useOrganization } from '../../contexts/OrganizationContext';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const { unreadCount } = useNotifications();
+  const [agents, setAgents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { getPlanName } = useOrganization();
+  
+  // Fetch agents from API
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch(`${apiUrl()}/agents/active`, {
+          method: 'GET',
+          headers: { 'accept': 'application/json' }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching agents: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAgents(data.agents || []);
+      } catch (err) {
+        console.error('Failed to fetch agents:', err);
+        // Fallback to default agents if API fails
+        setAgents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAgents();
+  }, []);
+  
+  // Function to get the appropriate icon based on system_name
+  const getAgentIcon = (systemName) => {
+    switch (systemName) {
+      case 'slack_app_agent':
+        return <RiSlackFill className="mr-2" />;
+      case 'social_media_manager_agent':
+        return <RiPulseLine className="mr-2" />;
+      case 'ai_content_manager_agent':
+        return <FaBrain className="mr-2" />;
+      case 'market_research_agent':
+        return <RiSearchLine className="mr-2" />;
+      case 'content_writer_agent':
+        return <RiQuillPenLine className="mr-2" />;
+      case 'image_generator_agent':
+        return <RiImageLine className="mr-2" />;
+      case 'echo_prompt_agent':
+        return <FaWandMagicSparkles className="mr-2" />;
+      case 'workflow_helper_agent':
+        return <RiFlowChart className="mr-2" />;
+      case 'linkedin_influencer_agent':
+        return <RiLinkedinBoxFill className="mr-2" />;
+      case 'facebook_influencer_agent':
+        return <RiFacebookBoxFill className="mr-2" />;
+      case 'instagram_influencer_agent':
+        return <RiInstagramLine className="mr-2" />;
+      case 'twitter_marketer_agent':
+        return <RiTwitterXFill className="mr-2" />;
+      case 'wordpress_blogger_agent':
+        return <RiWordpressFill className="mr-2" />;
+      default:
+        return <FaRobot className="mr-2" />;
+    }
+  };
+  
+  // Function to get the star color based on plan name
+  const getPlanStarColor = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) return 'text-purple-400';
+    if (planName.includes('business')) return 'text-blue-400';
+    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
+  };
+  
+  // Function to get the background style for the plan badge
+  const getPlanBadgeStyle = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#231a2e] border-b border-purple-400/30';
+    } else if (planName.includes('business')) {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#1e2a3a] border-b border-blue-400/30';
+    } else {
+      return 'bg-gradient-to-r from-[#1a1f25] to-[#25231a] border-b border-[#f6e05e]/30';
+    }
+  };
+  
+  // Function to get the text color for the plan name
+  const getPlanTextColor = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) return 'text-purple-400';
+    if (planName.includes('business')) return 'text-blue-400';
+    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
+  };
   
   // Determine active section based on URL path
   useEffect(() => {
@@ -186,25 +281,6 @@ function DashboardLayout({ children }) {
     }
   ];
   
-  // AI Agents section - always shown at the bottom
-  const agentsMenuItems = [
-    {
-      path: '/dashboard/settings/support',
-      label: 'Slack App',
-      icon: <FiSlack className="mr-2" />
-    },
-    {
-      path: '/dashboard/settings/team',
-      label: 'Image Creator',
-      icon: <FiImage className="mr-2" />
-    },
-    {
-      path: '/dashboard/settings/analytics',
-      label: 'Copy Creator',
-      icon: <FiFileText className="mr-2" />
-    }
-  ];
-  
   // Determine which menu items to show based on active section
   const getActiveMenuItems = () => {
     switch (activeSection) {
@@ -238,8 +314,8 @@ function DashboardLayout({ children }) {
   return (
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
-        <div className="max-w-[1440px] w-full mx-auto px-8 page-content flex-grow">
-          <div className="flex flex-col md:flex-row gap-8 pb-0">
+        <div className="container mx-auto px-8 pb-4 max-w-[1440px] page-content flex-grow">
+          <div className="flex flex-col md:flex-row gap-4 pb-0">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
               <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
@@ -249,8 +325,16 @@ function DashboardLayout({ children }) {
                 
                 {/* Organization Dropdown - Show on dashboard and notifications sections */}
                 {(activeSection === 'dashboard' || activeSection === 'notifications') && (
-                  <div className="mb-4 px-2">
-                    <OrganizationDropdown />
+                  <div className="px-2 py-4">
+                    <div className="flex justify-center mb-1.5">
+                      <OrganizationDropdown />
+                    </div>
+                    <div className={`w-full px-3 py-1 text-xs font-medium ${getPlanBadgeStyle()} rounded-md`}>
+                      <div className="flex items-center justify-center">
+                        <FiStar className={`mr-1.5 ${getPlanStarColor()}`} />
+                        <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+                      </div>
+                    </div>
                   </div>
                 )}
                 
@@ -281,44 +365,77 @@ function DashboardLayout({ children }) {
                       <>
                         <li className="border-t border-white/5 my-3"></li>
                         <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
-                        {agentsMenuItems.map((item) => {
-                          // Extract agent ID from the path
-                          const agentId = item.path.split('/').pop();
-                          // Check if current path contains this agent ID in any form (settings, logs, usage, setup)
-                          const isActive = location.pathname.includes(`/${agentId}`);
-                          
-                          // Generate the correct path based on the current active tab
-                          let targetPath = item.path; // Default to settings path
-                          if (activeTab === 'activity' && isActive) {
-                            targetPath = `/dashboard/activity/${agentId}`;
-                          } else if (activeTab === 'usage' && isActive) {
-                            targetPath = `/dashboard/usage/${agentId}`;
-                          } else if (activeTab === 'setup' && isActive) {
-                            targetPath = `/dashboard/setup/${agentId}`;
-                          } else if (!isActive && location.pathname.includes('/activity/')) {
-                            targetPath = `/dashboard/activity/${agentId}`;
-                          } else if (!isActive && location.pathname.includes('/usage/')) {
-                            targetPath = `/dashboard/usage/${agentId}`;
-                          } else if (!isActive && location.pathname.includes('/setup/')) {
-                            targetPath = `/dashboard/setup/${agentId}`;
-                          }
-                          
-                          return (
-                            <li key={item.path}>
+                        {loading ? (
+                          <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
+                        ) : agents.length > 0 ? (
+                          agents.map((agent) => {
+                            // Check if current path contains this agent's system_name
+                            const isActive = location.pathname.includes(`/${agent.system_name}`);
+                            
+                            // Generate the correct path based on the current active tab
+                            let targetPath = `/dashboard/settings/${agent.system_name}`; // Default to settings path
+                            if (activeTab === 'activity' && isActive) {
+                              targetPath = `/dashboard/activity/${agent.system_name}`;
+                            } else if (activeTab === 'usage' && isActive) {
+                              targetPath = `/dashboard/usage/${agent.system_name}`;
+                            } else if (activeTab === 'setup' && isActive) {
+                              targetPath = `/dashboard/setup/${agent.system_name}`;
+                            } else if (!isActive && location.pathname.includes('/activity/')) {
+                              targetPath = `/dashboard/activity/${agent.system_name}`;
+                            } else if (!isActive && location.pathname.includes('/usage/')) {
+                              targetPath = `/dashboard/usage/${agent.system_name}`;
+                            } else if (!isActive && location.pathname.includes('/setup/')) {
+                              targetPath = `/dashboard/setup/${agent.system_name}`;
+                            }
+                            
+                            return (
+                              <li key={agent.id}>
+                                <Link
+                                  to={targetPath}
+                                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                    isActive
+                                      ? 'bg-emerald-500/20 text-emerald-400'
+                                      : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                  }`}
+                                >
+                                  {getAgentIcon(agent.system_name)}
+                                  {agent.name}
+                                </Link>
+                              </li>
+                            );
+                          })
+                        ) : (
+                          // Fallback to default agents if API returns empty
+                          <>
+                            <li>
                               <Link
-                                to={targetPath}
-                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                                  isActive
-                                    ? 'bg-emerald-500/20 text-emerald-400'
-                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                                }`}
+                                to="/dashboard/settings/slack_app_agent"
+                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
                               >
-                                {item.icon}
-                                {item.label}
+                                <RiSlackFill className="mr-2" />
+                                Slack App
                               </Link>
                             </li>
-                          );
-                        })}
+                            <li>
+                              <Link
+                                to="/dashboard/settings/image_generator_agent"
+                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
+                              >
+                                <RiImageLine className="mr-2" />
+                                Image Creator
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/dashboard/settings/content_writer_agent"
+                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
+                              >
+                                <RiFileTextLine className="mr-2" />
+                                Copy Creator
+                              </Link>
+                            </li>
+                          </>
+                        )}
                       </>
                     )}
                   </ul>
@@ -327,7 +444,9 @@ function DashboardLayout({ children }) {
             </div>
             
             <div className="flex-1">
-              {children}
+              <div className="pl-2">
+                {children}
+              </div>
             </div>
           </div>
         </div>

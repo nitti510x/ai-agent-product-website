@@ -36,7 +36,7 @@ function OverallUsage() {
   };
 
   return (
-    <div>
+    <div className="py-4 px-4">
       {/* Page title */}
       <div className="flex justify-between items-center mb-6">
         <div>

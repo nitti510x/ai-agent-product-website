@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import AIAgentsList from '../components/dashboard/AIAgentsList';
 import AgentSettings from '../components/dashboard/AgentSettings';
 import AgentActivity from '../components/dashboard/AgentActivity';
@@ -181,7 +181,7 @@ function Dashboard() {
   return (
       <div className="min-h-screen bg-dark">
       <nav className="bg-dark-lighter border-b border-dark-card">
-        <div className="max-w-[1440px] mx-auto px-8 py-4">
+        <div className="max-w-[1440px] mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <Link to="/dashboard" className="text-2xl font-bold text-gray-100">
               <Logo className="h-8" />
@@ -296,6 +296,9 @@ function Dashboard() {
           {/* Redirects for backward compatibility */}
           <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
           <Route path="subscription/*" element={<Navigate to="/dashboard/billing" replace />} />
+          <Route path="logs/:agentId" element={
+            <Navigate to={location => `/dashboard/activity/${location.pathname.split('/').pop()}`} replace />
+          } />
         </Routes>
       </div>
     </div>

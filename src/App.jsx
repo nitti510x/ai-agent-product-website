@@ -19,6 +19,7 @@ import { OrganizationProvider } from './contexts/OrganizationContext';
 import ChatBot from './components/chat/ChatBot';
 import CheckoutPage from './components/checkout/CheckoutPage';
 import CheckoutSuccess from './components/checkout/CheckoutSuccess';
+import { Toaster } from 'react-hot-toast';
 import './styles/auth-animations.css';
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
                 />
               </Routes>
               <ChatBot />
+              <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
             </Router>
           </OrganizationProvider>
         </NotificationProvider>

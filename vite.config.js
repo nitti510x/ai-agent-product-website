@@ -12,6 +12,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         secure: false
+      },
+      '/db-api': {
+        target: 'https://db.api.geniusos.co',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/db-api/, ''),
+        secure: false
       }
     }
   },
