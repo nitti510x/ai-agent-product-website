@@ -415,7 +415,9 @@ function DashboardLayout({ children }) {
               }}>
                 {getPlanName()}
               </span>
-              {children}
+              <div className="pl-2">
+                {children}
+              </div>
             </div>
           </div>
         </div>

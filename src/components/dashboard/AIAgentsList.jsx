@@ -132,7 +132,7 @@ function AIAgentsList() {
   }
 
   return (
-    <div className="py-4 px-4">
+    <div>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-white">Your AI Assistants</h1>
