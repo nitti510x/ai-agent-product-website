@@ -19,6 +19,8 @@ export function OrganizationProvider({ children }) {
   useEffect(() => {
     if (selectedOrg && selectedOrg.id) {
       fetchSubscription(selectedOrg.id);
+      // Store selected organization in localStorage when it changes
+      localStorage.setItem('selectedOrganization', JSON.stringify(selectedOrg));
     }
   }, [selectedOrg]);
 
@@ -66,9 +68,35 @@ export function OrganizationProvider({ children }) {
         });
         
         setOrganizations(sortedOrgs);
-        // Set the primary organization as selected by default, or the first one if no primary exists
-        const primaryOrg = sortedOrgs.find(org => org.is_primary === true);
-        setSelectedOrg(primaryOrg || sortedOrgs[0]);
+        
+        // Try to get the previously selected organization from localStorage
+        const savedOrgString = localStorage.getItem('selectedOrganization');
+        let savedOrg = null;
+        
+        if (savedOrgString) {
+          try {
+            savedOrg = JSON.parse(savedOrgString);
+            // Verify that the saved org still exists in the current list
+            const orgExists = sortedOrgs.some(org => org.id === savedOrg.id);
+            if (!orgExists) {
+              savedOrg = null;
+            }
+          } catch (e) {
+            console.error('Error parsing saved organization:', e);
+            savedOrg = null;
+          }
+        }
+        
+        // Set the selected organization: saved org > primary org > first org
+        if (savedOrg) {
+          // Find the full org object from the current list
+          const currentOrgData = sortedOrgs.find(org => org.id === savedOrg.id);
+          setSelectedOrg(currentOrgData);
+        } else {
+          // Fall back to primary or first org
+          const primaryOrg = sortedOrgs.find(org => org.is_primary === true);
+          setSelectedOrg(primaryOrg || sortedOrgs[0]);
+        }
       } else {
         setOrganizations([]);
       }

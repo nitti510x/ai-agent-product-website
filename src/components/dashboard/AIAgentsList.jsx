@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSettings, FiActivity, FiBarChart2, FiHelpCircle } from 'react-icons/fi';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiRobot2Line, RiPulseLine } from 'react-icons/ri';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { apiUrl } from '../../config/api';
+import { useOrganization } from '../../contexts/OrganizationContext';
 
 function AIAgentsList() {
   // Define a consistent gradient matching the site style
@@ -12,6 +13,7 @@ function AIAgentsList() {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { subscription, getPlanName } = useOrganization();
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -52,21 +54,29 @@ function AIAgentsList() {
       case 'slack_app_agent':
         return <RiSlackFill className="w-8 h-8" />;
       case 'social_media_manager_agent':
-        return <RiFacebookBoxFill className="w-8 h-8" />;
+        return <RiPulseLine className="w-8 h-8" />;
       case 'ai_content_manager_agent':
         return <RiFileTextLine className="w-8 h-8" />;
       case 'market_research_agent':
-        return <FaRobot className="w-8 h-8" />;
+        return <RiSearchLine className="w-8 h-8" />;
       case 'content_writer_agent':
         return <RiFileTextLine className="w-8 h-8" />;
       case 'image_generator_agent':
         return <RiImageLine className="w-8 h-8" />;
       case 'echo_prompt_agent':
-        return <FaRobot className="w-8 h-8" />;
+        return <RiRobot2Line className="w-8 h-8" />;
       case 'workflow_helper_agent':
-        return <FaRobot className="w-8 h-8" />;
+        return <RiFlowChart className="w-8 h-8" />;
       case 'linkedin_influencer_agent':
         return <RiLinkedinBoxFill className="w-8 h-8" />;
+      case 'facebook_influencer_agent':
+        return <RiFacebookBoxFill className="w-8 h-8" />;
+      case 'instagram_influencer_agent':
+        return <RiInstagramLine className="w-8 h-8" />;
+      case 'twitter_marketer_agent':
+        return <RiTwitterXFill className="w-8 h-8" />;
+      case 'wordpress_blogger_agent':
+        return <RiWordpressFill className="w-8 h-8" />;
       default:
         return <FaRobot className="w-8 h-8" />;
     }
@@ -74,9 +84,16 @@ function AIAgentsList() {
 
   // Function to determine if an agent is available in the user's plan
   const isAgentInUserPlan = (agent) => {
-    // This is a placeholder - in a real app, this would check against user's subscription
-    // For demo purposes, we'll assume all agents are available
-    return true;
+    const currentPlan = getPlanName().toLowerCase();
+    
+    if (currentPlan.includes('pro')) {
+      return agent.in_pro_plan === true;
+    } else if (currentPlan.includes('business')) {
+      return agent.in_business_plan === true;
+    } else {
+      // Default to starter plan
+      return agent.in_starter_plan === true;
+    }
   };
 
   // Function to get the setup status indicator
@@ -190,10 +207,10 @@ function AIAgentsList() {
               Upgrade your subscription to access our AI assistant tools.
             </p>
             <Link 
-              to="/dashboard/billing" 
-              className="inline-flex items-center px-4 py-2 mt-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-300"
+              to="/dashboard/account/billing"
+              className="inline-flex items-center px-4 py-2 mt-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white transition-all duration-300 text-sm hover:shadow-glow"
             >
-              <IoDiamond className="mr-2" />
+              <IoDiamond className="w-4 h-4 mr-2" />
               Upgrade Plan
             </Link>
           </div>
@@ -227,29 +244,43 @@ function AIAgentsList() {
                   
                   {/* Action buttons */}
                   <div className="p-4 pt-3 flex flex-col gap-2">
-                    <div className="flex justify-between gap-2">
+                    {isDisabled ? (
+                      // Show upgrade button for agents not in the current plan
                       <Link
-                        to={`/dashboard/activity/${agent.system_name}`}
-                        className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
+                        to="/dashboard/account/billing"
+                        className="flex items-center justify-center px-3 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white transition-all duration-300 text-xs w-full border border-purple-400/30 hover:shadow-glow"
                       >
-                        <FiActivity className="w-3.5 h-3.5 mr-1.5" />
-                        Logs
+                        <IoDiamond className="w-3.5 h-3.5 mr-1.5" />
+                        Upgrade Plan to Access
                       </Link>
-                      <Link
-                        to={`/dashboard/usage/${agent.system_name}`}
-                        className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
-                      >
-                        <FiBarChart2 className="w-3.5 h-3.5 mr-1.5" />
-                        Usage
-                      </Link>
-                    </div>
-                    <Link
-                      to={`/dashboard/settings/${agent.system_name}`}
-                      className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-700/40 hover:border-emerald-400/30"
-                    >
-                      <FiSettings className="w-3.5 h-3.5 mr-1.5" />
-                      Configure
-                    </Link>
+                    ) : (
+                      // Show normal action buttons for available agents
+                      <>
+                        <div className="flex justify-between gap-2">
+                          <Link
+                            to={`/dashboard/activity/${agent.system_name}`}
+                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
+                          >
+                            <FiActivity className="w-3.5 h-3.5 mr-1.5" />
+                            Logs
+                          </Link>
+                          <Link
+                            to={`/dashboard/usage/${agent.system_name}`}
+                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
+                          >
+                            <FiBarChart2 className="w-3.5 h-3.5 mr-1.5" />
+                            Usage
+                          </Link>
+                        </div>
+                        <Link
+                          to={`/dashboard/settings/${agent.system_name}`}
+                          className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-700/40 hover:border-emerald-400/30"
+                        >
+                          <FiSettings className="w-3.5 h-3.5 mr-1.5" />
+                          Configure
+                        </Link>
+                      </>
+                    )}
                     
                     {/* Always show Setup Guide link for all agents */}
                     <Link
@@ -259,86 +290,10 @@ function AIAgentsList() {
                       <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
                       Setup Guide
                     </Link>
-                    
-                    {isDisabled && (
-                      <Link
-                        to="/dashboard/billing"
-                        className="flex items-center px-3 py-2 mt-1 text-purple-300 hover:text-purple-200 transition-colors text-xs w-full justify-center bg-purple-900/20 border border-purple-500/20 rounded-lg"
-                      >
-                        <IoDiamond className="w-3.5 h-3.5 mr-1.5" />
-                        Upgrade to Access
-                      </Link>
-                    )}
                   </div>
                 </div>
               );
             })}
-            
-            {/* Example of a premium agent (X Marketer) */}
-            <div
-              className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden opacity-70 transition-all duration-300 relative shadow-md hover:shadow-lg"
-            >
-              <div className="absolute top-3 right-3 flex items-center">
-                <IoDiamond className="text-purple-400 w-4 h-4 mr-1" />
-                <span className="text-xs text-purple-300">Premium</span>
-              </div>
-              
-              {/* Agent header with icon */}
-              <div className="flex items-center p-4 pb-3 border-b border-white/5">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-dark-card to-dark-lighter flex items-center justify-center text-gray-500 mr-3">
-                  <RiTwitterXFill className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-white text-sm">
-                    X Marketer
-                  </h3>
-                  <p className="text-gray-400 text-xs">Schedule and post content to X (Twitter)</p>
-                </div>
-              </div>
-              
-              {/* Action buttons */}
-              <div className="p-4 pt-3 flex flex-col gap-2">
-                <div className="flex justify-between gap-2">
-                  <Link
-                    to={`/dashboard/activity/twitter_marketer_agent`}
-                    className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
-                  >
-                    <FiActivity className="w-3.5 h-3.5 mr-1.5" />
-                    Logs
-                  </Link>
-                  <Link
-                    to={`/dashboard/usage/twitter_marketer_agent`}
-                    className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
-                  >
-                    <FiBarChart2 className="w-3.5 h-3.5 mr-1.5" />
-                    Usage
-                  </Link>
-                </div>
-                <Link
-                  to={`/dashboard/settings/twitter_marketer_agent`}
-                  className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-700/40 hover:border-emerald-400/30"
-                >
-                  <FiSettings className="w-3.5 h-3.5 mr-1.5" />
-                  Configure
-                </Link>
-                
-                <Link
-                  to={`/dashboard/setup/twitter_marketer_agent`}
-                  className="flex items-center mt-2 text-gray-400 hover:text-blue-400 transition-colors text-xs justify-center"
-                >
-                  <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
-                  Setup Guide
-                </Link>
-                
-                <Link
-                  to="/dashboard/billing"
-                  className="flex items-center px-3 py-2 mt-1 text-purple-300 hover:text-purple-200 transition-colors text-xs w-full justify-center bg-purple-900/20 border border-purple-500/20 rounded-lg"
-                >
-                  <IoDiamond className="w-3.5 h-3.5 mr-1.5" />
-                  Upgrade to Access
-                </Link>
-              </div>
-            </div>
           </>
         )}
       </div>
