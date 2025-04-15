@@ -278,7 +278,7 @@ function DashboardLayout({ children }) {
   return (
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
-        <div className="max-w-[1440px] w-full mx-auto px-8 page-content flex-grow">
+        <div className="container mx-auto px-8 max-w-[1440px] page-content flex-grow">
           <div className="flex flex-col md:flex-row gap-4 pb-0">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
@@ -289,7 +289,7 @@ function DashboardLayout({ children }) {
                 
                 {/* Organization Dropdown - Show on dashboard and notifications sections */}
                 {(activeSection === 'dashboard' || activeSection === 'notifications') && (
-                  <div className="mb-4 pl-2 pr-4">
+                  <div className="flex justify-center p-4">
                     <OrganizationDropdown />
                   </div>
                 )}
