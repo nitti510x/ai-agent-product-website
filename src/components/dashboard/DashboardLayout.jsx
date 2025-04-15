@@ -5,7 +5,7 @@ import {
   FiFileText, FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
-  FiBell, FiCheckCircle
+  FiBell, FiCheckCircle, FiStar
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa';
@@ -76,6 +76,14 @@ function DashboardLayout({ children }) {
       default:
         return <FaRobot className="mr-2" />;
     }
+  };
+  
+  // Function to get the star color based on plan name
+  const getPlanStarColor = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('pro')) return 'text-purple-400';
+    if (planName.includes('business')) return 'text-blue-400';
+    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
   };
   
   // Determine active section based on URL path
@@ -289,8 +297,16 @@ function DashboardLayout({ children }) {
                 
                 {/* Organization Dropdown - Show on dashboard and notifications sections */}
                 {(activeSection === 'dashboard' || activeSection === 'notifications') && (
-                  <div className="flex justify-center p-4">
-                    <OrganizationDropdown />
+                  <div className="px-2 py-4">
+                    <div className="flex justify-center">
+                      <OrganizationDropdown />
+                    </div>
+                    <div className="flex justify-center mt-2">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2d3748] text-[#f6e05e] border border-[#f6e05e]/20">
+                        <FiStar className={`mr-1 ${getPlanStarColor()}`} />
+                        {getPlanName()} Plan
+                      </span>
+                    </div>
                   </div>
                 )}
                 
@@ -400,21 +416,6 @@ function DashboardLayout({ children }) {
             </div>
             
             <div className="flex-1">
-              <span style={{
-                display: 'inline-block',
-                background: '#2d3748', // dark neutral background
-                color: '#f6e05e',     // gold text for visibility
-                borderRadius: '12px',
-                padding: '2px 12px',
-                fontWeight: 'bold',
-                fontSize: '0.85em',
-                letterSpacing: '0.02em',
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-              }}>
-                {getPlanName()}
-              </span>
               <div className="pl-2">
                 {children}
               </div>
