@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOrganization } from '../../contexts/OrganizationContext';
-import { FiImage, FiUpload, FiTrash2, FiDownload, FiExternalLink, FiSearch } from 'react-icons/fi';
-import { RiImageAddLine } from 'react-icons/ri';
+import { FiImage, FiTrash2, FiExternalLink } from 'react-icons/fi';
 
 function MarketingImages() {
   const [images, setImages] = useState([]);
@@ -56,16 +55,6 @@ function MarketingImages() {
   const handleShowMore = () => {
     const newOffset = offset + limit;
     fetchImages(newOffset, false);
-  };
-
-  // Function to handle image download
-  const handleDownload = (imageUrl) => {
-    // For external images with CORS restrictions, we can't force a download
-    // So we'll open it in a new tab and show instructions to the user
-    window.open(imageUrl, '_blank');
-    
-    // Show a toast or alert with instructions
-    alert('Right-click on the image and select "Save Image As..." to download.');
   };
 
   // Function to open image in new tab
@@ -165,13 +154,6 @@ function MarketingImages() {
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                      <button 
-                        className="p-2 bg-emerald-600 rounded-full hover:bg-emerald-700 transition-colors" 
-                        title="Save Image"
-                        onClick={() => handleDownload(image.image_url)}
-                      >
-                        <FiDownload className="text-white" />
-                      </button>
                       <button 
                         className="p-2 bg-blue-600 rounded-full hover:bg-blue-700 transition-colors" 
                         title="View Image"

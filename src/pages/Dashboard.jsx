@@ -282,7 +282,12 @@ function Dashboard() {
           <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
           <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
           <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
-          <Route path="quicksetup" element={<DashboardLayout><QuickSetup /></DashboardLayout>} />
+          {/* Help Section Routes */}
+          <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
+          <Route path="help/quicksetup" element={<DashboardLayout><QuickSetup /></DashboardLayout>} />
+          <Route path="help/faqs" element={<DashboardLayout><FAQs /></DashboardLayout>} />
+          <Route path="help/support" element={<DashboardLayout><Support /></DashboardLayout>} />
+          <Route path="help/status" element={<DashboardLayout><SystemStatus /></DashboardLayout>} />
           <Route path="profile" element={<Profile />} />
           <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
@@ -303,12 +308,6 @@ function Dashboard() {
           {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
           <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
-          
-          {/* Help Section Routes */}
-          <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
-          <Route path="help/faqs" element={<DashboardLayout><FAQs /></DashboardLayout>} />
-          <Route path="help/support" element={<DashboardLayout><Support /></DashboardLayout>} />
-          <Route path="help/status" element={<DashboardLayout><SystemStatus /></DashboardLayout>} />
           
           {/* Account Section Routes */}
           <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />

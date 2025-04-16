@@ -98,20 +98,21 @@ function DashboardLayout({ children }) {
   const getPlanBadgeStyle = () => {
     const planName = getPlanName().toLowerCase();
     if (planName.includes('pro')) {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#231a2e] border-b border-purple-400/30';
-    } else if (planName.includes('business')) {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#1e2a3a] border-b border-blue-400/30';
-    } else {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#25231a] border-b border-[#f6e05e]/30';
+      return 'bg-gradient-to-r from-purple-900/40 to-purple-800/20 border border-purple-700/30';
     }
+    if (planName.includes('business')) {
+      return 'bg-gradient-to-r from-blue-900/40 to-blue-800/20 border border-blue-700/30';
+    }
+    // Default for starter/basic plans
+    return 'bg-gradient-to-r from-amber-900/40 to-amber-800/20 border border-amber-700/30';
   };
   
   // Function to get the text color for the plan name
   const getPlanTextColor = () => {
     const planName = getPlanName().toLowerCase();
-    if (planName.includes('pro')) return 'text-purple-400';
-    if (planName.includes('business')) return 'text-blue-400';
-    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
+    if (planName.includes('pro')) return 'text-purple-300';
+    if (planName.includes('business')) return 'text-blue-300';
+    return 'text-amber-300'; // Default for starter/basic plans
   };
   
   // Determine active section based on URL path
@@ -150,11 +151,6 @@ function DashboardLayout({ children }) {
       path: '/dashboard/usage',
       label: 'Overall Usage',
       icon: <FiBarChart2 className="mr-2" />
-    },
-    {
-      path: '/dashboard/quicksetup',
-      label: 'Quick Setup',
-      icon: <FiSettings className="mr-2" />
     }
   ];
 
@@ -236,6 +232,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/help',
       label: 'Documentation',
       icon: <FiHelpCircle className="mr-2" />
+    },
+    {
+      path: '/dashboard/help/quicksetup',
+      label: 'Quick Setup Guide',
+      icon: <FiSettings className="mr-2" />
     },
     {
       path: '/dashboard/help/faqs',
@@ -381,11 +382,9 @@ function DashboardLayout({ children }) {
                     <div className="flex justify-center mb-1.5">
                       <OrganizationDropdown />
                     </div>
-                    <div className={`w-full px-3 py-1 text-xs font-medium ${getPlanBadgeStyle()} rounded-md`}>
-                      <div className="flex items-center justify-center">
-                        <FiStar className={`mr-1.5 ${getPlanStarColor()}`} />
-                        <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
-                      </div>
+                    <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
+                      <FiStar className={`text-sm ${getPlanStarColor()}`} />
+                      <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
                     </div>
                   </div>
                 )}
