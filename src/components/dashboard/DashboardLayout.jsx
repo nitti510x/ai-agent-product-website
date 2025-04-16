@@ -5,11 +5,11 @@ import {
   FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
-  FiBell, FiCheckCircle, FiStar
+  FiBell, FiCheckCircle, FiStar, FiCalendar, FiEdit
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
@@ -98,20 +98,21 @@ function DashboardLayout({ children }) {
   const getPlanBadgeStyle = () => {
     const planName = getPlanName().toLowerCase();
     if (planName.includes('pro')) {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#231a2e] border-b border-purple-400/30';
-    } else if (planName.includes('business')) {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#1e2a3a] border-b border-blue-400/30';
-    } else {
-      return 'bg-gradient-to-r from-[#1a1f25] to-[#25231a] border-b border-[#f6e05e]/30';
+      return 'bg-gradient-to-r from-purple-900/40 to-purple-800/20 border border-purple-700/30';
     }
+    if (planName.includes('business')) {
+      return 'bg-gradient-to-r from-blue-900/40 to-blue-800/20 border border-blue-700/30';
+    }
+    // Default for starter/basic plans
+    return 'bg-gradient-to-r from-amber-900/40 to-amber-800/20 border border-amber-700/30';
   };
   
   // Function to get the text color for the plan name
   const getPlanTextColor = () => {
     const planName = getPlanName().toLowerCase();
-    if (planName.includes('pro')) return 'text-purple-400';
-    if (planName.includes('business')) return 'text-blue-400';
-    return 'text-[#f6e05e]'; // Default gold for starter/basic plans
+    if (planName.includes('pro')) return 'text-purple-300';
+    if (planName.includes('business')) return 'text-blue-300';
+    return 'text-amber-300'; // Default for starter/basic plans
   };
   
   // Determine active section based on URL path
@@ -127,6 +128,8 @@ function DashboardLayout({ children }) {
       setActiveSection('account');
     } else if (path.includes('/dashboard/notifications')) {
       setActiveSection('notifications');
+    } else if (path.includes('/dashboard/marketing')) {
+      setActiveSection('marketing');
     } else {
       setActiveSection('dashboard');
     }
@@ -148,11 +151,30 @@ function DashboardLayout({ children }) {
       path: '/dashboard/usage',
       label: 'Overall Usage',
       icon: <FiBarChart2 className="mr-2" />
+    }
+  ];
+
+  // Marketing assets menu items (part of dashboard but with separate header)
+  const marketingMenuItems = [
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
     },
     {
-      path: '/dashboard/quicksetup',
-      label: 'Quick Setup',
-      icon: <FiSettings className="mr-2" />
+      path: '/dashboard/campaigns',
+      label: 'Campaigns',
+      icon: <RiMegaphoneLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/scheduled',
+      label: 'Scheduled Posts',
+      icon: <FiCalendar className="mr-2" />
+    },
+    {
+      path: '/dashboard/drafts',
+      label: 'Draft Posts',
+      icon: <RiDraftLine className="mr-2" />
     }
   ];
   
@@ -210,6 +232,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/help',
       label: 'Documentation',
       icon: <FiHelpCircle className="mr-2" />
+    },
+    {
+      path: '/dashboard/help/quicksetup',
+      label: 'Quick Setup Guide',
+      icon: <FiSettings className="mr-2" />
     },
     {
       path: '/dashboard/help/faqs',
@@ -281,6 +308,30 @@ function DashboardLayout({ children }) {
     }
   ];
   
+  // Marketing Assets section menu items
+  const marketingAssetsMenuItems = [
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/campaigns',
+      label: 'Campaigns',
+      icon: <RiMegaphoneLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/scheduled',
+      label: 'Scheduled Posts',
+      icon: <FiCalendar className="mr-2" />
+    },
+    {
+      path: '/dashboard/drafts',
+      label: 'Draft Posts',
+      icon: <RiDraftLine className="mr-2" />
+    }
+  ];
+  
   // Determine which menu items to show based on active section
   const getActiveMenuItems = () => {
     switch (activeSection) {
@@ -294,8 +345,10 @@ function DashboardLayout({ children }) {
         return accountMenuItems;
       case 'notifications':
         return notificationsMenuItems;
+      case 'marketing':
+        return marketingAssetsMenuItems;
       default:
-        return dashboardMenuItems;
+        return [...dashboardMenuItems, ...marketingMenuItems];
     }
   };
   
@@ -329,42 +382,63 @@ function DashboardLayout({ children }) {
                     <div className="flex justify-center mb-1.5">
                       <OrganizationDropdown />
                     </div>
-                    <div className={`w-full px-3 py-1 text-xs font-medium ${getPlanBadgeStyle()} rounded-md`}>
-                      <div className="flex items-center justify-center">
-                        <FiStar className={`mr-1.5 ${getPlanStarColor()}`} />
-                        <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
-                      </div>
+                    <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
+                      <FiStar className={`text-sm ${getPlanStarColor()}`} />
+                      <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
                     </div>
                   </div>
                 )}
                 
                 <nav>
                   <ul className="space-y-1">
-                    {/* Section-specific menu items */}
-                    {getActiveMenuItems().map((item, index) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <li key={item.path}>
-                          <Link
-                            to={item.path}
-                            className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                              isActive
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                            }`}
-                          >
-                            {item.icon}
-                            {item.label}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                    
-                    {/* Only show AI Agents section at the bottom when in Dashboard section */}
+                    {/* Dashboard menu items */}
                     {activeSection === 'dashboard' && (
                       <>
+                        {/* Regular dashboard items */}
+                        {dashboardMenuItems.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                }`}
+                              >
+                                {item.icon}
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+
+                        {/* Marketing Assets section */}
                         <li className="border-t border-white/5 my-3"></li>
-                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
+                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">MARKETING ASSETS</li>
+                        {marketingMenuItems.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                }`}
+                              >
+                                {item.icon}
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+
+                        {/* AI Agents section */}
+                        <li className="border-t border-white/5 my-3"></li>
+                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI AGENTS</li>
                         {loading ? (
                           <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
                         ) : agents.length > 0 ? (
@@ -438,6 +512,26 @@ function DashboardLayout({ children }) {
                         )}
                       </>
                     )}
+
+                    {/* Other section menu items (tokens, billing, help, account, notifications) */}
+                    {activeSection !== 'dashboard' && getActiveMenuItems().map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <li key={item.path}>
+                          <Link
+                            to={item.path}
+                            className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                              isActive
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                            }`}
+                          >
+                            {item.icon}
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </nav>
               </div>
