@@ -7,6 +7,7 @@ import AgentUsage from '../components/dashboard/AgentUsage';
 import OverallUsage from '../components/dashboard/OverallUsage';
 import RecentActivity from '../components/dashboard/RecentActivity';
 import DashboardLayout from '../components/dashboard/DashboardLayout';
+import BillingLayout from '../components/dashboard/BillingLayout';
 import Profile from '../components/dashboard/Profile';
 import Subscription from '../components/dashboard/Subscription';
 import TokenManagement from '../components/dashboard/TokenManagement';
@@ -23,7 +24,6 @@ import SystemStatus from '../components/dashboard/help/SystemStatus';
 import QuickSetup from '../components/dashboard/QuickSetup';
 import Security from '../components/dashboard/account/Security';
 import OrganizationProfile from '../components/dashboard/account/OrganizationProfile';
-import BillingLayout from '../components/billing/BillingLayout';
 import TransactionHistory from '../components/billing/TransactionHistory';
 import PaymentMethods from '../components/billing/PaymentMethods';
 import SubscriptionCheckout from '../components/subscription/SubscriptionCheckout';
@@ -267,12 +267,12 @@ function Dashboard() {
           <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
           <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
-          <Route path="billing/tokens" element={<Navigate to="/dashboard/tokens" replace />} />
+          <Route path="billing/tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
           {/* Token Management Routes */}
-          <Route path="tokens" element={<DashboardLayout><TokenManagement /></DashboardLayout>} />
-          <Route path="tokens/purchase" element={<DashboardLayout><TokenPurchase /></DashboardLayout>} />
-          <Route path="tokens/history" element={<DashboardLayout><TokenHistory /></DashboardLayout>} />
-          <Route path="tokens/settings" element={<DashboardLayout><TokenSettings /></DashboardLayout>} />
+          <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
+          <Route path="tokens/purchase" element={<BillingLayout><TokenPurchase /></BillingLayout>} />
+          <Route path="tokens/history" element={<BillingLayout><TokenHistory /></BillingLayout>} />
+          <Route path="tokens/settings" element={<BillingLayout><TokenSettings /></BillingLayout>} />
           
           {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />

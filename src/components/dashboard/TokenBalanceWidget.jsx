@@ -113,13 +113,22 @@ const TokenBalanceWidget = ({ compact = false }) => {
     return (
       <Link 
         to="/dashboard/tokens" 
-        className={`flex items-center px-3 py-1.5 rounded-lg ${
-          isLowBalance ? 'bg-red-900/20 text-red-400 hover:bg-red-900/30 hover:text-red-300' : 'bg-primary/20 text-primary hover:bg-primary/30 hover:text-primary-hover'
-        } transition-colors`}
+        className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#111418] text-white transition-all duration-300 group"
       >
-        <FaRobot className="mr-1.5 text-primary" />
-        <span className="font-medium">{tokens?.balance || 0}</span>
-        {isLowBalance && <FiAlertTriangle className="ml-1.5 text-yellow-500" size={14} />}
+        {/* Background gradient effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/10 to-blue-900/10 opacity-30"></div>
+        
+        {/* Icon container */}
+        <div className="relative z-10 flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500/10 to-emerald-700/10">
+          <FaRobot className="text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300" size={14} />
+        </div>
+        
+        {/* Token count */}
+        <div className="relative z-10 flex flex-col">
+          <span className={`font-bold text-sm ${isLowBalance ? 'text-red-400 group-hover:text-red-300' : 'text-emerald-400 group-hover:text-emerald-300'} transition-colors duration-300`}>
+            {tokens?.balance.toLocaleString() || 0}
+          </span>
+        </div>
       </Link>
     );
   }
