@@ -5,11 +5,11 @@ import {
   FiUsers, FiCreditCard, FiDollarSign, FiClock,
   FiHelpCircle, FiMessageSquare, FiAlertCircle, FiUser,
   FiLock, FiSliders, FiUserPlus, FiList, FiShoppingCart, FiTrendingUp, FiLayout,
-  FiBell, FiCheckCircle, FiStar
+  FiBell, FiCheckCircle, FiStar, FiCalendar, FiEdit
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
@@ -127,6 +127,8 @@ function DashboardLayout({ children }) {
       setActiveSection('account');
     } else if (path.includes('/dashboard/notifications')) {
       setActiveSection('notifications');
+    } else if (path.includes('/dashboard/marketing')) {
+      setActiveSection('marketing');
     } else {
       setActiveSection('dashboard');
     }
@@ -153,6 +155,30 @@ function DashboardLayout({ children }) {
       path: '/dashboard/quicksetup',
       label: 'Quick Setup',
       icon: <FiSettings className="mr-2" />
+    }
+  ];
+
+  // Marketing assets menu items (part of dashboard but with separate header)
+  const marketingMenuItems = [
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/campaigns',
+      label: 'Campaigns',
+      icon: <RiMegaphoneLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/scheduled',
+      label: 'Scheduled Posts',
+      icon: <FiCalendar className="mr-2" />
+    },
+    {
+      path: '/dashboard/drafts',
+      label: 'Draft Posts',
+      icon: <RiDraftLine className="mr-2" />
     }
   ];
   
@@ -281,6 +307,30 @@ function DashboardLayout({ children }) {
     }
   ];
   
+  // Marketing Assets section menu items
+  const marketingAssetsMenuItems = [
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/campaigns',
+      label: 'Campaigns',
+      icon: <RiMegaphoneLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/scheduled',
+      label: 'Scheduled Posts',
+      icon: <FiCalendar className="mr-2" />
+    },
+    {
+      path: '/dashboard/drafts',
+      label: 'Draft Posts',
+      icon: <RiDraftLine className="mr-2" />
+    }
+  ];
+  
   // Determine which menu items to show based on active section
   const getActiveMenuItems = () => {
     switch (activeSection) {
@@ -294,8 +344,10 @@ function DashboardLayout({ children }) {
         return accountMenuItems;
       case 'notifications':
         return notificationsMenuItems;
+      case 'marketing':
+        return marketingAssetsMenuItems;
       default:
-        return dashboardMenuItems;
+        return [...dashboardMenuItems, ...marketingMenuItems];
     }
   };
   
@@ -340,31 +392,54 @@ function DashboardLayout({ children }) {
                 
                 <nav>
                   <ul className="space-y-1">
-                    {/* Section-specific menu items */}
-                    {getActiveMenuItems().map((item, index) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <li key={item.path}>
-                          <Link
-                            to={item.path}
-                            className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                              isActive
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                            }`}
-                          >
-                            {item.icon}
-                            {item.label}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                    
-                    {/* Only show AI Agents section at the bottom when in Dashboard section */}
+                    {/* Dashboard menu items */}
                     {activeSection === 'dashboard' && (
                       <>
+                        {/* Regular dashboard items */}
+                        {dashboardMenuItems.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                }`}
+                              >
+                                {item.icon}
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+
+                        {/* Marketing Assets section */}
                         <li className="border-t border-white/5 my-3"></li>
-                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI Agents</li>
+                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">MARKETING ASSETS</li>
+                        {marketingMenuItems.map((item) => {
+                          const isActive = location.pathname === item.path;
+                          return (
+                            <li key={item.path}>
+                              <Link
+                                to={item.path}
+                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400'
+                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                }`}
+                              >
+                                {item.icon}
+                                {item.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+
+                        {/* AI Agents section */}
+                        <li className="border-t border-white/5 my-3"></li>
+                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI AGENTS</li>
                         {loading ? (
                           <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
                         ) : agents.length > 0 ? (
@@ -438,6 +513,26 @@ function DashboardLayout({ children }) {
                         )}
                       </>
                     )}
+
+                    {/* Other section menu items (tokens, billing, help, account, notifications) */}
+                    {activeSection !== 'dashboard' && getActiveMenuItems().map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <li key={item.path}>
+                          <Link
+                            to={item.path}
+                            className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                              isActive
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                            }`}
+                          >
+                            {item.icon}
+                            {item.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </nav>
               </div>

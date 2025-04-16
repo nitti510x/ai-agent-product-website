@@ -33,14 +33,17 @@ import { FiUser, FiLogOut, FiCreditCard, FiHelpCircle } from 'react-icons/fi';
 import Notifications from '../components/dashboard/notifications/Notifications';
 import NotificationDropdown from '../components/dashboard/notifications/NotificationDropdown';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import MarketingImages from '../components/dashboard/MarketingImages';
 
 function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [loginProvider, setLoginProvider] = useState(null);
   const [userAvatar, setUserAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState(null);
+  const [activeSection, setActiveSection] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -143,6 +146,23 @@ function Dashboard() {
 
     fetchUserProfile();
   }, []);
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/dashboard/tokens')) {
+      setActiveSection('tokens');
+    } else if (path.includes('/dashboard/billing')) {
+      setActiveSection('billing');
+    } else if (path.includes('/dashboard/help')) {
+      setActiveSection('help');
+    } else if (path.includes('/dashboard/account')) {
+      setActiveSection('account');
+    } else if (path.includes('/dashboard/notifications')) {
+      setActiveSection('notifications');
+    } else {
+      setActiveSection('dashboard');
+    }
+  }, [location.pathname]);
 
   // Function to determine login provider
   const getLoginProvider = (user) => {
@@ -273,6 +293,12 @@ function Dashboard() {
           <Route path="tokens/purchase" element={<BillingLayout><TokenPurchase /></BillingLayout>} />
           <Route path="tokens/history" element={<BillingLayout><TokenHistory /></BillingLayout>} />
           <Route path="tokens/settings" element={<BillingLayout><TokenSettings /></BillingLayout>} />
+          
+          {/* Marketing Assets Routes */}
+          <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
+          <Route path="campaigns" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
+          <Route path="scheduled" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
+          <Route path="drafts" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
           
           {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
