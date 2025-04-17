@@ -173,7 +173,7 @@ function DashboardLayout({ children }) {
     },
     {
       path: '/dashboard/drafts',
-      label: 'Draft Posts',
+      label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
     }
   ];
@@ -327,7 +327,7 @@ function DashboardLayout({ children }) {
     },
     {
       path: '/dashboard/drafts',
-      label: 'Draft Posts',
+      label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
     }
   ];
