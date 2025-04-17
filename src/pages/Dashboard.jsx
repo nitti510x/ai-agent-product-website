@@ -303,7 +303,7 @@ function Dashboard() {
           <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
           <Route path="campaigns" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
           <Route path="scheduled" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
-          <Route path="drafts" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
+          <Route path="drafts" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Drafts</h1><p className="text-gray-400 mt-4">Drafts management coming soon.</p></div></DashboardLayout>} />
           
           {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
