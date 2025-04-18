@@ -80,7 +80,7 @@ function BillingLayout({ children }) {
       <div className="flex flex-col md:flex-row gap-4 pt-4">
         {/* Sidebar */}
         <div className="w-full md:w-64 shrink-0">
-          <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-800/30 p-4">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-700/40 p-4">
             <div className="mb-4 px-2">
               <h2 className="text-xl font-bold text-white">Billing & Tokens</h2>
             </div>

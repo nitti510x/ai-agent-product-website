@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine, RiCheckboxCircleLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
@@ -170,13 +170,18 @@ function DashboardLayout({ children }) {
       icon: <RiMegaphoneLine className="mr-2" />
     },
     {
+      path: '/dashboard/published',
+      label: 'Published',
+      icon: <RiCheckboxCircleLine className="mr-2" />
+    },
+    {
       path: '/dashboard/scheduled',
-      label: 'Scheduled Posts',
+      label: 'Scheduled',
       icon: <FiCalendar className="mr-2" />
     },
     {
       path: '/dashboard/drafts',
-      label: 'Draft Posts',
+      label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
     }
   ];
@@ -324,13 +329,18 @@ function DashboardLayout({ children }) {
       icon: <RiMegaphoneLine className="mr-2" />
     },
     {
+      path: '/dashboard/published',
+      label: 'Published',
+      icon: <RiCheckboxCircleLine className="mr-2" />
+    },
+    {
       path: '/dashboard/scheduled',
-      label: 'Scheduled Posts',
+      label: 'Scheduled',
       icon: <FiCalendar className="mr-2" />
     },
     {
       path: '/dashboard/drafts',
-      label: 'Draft Posts',
+      label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
     }
   ];
@@ -374,7 +384,7 @@ function DashboardLayout({ children }) {
           <div className="flex flex-col md:flex-row gap-4 pb-0 pt-4">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
-              <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-800/30 p-4">
+              <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-700/40 p-4">
                 <h2 className="text-xl font-bold text-white mb-4 px-2">
                   {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
                 </h2>

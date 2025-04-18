@@ -141,7 +141,7 @@ function AIAgentsList() {
         <div className="text-red-400 mb-4">Error loading agents: {error}</div>
         <button 
           onClick={() => window.location.reload()} 
-          className="px-4 py-2 bg-dark-card hover:bg-dark-lighter text-white rounded-lg transition-colors"
+          className="px-4 py-2 bg-[#1A1E23] hover:bg-black/30 text-white rounded-lg transition-colors"
         >
           Retry
         </button>
@@ -188,25 +188,17 @@ function AIAgentsList() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          // Loading skeleton
-          Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden shadow-md animate-pulse">
-              <div className="p-4 pb-3 border-b border-white/5 flex items-center">
-                <div className="w-10 h-10 rounded-lg bg-dark-lighter mr-3"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-dark-lighter rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-dark-lighter rounded w-1/2"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md animate-pulse">
+                <div className="p-6">
+                  <div className="h-6 w-24 bg-gray-700/50 rounded mb-4"></div>
+                  <div className="h-4 w-full bg-gray-700/30 rounded mb-2"></div>
+                  <div className="h-4 w-3/4 bg-gray-700/30 rounded"></div>
                 </div>
               </div>
-              <div className="p-4 pt-3">
-                <div className="flex justify-between gap-2 mb-2">
-                  <div className="h-8 bg-dark-lighter rounded flex-1"></div>
-                  <div className="h-8 bg-dark-lighter rounded flex-1"></div>
-                </div>
-                <div className="h-8 bg-dark-lighter rounded w-full"></div>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         ) : agents.length === 0 ? (
           <div className="col-span-3 text-center py-12">
             <FaRobot className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -234,15 +226,15 @@ function AIAgentsList() {
               return (
                 <div 
                   key={agent.system_name} 
-                  className={`bg-[#1A1E23] border border-gray-800/30 rounded-xl overflow-hidden shadow-md ${
+                  className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md ${
                     isDisabled ? 'opacity-75' : ''
                   }`}
                 >
                   {getSetupStatusIndicator(setupStatus, 'active', isDisabled)}
                   
                   {/* Agent header with icon */}
-                  <div className="flex items-center p-4 pb-3 border-b border-white/5">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-dark-card to-dark-lighter flex items-center justify-center ${isDisabled ? 'text-gray-500' : 'text-emerald-400'} mr-3`}>
+                  <div className="flex items-center p-4 pb-3 border-b border-gray-800/30">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-[#111418] to-[#1E2328] flex items-center justify-center ${isDisabled ? 'text-gray-500' : 'text-emerald-400'} mr-3`}>
                       {getAgentIcon(agent.system_name)}
                     </div>
                     <div>
@@ -270,24 +262,24 @@ function AIAgentsList() {
                         <div className="flex justify-between gap-2">
                           <Link
                             to={`/dashboard/activity/${agent.system_name}`}
-                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
+                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-[#111418] hover:bg-black/30 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-800/40 hover:border-emerald-400/30"
                           >
-                            <FiActivity className="w-3.5 h-3.5 mr-1.5" />
-                            Logs
+                            <FiActivity className="mr-1" />
+                            Activity
                           </Link>
                           <Link
                             to={`/dashboard/usage/${agent.system_name}`}
-                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-700/40 hover:border-emerald-400/30"
+                            className="flex items-center justify-center px-3 py-2 rounded-lg bg-[#111418] hover:bg-black/30 text-white hover:text-emerald-400 transition-all duration-300 text-xs flex-1 border border-gray-800/40 hover:border-emerald-400/30"
                           >
-                            <FiBarChart2 className="w-3.5 h-3.5 mr-1.5" />
+                            <FiBarChart2 className="mr-1" />
                             Usage
                           </Link>
                         </div>
                         <Link
                           to={`/dashboard/settings/${agent.system_name}`}
-                          className="flex items-center justify-center px-3 py-2 rounded-lg bg-dark-lighter hover:bg-gray-800 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-700/40 hover:border-emerald-400/30"
+                          className="flex items-center justify-center px-3 py-2 rounded-lg bg-[#111418] hover:bg-black/30 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-800/40 hover:border-emerald-400/30"
                         >
-                          <FiSettings className="w-3.5 h-3.5 mr-1.5" />
+                          <FiSettings className="mr-1" />
                           Configure
                         </Link>
                       </>
@@ -305,9 +297,9 @@ function AIAgentsList() {
                     ) : (
                       <Link
                         to={`/dashboard/setup/${agent.system_name}`}
-                        className="flex items-center mt-2 text-gray-400 hover:text-blue-400 transition-colors text-xs justify-center"
+                        className="flex items-center justify-center px-3 py-2 rounded-lg bg-[#111418] hover:bg-black/30 text-white hover:text-emerald-400 transition-all duration-300 text-xs w-full border border-gray-800/40 hover:border-emerald-400/30"
                       >
-                        <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
+                        <FiHelpCircle className="mr-1" />
                         Setup Guide
                       </Link>
                     )}
