@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { FiClock, FiMessageCircle, FiUser, FiBarChart2, FiSettings, FiActivity, FiHelpCircle } from 'react-icons/fi';
 import { apiUrl } from '../../config/api';
+import PageHeader from './PageHeader';
 
 function AgentUsage({ agentId: propAgentId }) {
   const { agentId: paramAgentId } = useParams();
@@ -130,13 +131,10 @@ function AgentUsage({ agentId: propAgentId }) {
 
   return (
     <div className="w-full">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">{loading ? 'Loading...' : `${agentName}`}</h2>
-          <p className="text-gray-400 text-sm mt-1">Configure and monitor your AI assistant</p>
-        </div>
-      </div>
+      <PageHeader 
+        title={loading ? 'Loading...' : `${agentName}`}
+        description="Configure and monitor your AI assistant"
+      />
       
       {/* Tabs Navigation */}
       <div className="flex border-b border-gray-700/40 mb-6">

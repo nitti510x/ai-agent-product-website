@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiLock, FiSave } from 'react-icons/fi';
 import { supabase } from '../../config/supabase';
+import PageHeader from './PageHeader';
 
 function Profile() {
   const navigate = useNavigate();
@@ -226,10 +227,10 @@ function Profile() {
 
   return (
     <>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">My Profile</h2>
-        <p className="text-gray-400 mt-1">Manage your personal information and account security</p>
-      </div>
+      <PageHeader 
+        title="My Profile"
+        description="Manage your personal information and account security"
+      />
       
       <div className="grid md:grid-cols-2 gap-8">
         {/* Basic Information */}

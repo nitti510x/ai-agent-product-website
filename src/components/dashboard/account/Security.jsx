@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FiLock, FiShield, FiAlertTriangle, FiCheckCircle, FiEye, FiEyeOff } from 'react-icons/fi';
+import PageHeader from '../PageHeader';
 
 function Security() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -109,12 +110,10 @@ function Security() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Security Settings</h2>
-          <p className="text-gray-400 text-sm mt-1">Manage your account security and authentication</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Security Settings"
+        description="Manage your account security and authentication"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Password Change Section */}

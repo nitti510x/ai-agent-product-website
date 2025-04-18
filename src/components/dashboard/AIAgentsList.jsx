@@ -6,6 +6,7 @@ import { IoDiamond } from 'react-icons/io5';
 import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
 import { apiUrl } from '../../config/api';
 import { useOrganization } from '../../contexts/OrganizationContext';
+import PageHeader from './PageHeader';
 
 function AIAgentsList() {
   // Define a consistent gradient matching the site style
@@ -149,40 +150,30 @@ function AIAgentsList() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Your AI Assistants</h1>
-          <p className="text-gray-400 mt-1">Track your AI assistants' usage and performance</p>
-        </div>
-        <div className="flex gap-3">
-          <Link 
-            to="/dashboard/help/quicksetup" 
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
-          >
-            <FiSettings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
-            <span className="font-medium">Quick Setup Guide</span>
-          </Link>
-          <a
-            href="#"
-            onClick={(e) => { e.preventDefault(); openSlackApp(); }}
-            className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:shadow-xl transition-all duration-300 shadow-lg"
-          >
-            <span className="mr-2">Run in Slack</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.8 122.8" width="18" height="18">
-              <path d="M25.8,77.6c0,7.1-5.8,12.9-12.9,12.9S0,84.7,0,77.6s5.8-12.9,12.9-12.9h12.9V77.6z" fill="#E01E5A"></path>
-              <path d="M32.3,77.6c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9V77.6z" fill="#E01E5A"></path>
-              <path d="M45.2,25.8c-7.1,0-12.9-5.8-12.9-12.9S38.1,0,45.2,0s12.9,5.8,12.9,12.9v12.9H45.2z" fill="#36C5F0"></path>
-              <path d="M45.2,32.3c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H12.9C5.8,58.1,0,52.3,0,45.2s5.8-12.9,12.9-12.9H45.2z" fill="#36C5F0"></path>
-              <path d="M97,45.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H97V45.2z" fill="#2EB67D"></path>
-              <path d="M90.5,45.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9V12.9C64.7,5.8,70.5,0,77.6,0s12.9,5.8,12.9,12.9V45.2z" fill="#2EB67D"></path>
-              <path d="M77.6,97c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9V97H77.6z" fill="#ECB22E"></path>
-              <path d="M77.6,90.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H77.6z" fill="#ECB22E"></path>
-            </svg>
-          </a>
-        </div>
-      </div>
-
+    <div>
+      <PageHeader 
+        title="Your AI Assistants"
+        description="Track your AI assistants' usage and performance"
+        actions={
+          <div className="flex gap-3">
+            <Link 
+              to="/dashboard/help/quicksetup" 
+              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+            >
+              <FiSettings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
+              <span className="font-medium">Quick Setup Guide</span>
+            </Link>
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); openSlackApp(); }}
+              className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:shadow-xl transition-all duration-300 shadow-lg"
+            >
+              <span className="mr-2">Run in Slack</span>
+              <RiSlackFill className="w-5 h-5" />
+            </a>
+          </div>
+        }
+      />
       {error && (
         <div className="bg-red-500/20 border border-red-500 text-red-100 p-4 rounded-lg mb-6">
           Error loading agents: {error}

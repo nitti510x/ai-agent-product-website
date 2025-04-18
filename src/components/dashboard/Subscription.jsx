@@ -6,6 +6,7 @@ import { supabase } from '../../config/supabase.js';
 import { agentService } from '../../services/agentService.js';
 import { apiService } from '../../services/apiService.js';
 import { useOrganization } from '../../contexts/OrganizationContext';
+import PageHeader from './PageHeader';
 
 function Subscription() {
   const navigate = useNavigate();
@@ -212,6 +213,11 @@ function Subscription() {
 
   return (
     <div className="space-y-8">
+      <PageHeader 
+        title="Subscription Plans"
+        description="Manage your subscription and billing information"
+      />
+      
       {error && (
         <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
           <div className="flex items-center">

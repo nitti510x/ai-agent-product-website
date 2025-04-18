@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../../config/supabase';
 import { agentService } from '../../../services/agentService';
+import PageHeader from '../PageHeader';
 
 function TokenPurchase() {
   const [user, setUser] = useState(null);
@@ -101,12 +102,10 @@ function TokenPurchase() {
   return (
     <div>
       {subscriptionWarning}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Purchase Tokens</h2>
-          <p className="text-gray-400 text-sm mt-1">Add more tokens to your account</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Purchase Tokens"
+        description="Add more tokens to your account"
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {tokenPackages.map((pkg) => (

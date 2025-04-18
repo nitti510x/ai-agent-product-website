@@ -4,6 +4,7 @@ import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { useOrganization } from '../../../contexts/OrganizationContext';
 import { apiUrl } from '../../../config/api';
+import PageHeader from '../PageHeader';
 
 function OrganizationProfile() {
   const { selectedOrg } = useOrganization();
@@ -206,12 +207,10 @@ function OrganizationProfile() {
 
   return (
     <>
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold text-white">Organization Profile</h2>
-          <p className="text-gray-400 mt-1">Manage your organization's details and branding information</p>
-        </div>
-        {isPrimaryOwner && (
+      <PageHeader 
+        title="Organization Profile"
+        description="Manage your organization's details and branding information"
+        actions={isPrimaryOwner && (
           <button
             type="button"
             onClick={handleSubmit}
@@ -234,7 +233,7 @@ function OrganizationProfile() {
             )}
           </button>
         )}
-      </div>
+      />
 
       {/* Message display */}
       {message.text && (

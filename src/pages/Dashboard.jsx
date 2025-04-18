@@ -15,6 +15,10 @@ import TokenBalanceWidget from '../components/dashboard/TokenBalanceWidget';
 import SetupGuide from '../components/dashboard/SetupGuide';
 import UsersManagement from '../components/dashboard/UsersManagement';
 import Help from '../components/dashboard/Help';
+import HelpFaqs from '../components/dashboard/HelpFaqs';
+import HelpSupport from '../components/dashboard/HelpSupport';
+import HelpStatus from '../components/dashboard/HelpStatus';
+import HelpQuickSetup from '../components/dashboard/HelpQuickSetup';
 import TokenPurchase from '../components/dashboard/tokens/TokenPurchase';
 import TokenHistory from '../components/dashboard/tokens/TokenHistory';
 import TokenSettings from '../components/dashboard/tokens/TokenSettings';
@@ -284,10 +288,10 @@ function Dashboard() {
           <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
           {/* Help Section Routes */}
           <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
-          <Route path="help/quicksetup" element={<DashboardLayout><QuickSetup /></DashboardLayout>} />
-          <Route path="help/faqs" element={<DashboardLayout><FAQs /></DashboardLayout>} />
-          <Route path="help/support" element={<DashboardLayout><Support /></DashboardLayout>} />
-          <Route path="help/status" element={<DashboardLayout><SystemStatus /></DashboardLayout>} />
+          <Route path="help/quicksetup" element={<DashboardLayout><HelpQuickSetup /></DashboardLayout>} />
+          <Route path="help/faqs" element={<DashboardLayout><HelpFaqs /></DashboardLayout>} />
+          <Route path="help/support" element={<DashboardLayout><HelpSupport /></DashboardLayout>} />
+          <Route path="help/status" element={<DashboardLayout><HelpStatus /></DashboardLayout>} />
           <Route path="profile" element={<Profile />} />
           <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
           <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
@@ -301,9 +305,9 @@ function Dashboard() {
           
           {/* Marketing Assets Routes */}
           <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
-          <Route path="campaigns" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
-          <Route path="scheduled" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
-          <Route path="drafts" element={<DashboardLayout><div className="p-6"><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
+          <Route path="campaigns" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
+          <Route path="scheduled" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
+          <Route path="drafts" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
           
           {/* Agent Setup Route */}
           <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />

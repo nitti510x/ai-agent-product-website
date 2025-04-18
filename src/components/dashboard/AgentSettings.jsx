@@ -4,6 +4,8 @@ import { FiSave, FiSettings, FiSliders, FiMessageSquare, FiKey, FiCheckCircle, F
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import OrganizationContext, { useOrganization } from '../../contexts/OrganizationContext';
+import PageHeader from './PageHeader';
+import { apiUrl } from '../../config/api';
 
 function AgentSettings() {
   const { agentId } = useParams();
@@ -14,25 +16,12 @@ function AgentSettings() {
 
   // Get agent name from the URL
   const getAgentName = () => {
-    // Map agent IDs to display names
-    const agentDisplayNames = {
-      'slack-app': 'Slack App',
-      'social-media-manager': 'Social Media Manager',
-      'ai-content-manager': 'AI Content Manager',
-      'market-research': 'Market Research',
-      'content-writer': 'Content Writer',
-      'image-generator': 'Image Generator',
-      'echo-prompt': 'ECHO Prompt',
-      'workflow-helper': 'Workflow Helper',
-      'facebook-influencer': 'Facebook Influencer'
-    };
-    
-    // Check if we have a direct mapping
-    if (agentDisplayNames[agentId]) {
-      return agentDisplayNames[agentId];
+    // If we have agent data from API, use that name
+    if (settings && settings.name && settings.name !== '') {
+      return settings.name;
     }
     
-    // If no direct mapping, format the ID nicely
+    // Format the ID nicely as fallback
     return agentId
       .replace(/_agent$/, '') // Remove _agent suffix if present
       .split(/[-_]/) // Split by dash or underscore
@@ -150,34 +139,35 @@ function AgentSettings() {
           system_name: systemName
         });
         
-        const config = response.data;
-        console.log('Fetched agent config:', config);
+        console.log('Fetched agent config:', response.data);
         
         // Only update settings if we got a valid response
-        if (config) {
+        if (response.data) {
+          // Don't override the name that was set by fetchAgentDetails
+          const currentName = settings.name;
           setSettings(prev => ({
             ...prev,
-            name: getAgentName(),
-            model: config.llm_model_default || '',
-            backupModel: config.llm_model_fallback || '',
-            maxTokens: config.max_tokens || 0,
-            temperature: config.temperature || 0,
-            topP: config.top_p || 0,
-            frequencyPenalty: config.frequency_penalty || 0,
-            presencePenalty: config.presence_penalty || 0,
-            systemMessage: config.system_message || ''
+            // Keep the current name instead of overriding it
+            model: response.data.llm_model_default || '',
+            backupModel: response.data.llm_model_fallback || '',
+            maxTokens: response.data.max_tokens || 0,
+            temperature: response.data.temperature || 0,
+            topP: response.data.top_p || 0,
+            frequencyPenalty: response.data.frequency_penalty || 0,
+            presencePenalty: response.data.presence_penalty || 0,
+            systemMessage: response.data.system_message || ''
           }));
           setOriginalSettings({
-            ...config,
-            name: getAgentName(),
-            model: config.llm_model_default || '',
-            backupModel: config.llm_model_fallback || '',
-            maxTokens: config.max_tokens || 0,
-            temperature: config.temperature || 0,
-            topP: config.top_p || 0,
-            frequencyPenalty: config.frequency_penalty || 0,
-            presencePenalty: config.presence_penalty || 0,
-            systemMessage: config.system_message || ''
+            ...response.data,
+            name: currentName, // Keep the current name
+            model: response.data.llm_model_default || '',
+            backupModel: response.data.llm_model_fallback || '',
+            maxTokens: response.data.max_tokens || 0,
+            temperature: response.data.temperature || 0,
+            topP: response.data.top_p || 0,
+            frequencyPenalty: response.data.frequency_penalty || 0,
+            presencePenalty: response.data.presence_penalty || 0,
+            systemMessage: response.data.system_message || ''
           });
         }
         
@@ -214,6 +204,55 @@ function AgentSettings() {
     // Reset change tracking when agent changes
     setHasChanges(false);
     setOriginalSettings(null);
+  }, [agentId]);
+
+  // Fetch the agent details from the API to get the correct name
+  useEffect(() => {
+    const fetchAgentDetails = async () => {
+      try {
+        console.log('Fetching agent details for:', agentId);
+        const response = await fetch(`${apiUrl()}/agents/active`, {
+          method: 'GET',
+          headers: { 'accept': 'application/json' }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching agents: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('All agents data:', data.agents);
+        const agentDetails = (data.agents || []).find(agent => agent.system_name === agentId);
+        
+        if (agentDetails) {
+          console.log('Found agent details:', agentDetails);
+          // Set the name directly from the API data
+          setSettings(prev => ({
+            ...prev,
+            name: agentDetails.name
+          }));
+        } else {
+          console.log('Agent not found in API response, using formatted ID');
+          // If agent not found in API, use formatted ID
+          const formattedName = agentId
+            .replace(/_agent$/, '') // Remove _agent suffix if present
+            .split(/[-_]/) // Split by dash or underscore
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+            .join(' '); // Join with spaces
+            
+          setSettings(prev => ({
+            ...prev,
+            name: formattedName
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch agent details:', err);
+      }
+    };
+    
+    if (agentId) {
+      fetchAgentDetails();
+    }
   }, [agentId]);
 
   // Token options with descriptions
@@ -360,51 +399,50 @@ function AgentSettings() {
   
   return (
     <div className="w-full">
-      {/* Page title and action buttons */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">{getAgentName()}</h2>
-          <p className="text-gray-400 text-sm mt-1">Configure and monitor your AI assistant</p>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            type="submit"
-            form="agent-settings-form"
-            disabled={isSaving || !formModified}
-            className={`px-4 py-2 ${
-              isSaving || !formModified
-                ? 'bg-emerald-700/50 cursor-not-allowed'
-                : 'bg-emerald-600 hover:bg-emerald-500'
-            } text-white rounded-lg flex items-center transition-colors`}
-          >
-            {isSaving ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Saving...
-              </>
-            ) : (
-              <>
-                <FiSave className="mr-2" />
-                Save Settings
-              </>
-            )}
-          </button>
-          {/* Only show cancel button if the form has been modified */}
-          {formModified && (
+      <PageHeader 
+        title={settings.name}
+        description="Configure and monitor your AI assistant"
+        actions={
+          <div className="flex space-x-2">
             <button
-              onClick={handleCancel}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center transition-colors"
+              type="submit"
+              form="agent-settings-form"
+              disabled={isSaving || !formModified}
+              className={`px-4 py-2 ${
+                isSaving || !formModified
+                  ? 'bg-emerald-700/50 cursor-not-allowed'
+                  : 'bg-emerald-600 hover:bg-emerald-500'
+              } text-white rounded-lg flex items-center transition-colors`}
             >
-              <FiX className="mr-2" />
-              Cancel
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <FiSave className="mr-2" />
+                  Save Changes
+                </>
+              )}
             </button>
-          )}
-        </div>
-      </div>
-
+            
+            {showCancelButton && (
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center transition-colors"
+              >
+                <FiX className="mr-2" />
+                Cancel
+              </button>
+            )}
+          </div>
+        }
+      />
       {/* Tabs Navigation */}
       <div className="flex border-b border-gray-700/40 mb-6">
         <Link

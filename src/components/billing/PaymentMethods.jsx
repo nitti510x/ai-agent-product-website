@@ -4,6 +4,7 @@ import { stripeCustomers, stripePaymentMethods } from '../../utils/edgeFunctions
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { FiPlus, FiCheck, FiAlertTriangle, FiCreditCard, FiTrash2, FiInfo } from 'react-icons/fi';
+import PageHeader from '../dashboard/PageHeader';
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -498,6 +499,11 @@ function PaymentMethods() {
 
   return (
     <div className="space-y-8">
+      
+      <PageHeader 
+        title="Payment Methods"
+        description="Manage your payment methods for subscriptions and token purchases"
+      />
       
       {successMessage && (
         <div className="mb-8 bg-green-900/20 border border-green-500/50 text-green-500 p-4 rounded-lg">

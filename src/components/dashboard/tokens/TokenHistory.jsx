@@ -2,6 +2,7 @@ import React from 'react';
 import { FiClock, FiDownload, FiFilter } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
+import PageHeader from '../PageHeader';
 
 function TokenHistory() {
   // Sample usage history data
@@ -55,22 +56,22 @@ function TokenHistory() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Token Usage History</h2>
-          <p className="text-gray-400 text-sm mt-1">Track your token consumption over time</p>
-        </div>
-        <div className="flex space-x-2">
-          <button className="bg-dark-card hover:bg-dark-card/70 text-gray-300 px-3 py-2 rounded-lg flex items-center">
-            <FiFilter className="mr-2" />
-            Filter
-          </button>
-          <button className="bg-dark-card hover:bg-dark-card/70 text-gray-300 px-3 py-2 rounded-lg flex items-center">
-            <FiDownload className="mr-2" />
-            Export
-          </button>
-        </div>
-      </div>
+      <PageHeader 
+        title="Token Usage History"
+        description="Track your token consumption over time"
+        actions={
+          <div className="flex space-x-2">
+            <button className="bg-dark-card hover:bg-dark-card/70 text-gray-300 px-3 py-2 rounded-lg flex items-center">
+              <FiFilter className="mr-2" />
+              Filter
+            </button>
+            <button className="bg-dark-card hover:bg-dark-card/70 text-gray-300 px-3 py-2 rounded-lg flex items-center">
+              <FiDownload className="mr-2" />
+              Export
+            </button>
+          </div>
+        }
+      />
 
       {/* Usage summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

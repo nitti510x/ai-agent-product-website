@@ -4,6 +4,7 @@ import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase';
 import { agentService } from '../../services/agentService';
+import PageHeader from './PageHeader';
 
 function RecentActivity() {
   const [loading, setLoading] = useState(true);
@@ -146,23 +147,33 @@ function RecentActivity() {
     activity.details.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <div className="py-4 px-4">
-      {/* Page title */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Recent Activity</h2>
-          <p className="text-gray-400 text-sm mt-1">Track your AI assistants' usage and performance</p>
-        </div>
-        <button
-          onClick={handleRefresh}
-          className="px-4 py-2 bg-dark-card/80 border border-emerald-400/20 text-emerald-400 rounded-lg hover:bg-dark-card hover:border-emerald-400/40 transition-all duration-300 text-sm font-medium flex items-center"
-        >
-          <FiRefreshCw className="mr-2" />
-          Refresh
-        </button>
-      </div>
+  const isRefreshing = false;
 
+  return (
+    <div>
+      <PageHeader 
+        title="Recent Activity"
+        description="View and monitor your AI agents' recent interactions and performance"
+        actions={
+          <button
+            onClick={handleRefresh}
+            className="flex items-center px-3 py-2 text-sm bg-dark-card hover:bg-dark-card/80 text-white rounded-lg transition-colors"
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? (
+              <>
+                <FiRefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <FiRefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </>
+            )}
+          </button>
+        }
+      />
       {/* Filters and search */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-wrap gap-2">

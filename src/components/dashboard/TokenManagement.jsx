@@ -8,6 +8,7 @@ import { agentService } from '../../services/agentService';
 import { formatDistanceToNow } from 'date-fns';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import stripePromise from '../../config/stripe';
+import PageHeader from './PageHeader';
 
 // Stripe payment form component
 const StripePaymentForm = ({ amount, tokenAmount, onSuccess, onCancel }) => {
@@ -245,6 +246,11 @@ const TokenManagement = () => {
 
   return (
     <div className="space-y-8">
+      <PageHeader 
+        title="Token Management"
+        description="Monitor your token usage and purchase additional tokens"
+      />
+      
       {/* Current Token Balance */}
       <div className="mb-12 bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Your Token Balance</h2>

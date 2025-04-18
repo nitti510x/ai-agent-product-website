@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiUsers, FiMessageSquare, FiCpu, FiPower, FiArrowLeft, FiBarChart2 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
+import PageHeader from './PageHeader';
 
 function OverallUsage() {
   const navigate = useNavigate();
@@ -36,14 +37,11 @@ function OverallUsage() {
   };
 
   return (
-    <div className="py-4 px-4">
-      {/* Page title */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Overall Usage Dashboard</h2>
-          <p className="text-gray-400 text-sm mt-1">Analytics and performance metrics for all your AI assistants</p>
-        </div>
-      </div>
+    <div>
+      <PageHeader 
+        title="Overall Usage Dashboard"
+        description="Analytics and performance metrics for all your AI assistants"
+      />
       
       {/* Key Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

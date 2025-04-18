@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiSettings, FiAlertCircle, FiToggleLeft, FiToggleRight, FiBell } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
+import PageHeader from '../PageHeader';
 
 function TokenSettings() {
   const [lowBalanceAlert, setLowBalanceAlert] = useState(true);
@@ -11,12 +12,10 @@ function TokenSettings() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">Token Settings</h2>
-          <p className="text-gray-400 text-sm mt-1">Manage your token preferences and notifications</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Token Settings"
+        description="Manage your token preferences and notifications"
+      />
 
       {/* Notification Settings */}
       <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 p-6 mb-8">

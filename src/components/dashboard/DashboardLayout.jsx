@@ -15,6 +15,7 @@ import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
 import { apiUrl } from '../../config/api';
 import { useOrganization } from '../../contexts/OrganizationContext';
+import PageContent from './PageContent';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -39,7 +40,9 @@ function DashboardLayout({ children }) {
         }
         
         const data = await response.json();
-        setAgents(data.agents || []);
+        // Filter out background agents
+        const filteredAgents = (data.agents || []).filter(agent => !agent.is_background_agent);
+        setAgents(filteredAgents);
       } catch (err) {
         console.error('Failed to fetch agents:', err);
         // Fallback to default agents if API fails
@@ -368,7 +371,7 @@ function DashboardLayout({ children }) {
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
         <div className="container mx-auto px-8 pb-4 max-w-[1440px] page-content flex-grow">
-          <div className="flex flex-col md:flex-row gap-4 pb-0">
+          <div className="flex flex-col md:flex-row gap-4 pb-0 pt-4">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
               <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
@@ -463,7 +466,7 @@ function DashboardLayout({ children }) {
                             }
                             
                             return (
-                              <li key={agent.id}>
+                              <li key={agent.id || agent.system_name}>
                                 <Link
                                   to={targetPath}
                                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
@@ -479,7 +482,7 @@ function DashboardLayout({ children }) {
                             );
                           })
                         ) : (
-                          // Fallback to default agents if API returns empty
+                          // Fallback to default agents if API fails
                           <>
                             <li>
                               <Link
@@ -487,7 +490,7 @@ function DashboardLayout({ children }) {
                                 className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
                               >
                                 <RiSlackFill className="mr-2" />
-                                Slack App
+                                Messaging Integration
                               </Link>
                             </li>
                             <li>
@@ -496,7 +499,7 @@ function DashboardLayout({ children }) {
                                 className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
                               >
                                 <RiImageLine className="mr-2" />
-                                Image Creator
+                                Image Generator
                               </Link>
                             </li>
                             <li>
@@ -505,7 +508,7 @@ function DashboardLayout({ children }) {
                                 className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
                               >
                                 <RiFileTextLine className="mr-2" />
-                                Copy Creator
+                                Content Writer
                               </Link>
                             </li>
                           </>
@@ -538,9 +541,9 @@ function DashboardLayout({ children }) {
             </div>
             
             <div className="flex-1">
-              <div className="pl-2">
+              <PageContent>
                 {children}
-              </div>
+              </PageContent>
             </div>
           </div>
         </div>

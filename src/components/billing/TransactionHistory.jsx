@@ -4,6 +4,7 @@ import { IoDiamond } from 'react-icons/io5';
 import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../config/supabase.js';
 import { apiService } from '../../services/apiService.js';
+import PageHeader from '../dashboard/PageHeader';
 
 function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -95,12 +96,10 @@ function TransactionHistory() {
         </div>
       )}
 
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold text-white">Your Transactions</h2>
-          <p className="text-gray-400 mt-1">View all your payments and credit purchases</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Your Transactions"
+        description="View all your payments and credit purchases"
+      />
 
       <div className="bg-[#1A1E23] rounded-2xl shadow-2xl border border-dark-card/30 overflow-hidden">
         {/* Transaction list header with search and filter */}

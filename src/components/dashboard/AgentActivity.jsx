@@ -5,6 +5,7 @@ import { FaRobot } from 'react-icons/fa6';
 import { BiBot } from 'react-icons/bi';
 import AgentLogs from './AgentLogs';
 import { apiUrl } from '../../config/api';
+import PageHeader from './PageHeader';
 
 function AgentActivity() {
   const { agentId } = useParams();
@@ -84,13 +85,10 @@ function AgentActivity() {
 
   return (
     <div className="w-full">
-      {/* Page title and action buttons */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-white">{loading ? 'Loading...' : agentName}</h2>
-          <p className="text-gray-400 text-sm mt-1">Configure and monitor your AI assistant</p>
-        </div>
-      </div>
+      <PageHeader 
+        title={loading ? 'Loading...' : agentName}
+        description="Configure and monitor your AI assistant"
+      />
       
       {/* Tabs Navigation */}
       <div className="flex border-b border-gray-700/40 mb-6">
