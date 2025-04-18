@@ -381,12 +381,15 @@ function DashboardLayout({ children }) {
                 
                 {/* Organization Dropdown - Show on all sections */}
                 <div className="px-2 py-4 border-b border-gray-800/50 mb-4">
-                  <div className="flex justify-center mb-1.5">
-                    <OrganizationDropdown />
-                  </div>
-                  <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
+                  {/* Subscription Plan Badge - Moved above dropdown */}
+                  <div className={`w-full px-3 py-1.5 mb-3 text-xs font-medium ${getPlanBadgeStyle()} rounded-xl flex items-center justify-center space-x-1.5 shadow-sm`}>
                     <FiStar className={`text-sm ${getPlanStarColor()}`} />
                     <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+                  </div>
+                  
+                  {/* Organization Dropdown */}
+                  <div className="flex justify-center">
+                    <OrganizationDropdown />
                   </div>
                 </div>
                 

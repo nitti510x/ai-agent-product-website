@@ -80,19 +80,22 @@ function BillingLayout({ children }) {
       <div className="flex flex-col md:flex-row gap-4 pt-4">
         {/* Sidebar */}
         <div className="w-full md:w-64 shrink-0">
-          <div className="bg-dark-card rounded-2xl shadow-2xl border border-dark-card/30 p-4">
+          <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-800/30 p-4">
             <div className="mb-4 px-2">
               <h2 className="text-xl font-bold text-white">Billing & Tokens</h2>
             </div>
             
             {/* Organization Dropdown */}
             <div className="px-2 py-3 mb-3 border-b border-gray-800/50">
-              <div className="flex justify-center mb-1.5">
-                <OrganizationDropdown />
-              </div>
-              <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
+              {/* Subscription Plan Badge - Moved above dropdown */}
+              <div className={`w-full px-3 py-1.5 mb-3 text-xs font-medium ${getPlanBadgeStyle()} rounded-xl flex items-center justify-center space-x-1.5 shadow-sm`}>
                 <FiStar className={`text-sm ${getPlanStarColor()}`} />
                 <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+              </div>
+              
+              {/* Organization Dropdown */}
+              <div className="flex justify-center">
+                <OrganizationDropdown />
               </div>
             </div>
             
@@ -109,8 +112,8 @@ function BillingLayout({ children }) {
                             to={item.path}
                             className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                               isActive
-                                ? 'bg-primary/20 text-primary'
-                                : 'text-gray-300 hover:bg-dark-card/70 hover:text-white'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
                             }`}
                           >
                             {item.icon}
