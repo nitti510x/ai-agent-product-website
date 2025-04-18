@@ -101,7 +101,7 @@ function AIAgentsList() {
   const getSetupStatusIndicator = (status, operationalStatus, isDisabled) => {
     if (isDisabled) {
       return (
-        <div className="absolute top-3 right-3 flex items-center">
+        <div className="absolute top-3 right-3 flex items-center z-20">
           <IoDiamond className="text-purple-400 w-4 h-4 mr-1" />
           <span className="text-xs text-purple-300">Premium</span>
         </div>
@@ -111,20 +111,20 @@ function AIAgentsList() {
     switch (status) {
       case 'operational':
         return (
-          <div className="absolute top-3 right-3">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-sm"></div>
+          <div className="absolute top-3 right-3 z-20 flex items-center">
+            <div className="w-4 h-4 rounded-full bg-emerald-400 shadow-lg ring-2 ring-emerald-500/50"></div>
           </div>
         );
       case 'pending':
         return (
-          <div className="absolute top-3 right-3">
-            <div className="w-2 h-2 rounded-full bg-yellow-400 shadow-glow-sm"></div>
+          <div className="absolute top-3 right-3 z-20 flex items-center">
+            <div className="w-4 h-4 rounded-full bg-yellow-400 shadow-lg ring-2 ring-yellow-500/50"></div>
           </div>
         );
       default:
         return (
-          <div className="absolute top-3 right-3">
-            <div className="w-2 h-2 rounded-full bg-gray-400 shadow-glow-sm"></div>
+          <div className="absolute top-3 right-3 z-20 flex items-center">
+            <div className="w-4 h-4 rounded-full bg-red-400 shadow-lg ring-2 ring-red-500/50"></div>
           </div>
         );
     }
@@ -220,13 +220,13 @@ function AIAgentsList() {
             {agents.map((agent) => {
               // Determine if the agent is available in the user's plan
               const isDisabled = !isAgentInUserPlan(agent);
-              // For demo purposes, set a default setup status
-              const setupStatus = isDisabled ? 'not-started' : 'operational';
+              // Force all agents to show as operational for now
+              const setupStatus = 'operational';
               
               return (
                 <div 
                   key={agent.system_name} 
-                  className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md ${
+                  className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md relative ${
                     isDisabled ? 'opacity-75' : ''
                   }`}
                 >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FiHome, FiActivity, FiBarChart2, FiSettings, FiFileText,
@@ -25,7 +25,8 @@ function DashboardLayout({ children }) {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const { getPlanName } = useOrganization();
-  
+  const scrollableRef = useRef(null);
+
   // Fetch agents from API
   useEffect(() => {
     const fetchAgents = async () => {
@@ -377,177 +378,207 @@ function DashboardLayout({ children }) {
   // Get the current active tab to preserve when switching agents
   const activeTab = getActiveTab();
 
+  useEffect(() => {
+    const checkScrollable = () => {
+      if (scrollableRef.current) {
+        const isScrollable = scrollableRef.current.scrollHeight > scrollableRef.current.clientHeight;
+        if (isScrollable) {
+          scrollableRef.current.classList.add('has-overflow');
+        } else {
+          scrollableRef.current.classList.remove('has-overflow');
+        }
+      }
+    };
+
+    // Check on initial render and window resize
+    checkScrollable();
+    window.addEventListener('resize', checkScrollable);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkScrollable);
+  }, [agents, activeSection]);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
         <div className="container mx-auto px-8 pb-4 max-w-[1440px] page-content flex-grow">
           <div className="flex flex-col md:flex-row gap-4 pb-0 pt-4">
-            <div className="w-full md:w-64 shrink-0">
+            <div className="w-full md:w-64 shrink-0 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)]">
               {/* Contextual Section Menu */}
               <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-700/40 p-4">
-                <h2 className="text-xl font-bold text-white mb-4 px-2">
-                  {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
-                </h2>
-                
-                {/* Organization Dropdown - Show on all sections */}
-                <div className="px-2 py-4 border-b border-gray-800/50 mb-4">
-                  {/* Subscription Plan Badge - Moved above dropdown */}
-                  <div className={`w-full px-3 py-1.5 mb-3 text-xs font-medium ${getPlanBadgeStyle()} rounded-xl flex items-center justify-center space-x-1.5 shadow-sm`}>
-                    <FiStar className={`text-sm ${getPlanStarColor()}`} />
-                    <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
-                  </div>
+                {/* Fixed Header Section */}
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-white mb-4 px-2">
+                    {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+                  </h2>
                   
-                  {/* Organization Dropdown */}
-                  <div className="flex justify-center">
-                    <OrganizationDropdown />
+                  {/* Organization Dropdown - Show on all sections */}
+                  <div className="px-2 py-4 border-b border-gray-800/50 mb-4 bg-transparent">
+                    {/* Subscription Plan Badge - Moved above dropdown */}
+                    <div className={`w-full px-3 py-1.5 mb-3 text-xs font-medium ${getPlanBadgeStyle()} rounded-xl flex items-center justify-center space-x-1.5 shadow-sm`}>
+                      <FiStar className={`text-sm ${getPlanStarColor()}`} />
+                      <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+                    </div>
+                    
+                    {/* Organization Dropdown */}
+                    <div className="flex justify-center">
+                      <OrganizationDropdown />
+                    </div>
                   </div>
                 </div>
                 
-                <nav>
-                  <ul className="space-y-1">
-                    {/* Dashboard menu items */}
-                    {activeSection === 'dashboard' && (
-                      <>
-                        {/* Regular dashboard items */}
-                        {dashboardMenuItems.map((item) => {
-                          const isActive = location.pathname === item.path;
-                          return (
-                            <li key={item.path}>
-                              <Link
-                                to={item.path}
-                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                                  isActive
-                                    ? 'bg-emerald-500/20 text-emerald-400'
-                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                                }`}
-                              >
-                                {item.icon}
-                                {item.label}
-                              </Link>
-                            </li>
-                          );
-                        })}
-
-                        {/* Marketing Assets section */}
-                        <li className="border-t border-white/5 my-3"></li>
-                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">MARKETING ASSETS</li>
-                        {marketingMenuItems.map((item) => {
-                          const isActive = location.pathname === item.path;
-                          return (
-                            <li key={item.path}>
-                              <Link
-                                to={item.path}
-                                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                                  isActive
-                                    ? 'bg-emerald-500/20 text-emerald-400'
-                                    : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                                }`}
-                              >
-                                {item.icon}
-                                {item.label}
-                              </Link>
-                            </li>
-                          );
-                        })}
-
-                        {/* AI Agents section */}
-                        <li className="border-t border-white/5 my-3"></li>
-                        <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI AGENTS</li>
-                        {loading ? (
-                          <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
-                        ) : agents.length > 0 ? (
-                          agents.map((agent) => {
-                            // Check if current path contains this agent's system_name
-                            const isActive = location.pathname.includes(`/${agent.system_name}`);
-                            
-                            // Generate the correct path based on the current active tab
-                            let targetPath = `/dashboard/settings/${agent.system_name}`; // Default to settings path
-                            if (activeTab === 'activity' && isActive) {
-                              targetPath = `/dashboard/activity/${agent.system_name}`;
-                            } else if (activeTab === 'usage' && isActive) {
-                              targetPath = `/dashboard/usage/${agent.system_name}`;
-                            } else if (activeTab === 'setup' && isActive) {
-                              targetPath = `/dashboard/setup/${agent.system_name}`;
-                            } else if (!isActive && location.pathname.includes('/activity/')) {
-                              targetPath = `/dashboard/activity/${agent.system_name}`;
-                            } else if (!isActive && location.pathname.includes('/usage/')) {
-                              targetPath = `/dashboard/usage/${agent.system_name}`;
-                            } else if (!isActive && location.pathname.includes('/setup/')) {
-                              targetPath = `/dashboard/setup/${agent.system_name}`;
-                            }
-                            
+                {/* Scrollable Menu Section */}
+                <div ref={scrollableRef} className="md:max-h-[calc(100vh-16rem)] md:overflow-y-auto custom-scrollbar relative">
+                  {/* Scroll indicator - only shows when content is scrollable */}
+                  <div className="scroll-indicator-container">
+                    <div className="scroll-indicator"></div>
+                  </div>
+                  <nav>
+                    <ul className="space-y-1">
+                      {/* Dashboard menu items */}
+                      {activeSection === 'dashboard' && (
+                        <>
+                          {/* Regular dashboard items */}
+                          {dashboardMenuItems.map((item) => {
+                            const isActive = location.pathname === item.path;
                             return (
-                              <li key={agent.id || agent.system_name}>
+                              <li key={item.path}>
                                 <Link
-                                  to={targetPath}
+                                  to={item.path}
                                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                                     isActive
                                       ? 'bg-emerald-500/20 text-emerald-400'
                                       : 'text-gray-300 hover:bg-black/20 hover:text-white'
                                   }`}
                                 >
-                                  {getAgentIcon(agent.system_name)}
-                                  {agent.name}
+                                  {item.icon}
+                                  {item.label}
                                 </Link>
                               </li>
                             );
-                          })
-                        ) : (
-                          // Fallback to default agents if API fails
-                          <>
-                            <li>
-                              <Link
-                                to="/dashboard/settings/slack_app_agent"
-                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
-                              >
-                                <RiSlackFill className="mr-2" />
-                                Messaging Integration
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/dashboard/settings/image_generator_agent"
-                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
-                              >
-                                <RiImageLine className="mr-2" />
-                                Image Generator
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                to="/dashboard/settings/content_writer_agent"
-                                className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
-                              >
-                                <RiFileTextLine className="mr-2" />
-                                Content Writer
-                              </Link>
-                            </li>
-                          </>
-                        )}
-                      </>
-                    )}
+                          })}
 
-                    {/* Other section menu items (tokens, billing, help, account, notifications) */}
-                    {activeSection !== 'dashboard' && getActiveMenuItems().map((item) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <li key={item.path}>
-                          <Link
-                            to={item.path}
-                            className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                              isActive
-                                ? 'bg-emerald-500/20 text-emerald-400'
-                                : 'text-gray-300 hover:bg-black/20 hover:text-white'
-                            }`}
-                          >
-                            {item.icon}
-                            {item.label}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </nav>
+                          {/* Marketing Assets section */}
+                          <li className="border-t border-white/5 my-3"></li>
+                          <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">MARKETING ASSETS</li>
+                          {marketingMenuItems.map((item) => {
+                            const isActive = location.pathname === item.path;
+                            return (
+                              <li key={item.path}>
+                                <Link
+                                  to={item.path}
+                                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                    isActive
+                                      ? 'bg-emerald-500/20 text-emerald-400'
+                                      : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                  }`}
+                                >
+                                  {item.icon}
+                                  {item.label}
+                                </Link>
+                              </li>
+                            );
+                          })}
+
+                          {/* AI Agents section */}
+                          <li className="border-t border-white/5 my-3"></li>
+                          <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI AGENTS</li>
+                          {loading ? (
+                            <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
+                          ) : agents.length > 0 ? (
+                            agents.map((agent) => {
+                              // Check if current path contains this agent's system_name
+                              const isActive = location.pathname.includes(`/${agent.system_name}`);
+                              
+                              // Generate the correct path based on the current active tab
+                              let targetPath = `/dashboard/settings/${agent.system_name}`; // Default to settings path
+                              if (activeTab === 'activity' && isActive) {
+                                targetPath = `/dashboard/activity/${agent.system_name}`;
+                              } else if (activeTab === 'usage' && isActive) {
+                                targetPath = `/dashboard/usage/${agent.system_name}`;
+                              } else if (activeTab === 'setup' && isActive) {
+                                targetPath = `/dashboard/setup/${agent.system_name}`;
+                              } else if (!isActive && location.pathname.includes('/activity/')) {
+                                targetPath = `/dashboard/activity/${agent.system_name}`;
+                              } else if (!isActive && location.pathname.includes('/usage/')) {
+                                targetPath = `/dashboard/usage/${agent.system_name}`;
+                              } else if (!isActive && location.pathname.includes('/setup/')) {
+                                targetPath = `/dashboard/setup/${agent.system_name}`;
+                              }
+                              
+                              return (
+                                <li key={agent.id || agent.system_name}>
+                                  <Link
+                                    to={targetPath}
+                                    className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                      isActive
+                                        ? 'bg-emerald-500/20 text-emerald-400'
+                                        : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                                    }`}
+                                  >
+                                    {getAgentIcon(agent.system_name)}
+                                    {agent.name}
+                                  </Link>
+                                </li>
+                              );
+                            })
+                          ) : (
+                            // Fallback to default agents if API fails
+                            <>
+                              <li>
+                                <Link
+                                  to="/dashboard/settings/slack_app_agent"
+                                  className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
+                                >
+                                  <RiSlackFill className="mr-2" />
+                                  Messaging Integration
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  to="/dashboard/settings/image_generator_agent"
+                                  className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
+                                >
+                                  <RiImageLine className="mr-2" />
+                                  Image Generator
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  to="/dashboard/settings/content_writer_agent"
+                                  className="flex items-center px-3 py-2 rounded-lg transition-colors text-gray-300 hover:bg-black/20 hover:text-white"
+                                >
+                                  <RiFileTextLine className="mr-2" />
+                                  Content Writer
+                                </Link>
+                              </li>
+                            </>
+                          )}
+                        </>
+                      )}
+
+                      {/* Other section menu items (tokens, billing, help, account, notifications) */}
+                      {activeSection !== 'dashboard' && getActiveMenuItems().map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                          <li key={item.path}>
+                            <Link
+                              to={item.path}
+                              className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                                isActive
+                                  ? 'bg-emerald-500/20 text-emerald-400'
+                                  : 'text-gray-300 hover:bg-black/20 hover:text-white'
+                              }`}
+                            >
+                              {item.icon}
+                              {item.label}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </nav>
+                </div>
               </div>
             </div>
             
