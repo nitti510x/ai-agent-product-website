@@ -152,24 +152,30 @@ function AIAgentsList() {
   return (
     <div>
       <PageHeader 
-        title="Your AI Assistants"
-        description="Track your AI assistants' usage and performance"
+        title="Your AI Marketing Team"
+        description="Manage your AI agents' tasks and performance"
         actions={
-          <div className="flex gap-3">
+          <div className="flex items-center gap-6">
             <Link 
               to="/dashboard/help/quicksetup" 
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
+              className="flex items-center gap-2 text-white hover:text-gray-200 transition-all duration-300 group"
             >
-              <FiSettings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
-              <span className="font-medium">Quick Setup Guide</span>
+              <FiSettings className="w-4 h-4 group-hover:rotate-45 transition-transform duration-500" />
+              <span className="text-sm">Quick Setup Guide</span>
             </Link>
             <a
               href="#"
               onClick={(e) => { e.preventDefault(); openSlackApp(); }}
-              className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:shadow-xl transition-all duration-300 shadow-lg"
+              className="flex items-center px-6 py-2 bg-[#4A154B] hover:bg-[#611f64] text-white font-medium rounded-lg border border-purple-300/20 transition-all duration-300 shadow-sm hover:shadow-purple-500/20 hover:shadow-lg"
             >
-              <span className="mr-2">Run in Slack</span>
-              <RiSlackFill className="w-5 h-5" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet" width="20" height="20" style={{ marginRight: '8px' }} alt="Slack Logo">
+                <title>Slack Logo</title>
+                <path d="M22,12 a6,6 0 1 1 6,-6 v6z M22,16 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#36C5F0"></path>
+                <path d="M48,22 a6,6 0 1 1 6,6 h-6z M32,6 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#2EB67D"></path>
+                <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
+                <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
+              </svg>
+              <span>Run in Slack</span>
             </a>
           </div>
         }
@@ -226,9 +232,11 @@ function AIAgentsList() {
               const setupStatus = isDisabled ? 'not-started' : 'operational';
               
               return (
-                <div
-                  key={agent.id}
-                  className={`bg-dark-card/80 backdrop-blur-sm border border-white/5 rounded-xl overflow-hidden ${!isDisabled ? 'hover:border-emerald-400/30' : 'opacity-70'} transition-all duration-300 relative shadow-md hover:shadow-lg`}
+                <div 
+                  key={agent.system_name} 
+                  className={`bg-[#1A1E23] border border-gray-800/30 rounded-xl overflow-hidden shadow-md ${
+                    isDisabled ? 'opacity-75' : ''
+                  }`}
                 >
                   {getSetupStatusIndicator(setupStatus, 'active', isDisabled)}
                   

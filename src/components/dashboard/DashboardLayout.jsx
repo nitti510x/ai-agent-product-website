@@ -374,23 +374,21 @@ function DashboardLayout({ children }) {
           <div className="flex flex-col md:flex-row gap-4 pb-0 pt-4">
             <div className="w-full md:w-64 shrink-0">
               {/* Contextual Section Menu */}
-              <div className="bg-[#1F242B] rounded-2xl shadow-2xl border border-white/5 p-4">
+              <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-800/30 p-4">
                 <h2 className="text-xl font-bold text-white mb-4 px-2">
                   {activeSection === 'account' ? 'My Account' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
                 </h2>
                 
-                {/* Organization Dropdown - Show on dashboard and notifications sections */}
-                {(activeSection === 'dashboard' || activeSection === 'notifications') && (
-                  <div className="px-2 py-4">
-                    <div className="flex justify-center mb-1.5">
-                      <OrganizationDropdown />
-                    </div>
-                    <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
-                      <FiStar className={`text-sm ${getPlanStarColor()}`} />
-                      <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
-                    </div>
+                {/* Organization Dropdown - Show on all sections */}
+                <div className="px-2 py-4 border-b border-gray-800/50 mb-4">
+                  <div className="flex justify-center mb-1.5">
+                    <OrganizationDropdown />
                   </div>
-                )}
+                  <div className={`w-full px-3 py-1.5 text-xs font-medium ${getPlanBadgeStyle()} rounded-full flex items-center justify-center space-x-1.5 shadow-sm`}>
+                    <FiStar className={`text-sm ${getPlanStarColor()}`} />
+                    <span className={`${getPlanTextColor()}`}>{getPlanName()} Plan</span>
+                  </div>
+                </div>
                 
                 <nav>
                   <ul className="space-y-1">

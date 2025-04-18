@@ -204,39 +204,44 @@ function Dashboard() {
 
   return (
       <div className="min-h-screen bg-dark">
-      <nav className="bg-dark-lighter border-b border-dark-card">
-        <div className="max-w-[1440px] mx-auto px-8 py-6">
+      <nav className="bg-gradient-to-r from-[#111418] via-[#151a20] to-[#1A1E23] border-b border-emerald-500/10 backdrop-blur-sm fixed w-full z-50 shadow-md">
+        <div className="max-w-[1440px] mx-auto px-8 py-3">
           <div className="flex items-center justify-between">
-            <Link to="/dashboard" className="text-2xl font-bold text-gray-100">
-              <Logo className="h-8" />
+            <Link to="/dashboard" className="text-2xl font-bold text-white hover:text-emerald-400 transition-colors duration-300 flex items-center">
+              <Logo className="h-8 mr-2" />
+              {/* Removed the duplicate OpAgents text */}
             </Link>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-5">
               {user && (
-                <Link to="/dashboard" className="text-text-light hover:text-primary transition-colors">
+                <Link to="/dashboard" className="text-text-light font-medium">
                   Dashboard
                 </Link>
               )}
               {/* Token Balance Widget */}
-              <div className="mr-4">
+              <div className="mr-2">
                 <TokenBalanceWidget compact={true} />
               </div>
               {/* Billing/Subscription Link */}
               <Link 
                 to="/dashboard/billing" 
-                className="flex items-center text-gray-400 hover:text-primary transition-colors"
+                className="flex items-center text-gray-300"
               >
-                <FiCreditCard className="w-5 h-5 mr-1" />
-                <span className="text-sm">
+                <div className="relative">
+                  <FiCreditCard className="w-5 h-5 mr-1" />
+                </div>
+                <span className="text-sm relative hidden sm:inline-block">
                   Billing
                 </span>
               </Link>
               {/* Help/Support Link */}
               <Link 
                 to="/dashboard/help" 
-                className="flex items-center text-gray-400 hover:text-primary transition-colors"
+                className="flex items-center text-gray-300"
               >
-                <FiHelpCircle className="w-5 h-5 mr-1" />
-                <span className="text-sm">
+                <div className="relative">
+                  <FiHelpCircle className="w-5 h-5 mr-1" />
+                </div>
+                <span className="text-sm relative hidden sm:inline-block">
                   Help
                 </span>
               </Link>
@@ -245,91 +250,98 @@ function Dashboard() {
               {/* My Account Link */}
               <Link 
                 to="/dashboard/account" 
-                className="flex items-center text-gray-400 hover:text-primary transition-colors"
+                className="flex items-center text-gray-300"
               >
                 {userAvatar ? (
                   <img 
                     src={userAvatar} 
-                    alt={userName || "User"} 
-                    className="w-8 h-8 rounded-full mr-2 border border-gray-700 object-cover"
-                    onError={(e) => {
-                      console.error('Error loading avatar image:', e);
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || 'User')}&background=10B981&color=fff`;
-                    }}
+                    alt="User Avatar" 
+                    className="w-7 h-7 rounded-full border-2 border-transparent"
                   />
                 ) : (
-                  <FiUser className="w-5 h-5 mr-1" />
+                  <div className="relative">
+                    <FiUser className="w-5 h-5 mr-1" />
+                  </div>
                 )}
-                <span className="text-sm">
+                <span className="text-sm relative hidden sm:inline-block">
                   My Account
                 </span>
               </Link>
               {/* Sign Out Button */}
               <button
                 onClick={handleSignOut}
-                className="flex items-center text-gray-400 hover:text-secondary transition-colors"
+                className="flex items-center text-gray-300"
               >
                 <FiLogOut className="w-5 h-5 mr-1" />
-                <span className="text-sm">Sign Out</span>
+                <span className="text-sm relative hidden sm:inline-block">
+                  Sign Out
+                </span>
               </button>
             </div>
           </div>
         </div>
       </nav>
-
-      <div className="pt-8 pb-0">
-        <Routes>
-          <Route index element={<DashboardLayout><AIAgentsList /></DashboardLayout>} />
-          <Route path="settings/:agentId" element={<DashboardLayout><AgentSettings /></DashboardLayout>} />
-          <Route path="activity/:agentId" element={<DashboardLayout><AgentActivity /></DashboardLayout>} />
-          <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
-          <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
-          <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
-          {/* Help Section Routes */}
-          <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
-          <Route path="help/quicksetup" element={<DashboardLayout><HelpQuickSetup /></DashboardLayout>} />
-          <Route path="help/faqs" element={<DashboardLayout><HelpFaqs /></DashboardLayout>} />
-          <Route path="help/support" element={<DashboardLayout><HelpSupport /></DashboardLayout>} />
-          <Route path="help/status" element={<DashboardLayout><HelpStatus /></DashboardLayout>} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
-          <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
-          <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
-          <Route path="billing/tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
-          {/* Token Management Routes */}
-          <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
-          <Route path="tokens/purchase" element={<BillingLayout><TokenPurchase /></BillingLayout>} />
-          <Route path="tokens/history" element={<BillingLayout><TokenHistory /></BillingLayout>} />
-          <Route path="tokens/settings" element={<BillingLayout><TokenSettings /></BillingLayout>} />
-          
-          {/* Marketing Assets Routes */}
-          <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
-          <Route path="campaigns" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
-          <Route path="scheduled" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
-          <Route path="drafts" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
-          
-          {/* Agent Setup Route */}
-          <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
-          <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
-          
-          {/* Account Section Routes */}
-          <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />
-          
-          {/* Notifications Route */}
-          <Route path="notifications" element={<DashboardLayout><Notifications /></DashboardLayout>} />
-          <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
-          <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
-          <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
-          
-          {/* Redirects for backward compatibility */}
-          <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
-          <Route path="subscription/*" element={<Navigate to="/dashboard/billing" replace />} />
-          <Route path="logs/:agentId" element={
-            <Navigate to={location => `/dashboard/activity/${location.pathname.split('/').pop()}`} replace />
-          } />
-        </Routes>
-      </div>
+      
+      {/* Add padding to account for fixed navbar */}
+      <div className="pt-16"></div>
+      
+      <NotificationProvider>
+        <div className="pt-8 pb-0">
+          <Routes>
+            <Route index element={<DashboardLayout><AIAgentsList /></DashboardLayout>} />
+            <Route path="settings/:agentId" element={<DashboardLayout><AgentSettings /></DashboardLayout>} />
+            <Route path="activity/:agentId" element={<DashboardLayout><AgentActivity /></DashboardLayout>} />
+            <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
+            <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
+            <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
+            {/* Help Section Routes */}
+            <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
+            <Route path="help/quicksetup" element={<DashboardLayout><HelpQuickSetup /></DashboardLayout>} />
+            <Route path="help/faqs" element={<DashboardLayout><HelpFaqs /></DashboardLayout>} />
+            <Route path="help/support" element={<DashboardLayout><HelpSupport /></DashboardLayout>} />
+            <Route path="help/status" element={<DashboardLayout><HelpStatus /></DashboardLayout>} />
+            <Route path="profile" element={<Profile />} />
+            
+            {/* Billing Routes */}
+            <Route path="billing" element={<BillingLayout><Subscription /></BillingLayout>} />
+            <Route path="billing/payment" element={<BillingLayout><PaymentMethods /></BillingLayout>} />
+            <Route path="billing/transactions" element={<BillingLayout><TransactionHistory /></BillingLayout>} />
+            <Route path="billing/tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
+            
+            {/* Token Management Routes */}
+            <Route path="tokens" element={<BillingLayout><TokenManagement /></BillingLayout>} />
+            <Route path="tokens/purchase" element={<BillingLayout><TokenPurchase /></BillingLayout>} />
+            <Route path="tokens/history" element={<BillingLayout><TokenHistory /></BillingLayout>} />
+            <Route path="tokens/settings" element={<BillingLayout><TokenSettings /></BillingLayout>} />
+            
+            {/* Marketing Assets Routes */}
+            <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
+            <Route path="campaigns" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
+            <Route path="scheduled" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
+            <Route path="drafts" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
+            
+            {/* Agent Setup Route */}
+            <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
+            <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
+            
+            {/* Account Section Routes */}
+            <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />
+            
+            {/* Notifications Route */}
+            <Route path="notifications" element={<DashboardLayout><Notifications /></DashboardLayout>} />
+            <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
+            <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
+            <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
+            
+            {/* Redirects for backward compatibility */}
+            <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
+            <Route path="subscription/*" element={<Navigate to="/dashboard/billing" replace />} />
+            <Route path="logs/:agentId" element={
+              <Navigate to={location => `/dashboard/activity/${location.pathname.split('/').pop()}`} replace />
+            } />
+          </Routes>
+        </div>
+      </NotificationProvider>
     </div>
   );
 }

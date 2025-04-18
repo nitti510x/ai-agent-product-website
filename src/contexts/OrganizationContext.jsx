@@ -143,6 +143,60 @@ export function OrganizationProvider({ children }) {
     return 'Unknown Plan';
   };
 
+  // Plan color mapping - centralized configuration for plan colors
+  const planColorConfig = {
+    starter: {
+      badge: 'bg-amber-500/20 border border-amber-500/30',
+      star: 'text-amber-400',
+      text: 'text-amber-400'
+    },
+    pro: {
+      badge: 'bg-purple-500/20 border border-purple-500/30',
+      star: 'text-purple-400',
+      text: 'text-purple-400'
+    },
+    business: {
+      badge: 'bg-blue-500/20 border border-blue-500/30',
+      star: 'text-blue-400',
+      text: 'text-blue-400'
+    },
+    enterprise: {
+      badge: 'bg-emerald-500/20 border border-emerald-500/30',
+      star: 'text-emerald-400',
+      text: 'text-emerald-400'
+    },
+    default: {
+      badge: 'bg-gray-500/20 border border-gray-500/30',
+      star: 'text-gray-400',
+      text: 'text-gray-400'
+    }
+  };
+
+  // Get plan type from plan name
+  const getPlanType = () => {
+    const planName = getPlanName().toLowerCase();
+    if (planName.includes('starter')) return 'starter';
+    if (planName.includes('pro')) return 'pro';
+    if (planName.includes('business')) return 'business';
+    if (planName.includes('enterprise')) return 'enterprise';
+    return 'default';
+  };
+
+  // Get plan badge style based on plan name
+  const getPlanBadgeStyle = () => {
+    return planColorConfig[getPlanType()].badge;
+  };
+
+  // Get plan star color based on plan name
+  const getPlanStarColor = () => {
+    return planColorConfig[getPlanType()].star;
+  };
+
+  // Get plan text color based on plan name
+  const getPlanTextColor = () => {
+    return planColorConfig[getPlanType()].text;
+  };
+
   const value = {
     organizations,
     selectedOrg,
@@ -152,7 +206,10 @@ export function OrganizationProvider({ children }) {
     subscription,
     selectOrganization,
     fetchOrganizations,
-    getPlanName
+    getPlanName,
+    getPlanBadgeStyle,
+    getPlanStarColor,
+    getPlanTextColor
   };
 
   return (

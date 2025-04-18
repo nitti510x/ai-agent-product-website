@@ -9,6 +9,7 @@ import { useOrganization } from '../../contexts/OrganizationContext';
 import PageHeader from './PageHeader';
 
 function Subscription() {
+  console.log("Subscription component rendering");
   const navigate = useNavigate();
   const { subscription, selectedOrg, getPlanName } = useOrganization();
   const [user, setUser] = useState(null);
@@ -212,16 +213,16 @@ function Subscription() {
   }
 
   return (
-    <div className="space-y-8">
+    <div>
       <PageHeader 
-        title="Subscription Plans"
-        description="Manage your subscription and billing information"
+        title="Subscription"
+        description="Manage your subscription plan and billing details"
       />
-      
+
       {error && (
-        <div className="mb-8 bg-red-900/20 border border-red-500/50 text-red-500 p-4 rounded-lg">
-          <div className="flex items-center">
-            <FiAlertTriangle className="mr-2" size={20} />
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-red-400">
+          <div className="flex items-start">
+            <FiAlertTriangle className="mt-0.5 mr-2 flex-shrink-0" />
             <span>{error}</span>
           </div>
         </div>

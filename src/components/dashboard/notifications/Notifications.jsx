@@ -5,6 +5,7 @@ import { FaRobot } from 'react-icons/fa6';
 import { supabase } from '../../../config/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { useNotifications } from '../../../contexts/NotificationContext';
+import PageHeader from '../PageHeader';
 
 function Notifications() {
   const location = useLocation();
@@ -74,31 +75,28 @@ function Notifications() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Notifications</h2>
-          <p className="text-gray-400 text-sm mt-1">
-            Stay updated on agent activities and system alerts
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <button 
-            onClick={markAllAsRead}
-            className="px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm transition-colors flex items-center"
-          >
-            <FiCheckCircle className="mr-1" />
-            Mark all as read
-          </button>
-          <button 
-            onClick={() => window.location.reload()}
-            className="px-3 py-1.5 bg-gray-700/50 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors flex items-center"
-          >
-            <FiRefreshCw className="mr-1" />
-            Refresh
-          </button>
-        </div>
-      </div>
-
+      <PageHeader 
+        title="Notifications"
+        description="Stay updated on agent activities and system alerts"
+        actions={
+          <div className="flex space-x-2">
+            <button 
+              onClick={markAllAsRead}
+              className="px-3 py-1.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm transition-colors flex items-center"
+            >
+              <FiCheckCircle className="mr-1" />
+              Mark all as read
+            </button>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-3 py-1.5 bg-gray-700/50 hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors flex items-center"
+            >
+              <FiRefreshCw className="mr-1" />
+              Refresh
+            </button>
+          </div>
+        }
+      />
       {/* Filter tabs */}
       <div className="flex border-b border-gray-700 mb-4">
         <button 
