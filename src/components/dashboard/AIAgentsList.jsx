@@ -175,7 +175,7 @@ function AIAgentsList() {
                 <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
                 <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
               </svg>
-              <span>Run in Slack</span>
+              <span>Connect in Slack</span>
             </a>
           </div>
         }
