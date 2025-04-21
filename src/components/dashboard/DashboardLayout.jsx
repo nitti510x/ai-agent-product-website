@@ -155,6 +155,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/usage',
       label: 'Overall Usage',
       icon: <FiBarChart2 className="mr-2" />
+    },
+    {
+      path: '/dashboard/personalization',
+      label: 'Personalization ✨',
+      icon: <span className="mr-2">✨</span>
     }
   ];
 

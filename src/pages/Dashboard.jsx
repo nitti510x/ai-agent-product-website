@@ -38,6 +38,7 @@ import Notifications from '../components/dashboard/notifications/Notifications';
 import NotificationDropdown from '../components/dashboard/notifications/NotificationDropdown';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import MarketingImages from '../components/dashboard/MarketingImages';
+import Personalization from './Personalization';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -332,6 +333,9 @@ function Dashboard() {
             <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
             <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
             <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
+            
+            {/* Personalization Route */}
+            <Route path="personalization" element={<DashboardLayout><Personalization /></DashboardLayout>} />
             
             {/* Redirects for backward compatibility */}
             <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
