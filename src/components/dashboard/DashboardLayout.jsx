@@ -464,7 +464,7 @@ function DashboardLayout({ children }) {
                           })}
 
                           {/* Marketing Assets section */}
-                          <li className="border-t border-white/5 my-3"></li>
+                          <li className="border-t border-gray-700/40 my-3"></li>
                           <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">MARKETING ASSETS</li>
                           {marketingMenuItems.map((item) => {
                             const isActive = location.pathname === item.path;
@@ -486,7 +486,7 @@ function DashboardLayout({ children }) {
                           })}
 
                           {/* AI Agents section */}
-                          <li className="border-t border-white/5 my-3"></li>
+                          <li className="border-t border-gray-700/40 my-3"></li>
                           <li className="text-emerald-400 text-xs uppercase font-bold px-3 py-2">AI AGENTS</li>
                           {loading ? (
                             <li className="text-gray-400 text-xs px-3 py-2">Loading agents...</li>
