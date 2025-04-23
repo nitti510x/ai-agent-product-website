@@ -197,6 +197,19 @@ export function OrganizationProvider({ children }) {
     return planColorConfig[getPlanType()].text;
   };
 
+  // Function to determine if an agent is available in the user's plan
+  const isAgentInUserPlan = (agent) => {
+    const currentPlan = getPlanName().toLowerCase();
+    if (currentPlan.includes('pro')) {
+      return agent.in_pro_plan === true;
+    } else if (currentPlan.includes('business')) {
+      return agent.in_business_plan === true;
+    } else {
+      // Default to starter plan
+      return agent.in_starter_plan === true;
+    }
+  };
+
   const value = {
     organizations,
     selectedOrg,
@@ -207,9 +220,11 @@ export function OrganizationProvider({ children }) {
     selectOrganization,
     fetchOrganizations,
     getPlanName,
-    getPlanBadgeStyle,
+    getPlanType,
     getPlanStarColor,
-    getPlanTextColor
+    getPlanBadgeStyle,
+    getPlanTextColor,
+    isAgentInUserPlan,
   };
 
   return (

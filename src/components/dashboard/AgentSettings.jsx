@@ -448,7 +448,7 @@ function AgentSettings() {
         <Link
           to={`/dashboard/settings/${agentId}`}
           className={`px-4 py-3 text-sm font-medium border-b-2 ${
-            location.pathname.includes('/settings/') && !location.pathname.includes('/activity/') && !location.pathname.includes('/usage') && !location.pathname.includes('/setup-guide')
+            location.pathname.includes('/settings/') && !location.pathname.includes('/activity/') && !location.pathname.includes('/usage') && !location.pathname.includes('/setup')
               ? 'border-emerald-400 text-emerald-400'
               : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
           } transition-colors`}
@@ -485,9 +485,9 @@ function AgentSettings() {
           </div>
         </Link>
         <Link
-          to={`/dashboard/setup-guide/${agentId}`}
+          to={`/dashboard/setup/${agentId}`}
           className={`px-4 py-3 text-sm font-medium border-b-2 ${
-            location.pathname.includes('/setup-guide')
+            location.pathname.includes('/setup')
               ? 'border-emerald-400 text-emerald-400'
               : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
           } transition-colors`}
