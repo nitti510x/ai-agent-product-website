@@ -70,7 +70,7 @@ function DashboardLayout({ children }) {
       case 'content_writer_agent':
         return <RiQuillPenLine className="mr-2" />;
       case 'campaign_manager_agent':
-        return <RiMegaphoneLine className="mr-2 text-emerald-400" />;
+        return <RiMegaphoneLine className="mr-2" />;
       case 'image_generator_agent':
         return <RiImageLine className="mr-2" />;
       case 'echo_prompt_agent':
@@ -184,7 +184,7 @@ function DashboardLayout({ children }) {
     {
       path: '/dashboard/campaigns',
       label: 'Campaigns',
-      icon: <RiMegaphoneLine className="mr-2 text-emerald-400" />
+      icon: <RiMegaphoneLine className="mr-2" />
     },
     {
       path: '/dashboard/published',
@@ -343,7 +343,7 @@ function DashboardLayout({ children }) {
     {
       path: '/dashboard/campaigns',
       label: 'Campaigns',
-      icon: <RiMegaphoneLine className="mr-2 text-emerald-400" />
+      icon: <RiMegaphoneLine className="mr-2" />
     },
     {
       path: '/dashboard/published',
