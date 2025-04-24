@@ -190,7 +190,7 @@ function AIAgentsList() {
                 <path d="M38,48 a6,6 0 1 1 -6,6 v-6z M54,32 a6,6 0 0 1 0,12 h-16 a6,6 0 1 1 0,-12" fill="#ECB22E"></path>
                 <path d="M12,38 a6,6 0 1 1 -6,-6 h6z M16,38 a6,6 0 1 1 12,0v16a6,6 0 0 1 -12,0z" fill="#E01E5A"></path>
               </svg>
-              Join Slack Community
+              Connect to Slack
             </a>
           </div>
         }
@@ -201,12 +201,12 @@ function AIAgentsList() {
         {agentsInPlan.map((agent) => (
           <div 
             key={agent.system_name} 
-            className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md relative`}
+            className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md relative p-3 min-h-[120px]`}
           >
             {getSetupStatusIndicator('operational', 'active', false)}
             
             {/* Agent header with icon */}
-            <div className="flex items-center p-4 pb-3 border-b border-gray-800/30">
+            <div className="flex items-center p-3 pb-2 border-b border-gray-800/30 min-h-[44px]">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-[#111418] to-[#1E2328] flex items-center justify-center text-emerald-400 mr-3`}>
                 {getAgentIcon(agent.system_name)}
               </div>
@@ -219,7 +219,7 @@ function AIAgentsList() {
             </div>
             
             {/* Action buttons */}
-            <div className="p-4 pt-3 flex flex-col gap-2">
+            <div className="p-3 pt-2 flex flex-col gap-2">
               <div className="flex justify-between gap-2">
                 <Link
                   to={`/dashboard/activity/${agent.system_name}`}
@@ -264,12 +264,12 @@ function AIAgentsList() {
             {agentsNotInPlan.map((agent) => (
               <div 
                 key={agent.system_name} 
-                className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md relative opacity-75 p-6`}
+                className={`bg-[#1A1E23] border border-gray-700/40 rounded-xl overflow-hidden shadow-md relative opacity-75 p-3 min-h-[110px]`}
               >
                 {getSetupStatusIndicator('operational', 'active', true)}
                 
                 {/* Agent header with icon */}
-                <div className="flex items-center p-4 pb-3 border-b border-gray-800/30">
+                <div className="flex items-center p-3 pb-2 border-b border-gray-800/30 min-h-[44px]">
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#111418] to-[#1E2328] flex items-center justify-center text-gray-500 mr-3">
                     {getAgentIcon(agent.system_name, false, true)}
                   </div>
@@ -282,7 +282,7 @@ function AIAgentsList() {
                 </div>
                 
                 {/* Action buttons */}
-                <div className="p-4 pt-3 flex flex-col gap-2">
+                <div className="p-3 pt-2 flex flex-col gap-1">
                   <Link
                     to="/dashboard/account/billing"
                     className="flex items-center justify-center px-3 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white transition-all duration-300 text-xs w-full border border-purple-400/30 hover:shadow-glow"
@@ -292,7 +292,7 @@ function AIAgentsList() {
                   </Link>
                   <Link
                     to={`/dashboard/agents/${agent.system_name}`}
-                    className="flex items-center mt-2 text-purple-400 hover:text-purple-300 transition-colors text-xs justify-center"
+                    className="flex items-center text-purple-400 hover:text-purple-300 transition-colors text-xs justify-center"
                   >
                     <FiHelpCircle className="w-3.5 h-3.5 mr-1.5" />
                     Learn More
