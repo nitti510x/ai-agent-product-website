@@ -437,8 +437,8 @@ function DashboardLayout({ children }) {
     <div className="flex flex-col min-h-screen bg-[#111418]">
       <div className="flex-grow flex flex-col">
         <div className="container mx-auto px-8 pb-4 max-w-[1440px] page-content flex-grow">
-          <div className="flex flex-col md:flex-row gap-4 pb-0 pt-4">
-            <div className="w-full md:w-64 shrink-0 md:sticky md:top-4 md:self-start md:max-h-[calc(100vh-2rem)]">
+          <div className="flex flex-col md:flex-row gap-6 pb-0 pt-8">
+            <div className="w-full md:w-64 shrink-0 md:sticky md:top-8 md:self-start md:max-h-[calc(100vh-2.5rem)] mt-2">
               {/* Contextual Section Menu */}
               <div className="bg-[#1A1E23] rounded-2xl shadow-lg border border-gray-700/40 p-4">
                 {/* Fixed Header Section */}
