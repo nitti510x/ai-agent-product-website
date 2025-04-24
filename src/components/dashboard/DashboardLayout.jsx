@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fi';
 import { IoDiamond } from 'react-icons/io5';
 import { FaRobot, FaBrain, FaWandMagicSparkles } from 'react-icons/fa6';
-import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine, RiCheckboxCircleLine } from 'react-icons/ri';
+import { RiSlackFill, RiImageLine, RiFileTextLine, RiLinkedinBoxFill, RiWordpressFill, RiInstagramLine, RiFacebookBoxFill, RiTwitterXFill, RiSearchLine, RiFlowChart, RiPulseLine, RiQuillPenLine, RiGalleryLine, RiMegaphoneLine, RiDraftLine, RiCheckboxCircleLine, RiTimeLine } from 'react-icons/ri';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
@@ -177,11 +177,6 @@ function DashboardLayout({ children }) {
   // Marketing assets menu items (part of dashboard but with separate header)
   const marketingMenuItems = [
     {
-      path: '/dashboard/images',
-      label: 'Images',
-      icon: <RiGalleryLine className="mr-2" />
-    },
-    {
       path: '/dashboard/campaigns',
       label: 'Campaigns',
       icon: <RiMegaphoneLine className="mr-2" />
@@ -192,6 +187,11 @@ function DashboardLayout({ children }) {
       icon: <RiCheckboxCircleLine className="mr-2" />
     },
     {
+      path: '/dashboard/awaiting-approval',
+      label: 'Awaiting Approval',
+      icon: <RiTimeLine className="mr-2" />
+    },
+    {
       path: '/dashboard/scheduled',
       label: 'Scheduled',
       icon: <FiCalendar className="mr-2" />
@@ -200,6 +200,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/drafts',
       label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
     }
   ];
   
@@ -336,11 +341,6 @@ function DashboardLayout({ children }) {
   // Marketing Assets section menu items
   const marketingAssetsMenuItems = [
     {
-      path: '/dashboard/images',
-      label: 'Images',
-      icon: <RiGalleryLine className="mr-2" />
-    },
-    {
       path: '/dashboard/campaigns',
       label: 'Campaigns',
       icon: <RiMegaphoneLine className="mr-2" />
@@ -351,6 +351,11 @@ function DashboardLayout({ children }) {
       icon: <RiCheckboxCircleLine className="mr-2" />
     },
     {
+      path: '/dashboard/awaiting-approval',
+      label: 'Awaiting Approval',
+      icon: <RiTimeLine className="mr-2" />
+    },
+    {
       path: '/dashboard/scheduled',
       label: 'Scheduled',
       icon: <FiCalendar className="mr-2" />
@@ -359,6 +364,11 @@ function DashboardLayout({ children }) {
       path: '/dashboard/drafts',
       label: 'Drafts',
       icon: <RiDraftLine className="mr-2" />
+    },
+    {
+      path: '/dashboard/images',
+      label: 'Images',
+      icon: <RiGalleryLine className="mr-2" />
     }
   ];
   

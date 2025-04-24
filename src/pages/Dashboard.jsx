@@ -39,6 +39,10 @@ import NotificationDropdown from '../components/dashboard/notifications/Notifica
 import { NotificationProvider } from '../contexts/NotificationContext';
 import MarketingImages from '../components/dashboard/MarketingImages';
 import Personalization from './Personalization';
+import PublishedContent from '../components/dashboard/content/PublishedContent';
+import DraftsContent from '../components/dashboard/content/DraftsContent';
+import ScheduledContent from '../components/dashboard/content/ScheduledContent';
+import AwaitingApprovalContent from '../components/dashboard/content/AwaitingApprovalContent';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -204,7 +208,7 @@ function Dashboard() {
   };
 
   return (
-      <div className="min-h-screen bg-dark">
+    <div className="min-h-screen bg-dark">
       <nav className="bg-gradient-to-r from-[#111418] via-[#151a20] to-[#1A1E23] border-b border-emerald-500/10 backdrop-blur-sm fixed w-full z-50 shadow-md">
         <div className="max-w-[1440px] mx-auto px-8 py-3">
           <div className="flex items-center justify-between">
@@ -287,20 +291,20 @@ function Dashboard() {
       <div className="pt-16"></div>
       
       <NotificationProvider>
-        <div className="pt-8 pb-0">
+        <DashboardLayout>
           <Routes>
-            <Route index element={<DashboardLayout><AIAgentsList /></DashboardLayout>} />
-            <Route path="settings/:agentId" element={<DashboardLayout><AgentSettings /></DashboardLayout>} />
-            <Route path="activity/:agentId" element={<DashboardLayout><AgentActivity /></DashboardLayout>} />
-            <Route path="usage/:agentId" element={<DashboardLayout><AgentUsage /></DashboardLayout>} />
-            <Route path="usage" element={<DashboardLayout><OverallUsage /></DashboardLayout>} />
-            <Route path="activity" element={<DashboardLayout><RecentActivity /></DashboardLayout>} />
+            <Route index element={<AIAgentsList />} />
+            <Route path="settings/:agentId" element={<AgentSettings />} />
+            <Route path="activity/:agentId" element={<AgentActivity />} />
+            <Route path="usage/:agentId" element={<AgentUsage />} />
+            <Route path="usage" element={<OverallUsage />} />
+            <Route path="activity" element={<RecentActivity />} />
             {/* Help Section Routes */}
-            <Route path="help" element={<DashboardLayout><Help /></DashboardLayout>} />
-            <Route path="help/quicksetup" element={<DashboardLayout><HelpQuickSetup /></DashboardLayout>} />
-            <Route path="help/faqs" element={<DashboardLayout><HelpFaqs /></DashboardLayout>} />
-            <Route path="help/support" element={<DashboardLayout><HelpSupport /></DashboardLayout>} />
-            <Route path="help/status" element={<DashboardLayout><HelpStatus /></DashboardLayout>} />
+            <Route path="help" element={<Help />} />
+            <Route path="help/quicksetup" element={<HelpQuickSetup />} />
+            <Route path="help/faqs" element={<HelpFaqs />} />
+            <Route path="help/support" element={<HelpSupport />} />
+            <Route path="help/status" element={<HelpStatus />} />
             <Route path="profile" element={<Profile />} />
             
             {/* Billing Routes */}
@@ -316,26 +320,29 @@ function Dashboard() {
             <Route path="tokens/settings" element={<BillingLayout><TokenSettings /></BillingLayout>} />
             
             {/* Marketing Assets Routes */}
-            <Route path="images" element={<DashboardLayout><MarketingImages /></DashboardLayout>} />
-            <Route path="campaigns" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div></DashboardLayout>} />
-            <Route path="scheduled" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Scheduled Posts</h1><p className="text-gray-400 mt-4">Scheduled posts management coming soon.</p></div></DashboardLayout>} />
-            <Route path="drafts" element={<DashboardLayout><div><h1 className="text-2xl font-bold text-white">Draft Posts</h1><p className="text-gray-400 mt-4">Draft posts management coming soon.</p></div></DashboardLayout>} />
+            <Route path="images" element={<MarketingImages />} />
+            <Route path="campaigns" element={<div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div>} />
+            <Route path="scheduled" element={<ScheduledContent />} />
+            <Route path="drafts" element={<DraftsContent />} />
+            <Route path="published" element={<PublishedContent />} />
+            <Route path="content" element={<div><h1 className="text-2xl font-bold text-white">Content</h1><p className="text-gray-400 mt-4">Content management coming soon.</p></div>} />
+            <Route path="awaiting-approval" element={<AwaitingApprovalContent />} />
             
             {/* Agent Setup Route */}
-            <Route path="setup/:agentId" element={<DashboardLayout><SetupGuide /></DashboardLayout>} />
-            <Route path="users" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
+            <Route path="setup/:agentId" element={<SetupGuide />} />
+            <Route path="users" element={<UsersManagement />} />
             
             {/* Account Section Routes */}
-            <Route path="account" element={<DashboardLayout><Profile /></DashboardLayout>} />
+            <Route path="account" element={<Profile />} />
             
             {/* Notifications Route */}
-            <Route path="notifications" element={<DashboardLayout><Notifications /></DashboardLayout>} />
-            <Route path="account/organization" element={<DashboardLayout><OrganizationProfile /></DashboardLayout>} />
-            <Route path="account/security" element={<DashboardLayout><Security /></DashboardLayout>} />
-            <Route path="account/team" element={<DashboardLayout><UsersManagement /></DashboardLayout>} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="account/organization" element={<OrganizationProfile />} />
+            <Route path="account/security" element={<Security />} />
+            <Route path="account/team" element={<UsersManagement />} />
             
             {/* Personalization Route */}
-            <Route path="personalization" element={<DashboardLayout><Personalization /></DashboardLayout>} />
+            <Route path="personalization" element={<Personalization />} />
             
             {/* Redirects for backward compatibility */}
             <Route path="my-account/*" element={<Navigate to="/dashboard/account" replace />} />
@@ -344,7 +351,7 @@ function Dashboard() {
               <Navigate to={location => `/dashboard/activity/${location.pathname.split('/').pop()}`} replace />
             } />
           </Routes>
-        </div>
+        </DashboardLayout>
       </NotificationProvider>
     </div>
   );
