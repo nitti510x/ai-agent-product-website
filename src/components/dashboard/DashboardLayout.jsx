@@ -15,6 +15,7 @@ import { debugSupabaseAuth } from '../../utils/debugHelper';
 import OrganizationDropdown from './OrganizationDropdown';
 import { apiUrl } from '../../config/api';
 import { useOrganization } from '../../contexts/OrganizationContext';
+import { useAwaitingApproval } from '../../contexts/AwaitingApprovalContext';
 import PageContent from './PageContent';
 
 function DashboardLayout({ children }) {
@@ -22,6 +23,7 @@ function DashboardLayout({ children }) {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const { unreadCount } = useNotifications();
+  const { awaitingCount } = useAwaitingApproval();
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const { getPlanName, isAgentInUserPlan } = useOrganization();
@@ -189,7 +191,9 @@ function DashboardLayout({ children }) {
     {
       path: '/dashboard/awaiting-approval',
       label: 'Awaiting Approval',
-      icon: <RiTimeLine className="mr-2" />
+      icon: <RiTimeLine className="mr-2" />,
+      badge: awaitingCount > 0 ? awaitingCount : null,
+      badgeStyle: 'bg-emerald-500 border border-emerald-400/20'
     },
     {
       path: '/dashboard/scheduled',
@@ -353,7 +357,9 @@ function DashboardLayout({ children }) {
     {
       path: '/dashboard/awaiting-approval',
       label: 'Awaiting Approval',
-      icon: <RiTimeLine className="mr-2" />
+      icon: <RiTimeLine className="mr-2" />,
+      badge: awaitingCount > 0 ? awaitingCount : null,
+      badgeStyle: 'bg-emerald-500 border border-emerald-400/20'
     },
     {
       path: '/dashboard/scheduled',
@@ -504,6 +510,11 @@ function DashboardLayout({ children }) {
                                 >
                                   {item.icon}
                                   {item.label}
+                                  {item.badge && (
+                                    <span className={`ml-auto flex items-center justify-center text-xs font-medium text-white rounded-full w-5 h-5 min-w-[1.25rem] shadow-sm ${item.badgeStyle || 'bg-red-500/80'}`}>
+                                      {item.badge}
+                                    </span>
+                                  )}
                                 </Link>
                               </li>
                             );
@@ -601,6 +612,11 @@ function DashboardLayout({ children }) {
                             >
                               {item.icon}
                               {item.label}
+                              {item.badge && (
+                                <span className={`ml-auto flex items-center justify-center text-xs font-medium text-white rounded-full w-5 h-5 min-w-[1.25rem] shadow-sm ${item.badgeStyle || 'bg-red-500/80'}`}>
+                                  {item.badge}
+                                </span>
+                              )}
                             </Link>
                           </li>
                         );

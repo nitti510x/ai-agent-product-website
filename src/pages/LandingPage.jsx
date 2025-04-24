@@ -823,7 +823,7 @@ function LandingPage() {
 
           <div className="border-t border-dark-card mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-text-muted text-sm mb-4 md:mb-0">
-              &copy; 2025 OpAgents. All rights reserved.
+              &copy; 2025 echoAgents. All rights reserved.
             </p>
             <div className="flex space-x-8">
               <a href="#" className="text-text-muted hover:text-secondary transition-colors text-sm">

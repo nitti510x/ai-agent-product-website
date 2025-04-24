@@ -121,7 +121,10 @@ const DraftsContent = () => {
 
   return (
     <div>
-      <PageHeader title="Draft Posts" />
+      <PageHeader 
+        title="Draft Posts" 
+        description="Create and refine your content ideas before scheduling or submitting them for approval."
+      />
       
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

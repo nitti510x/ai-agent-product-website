@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://opagents.geniusos.co/sitemap.xml
+Sitemap: https://echoagents.geniusos.co/sitemap.xml

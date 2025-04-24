@@ -137,7 +137,10 @@ const ScheduledContent = () => {
 
   return (
     <div>
-      <PageHeader title="Scheduled Posts" />
+      <PageHeader 
+        title="Scheduled Posts" 
+        description="Manage your upcoming content calendar and optimize posting times for maximum audience engagement."
+      />
       
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

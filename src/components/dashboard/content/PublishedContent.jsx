@@ -107,7 +107,10 @@ const PublishedContent = () => {
 
   return (
     <div>
-      <PageHeader title="Published Posts" />
+      <PageHeader 
+        title="Published Posts" 
+        description="Track your active content across all platforms and monitor engagement metrics in real-time."
+      />
       
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

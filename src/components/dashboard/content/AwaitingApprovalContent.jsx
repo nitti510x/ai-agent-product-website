@@ -6,7 +6,7 @@ import ConfirmationModal from './ConfirmationModal';
 import PageHeader from '../PageHeader';
 
 // Mock data for content awaiting approval
-const mockAwaitingContent = [
+export const mockAwaitingContent = [
   {
     id: 'await-001',
     text: 'Our AI-powered content generation platform now supports 5 new languages! Expand your global reach with content in French, German, Spanish, Italian, and Portuguese. #AIContent #GlobalMarketing',
@@ -160,7 +160,10 @@ const AwaitingApprovalContent = () => {
 
   return (
     <div>
-      <PageHeader title="Awaiting Approval" />
+      <PageHeader 
+        title="Awaiting Approval" 
+        description="Review and moderate AI-generated content before it goes live across your social media channels."
+      />
       
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
