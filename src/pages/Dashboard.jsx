@@ -43,6 +43,7 @@ import PublishedContent from '../components/dashboard/content/PublishedContent';
 import DraftsContent from '../components/dashboard/content/DraftsContent';
 import ScheduledContent from '../components/dashboard/content/ScheduledContent';
 import AwaitingApprovalContent from '../components/dashboard/content/AwaitingApprovalContent';
+import CampaignsContent from '../components/dashboard/campaigns/CampaignsContent';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -321,7 +322,7 @@ function Dashboard() {
             
             {/* Marketing Assets Routes */}
             <Route path="images" element={<MarketingImages />} />
-            <Route path="campaigns" element={<div><h1 className="text-2xl font-bold text-white">Campaigns</h1><p className="text-gray-400 mt-4">Campaign management coming soon.</p></div>} />
+            <Route path="campaigns" element={<CampaignsContent />} />
             <Route path="scheduled" element={<ScheduledContent />} />
             <Route path="drafts" element={<DraftsContent />} />
             <Route path="published" element={<PublishedContent />} />
