@@ -14,14 +14,14 @@ function About() {
         </RouterLink>
         
         <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-text bg-clip-text text-transparent">
-          About echoAgents
+          About MindBolt AI
         </h1>
         
         <div className="grid md:grid-cols-2 gap-12">
           <div>
             <h2 className="text-2xl font-bold mb-6">Our Mission</h2>
             <p className="text-text-muted mb-6">
-              At echoAgents, we're on a mission to revolutionize marketing workflows by bringing AI-powered assistance directly into Slack. 
+              At MindBolt AI, we're on a mission to revolutionize marketing workflows by bringing AI-powered assistance directly into Slack. 
               We believe that marketing should be efficient, collaborative, and data-driven, and our platform makes that possible.
             </p>
             
@@ -53,7 +53,7 @@ function About() {
           <div className="bg-dark-lighter p-8 rounded-xl border border-dark-card">
             <h2 className="text-2xl font-bold mb-6">Our Story</h2>
             <p className="text-text-muted mb-4">
-              Founded in 2025, echoAgents was born out of the need for a more efficient marketing workflow. 
+              Founded in 2025, MindBolt AI was born out of the need for a more efficient marketing workflow. 
               Our team of AI experts and marketing professionals came together to create a solution that 
               would transform how teams work together on marketing projects.
             </p>

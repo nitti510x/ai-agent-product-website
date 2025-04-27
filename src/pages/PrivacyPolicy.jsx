@@ -90,7 +90,7 @@ function PrivacyPolicy() {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p className="text-text-muted">
-              privacy@echoagents.com
+              privacy@mindboltai.com
             </p>
           </section>
         </div>

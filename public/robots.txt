@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://echoagents.geniusos.co/sitemap.xml
+Sitemap: https://mindboltai.geniusos.co/sitemap.xml
