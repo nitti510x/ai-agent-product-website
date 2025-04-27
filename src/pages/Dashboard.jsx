@@ -58,6 +58,18 @@ function Dashboard() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
+        // Log all localStorage items for debugging
+        console.log('All localStorage items:');
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          try {
+            const value = localStorage.getItem(key);
+            console.log(`${key}:`, value.substring(0, 100) + (value.length > 100 ? '...' : ''));
+          } catch (e) {
+            console.log(`${key}: [Error reading value]`);
+          }
+        }
+        
         // Dynamically import supabase only when needed
         const { supabase } = await import('../config/supabase');
         
@@ -72,70 +84,35 @@ function Dashboard() {
         setLoginProvider(loginProvider);
         console.log('User logged in via:', loginProvider);
         
-        // Get user avatar
-        let avatarUrl = null;
+        // Get user avatar - directly use the avatar_url from localStorage
+        const avatarUrl = localStorage.getItem('avatar_url');
+        console.log('Avatar URL from localStorage:', avatarUrl);
         
-        // Check user_metadata for avatar
-        if (user.user_metadata?.avatar_url) {
-          avatarUrl = user.user_metadata.avatar_url;
-          console.log('Found avatar_url in user_metadata:', avatarUrl);
-        } else if (user.user_metadata?.picture) {
-          avatarUrl = user.user_metadata.picture;
-          console.log('Found picture in user_metadata:', avatarUrl);
-        }
-        
-        // For Slack users, the avatar might be in a different location
-        if (!avatarUrl && user.identities) {
-          const slackIdentity = user.identities.find(id => 
-            id.provider === 'slack' || id.provider === 'slack_oidc'
-          );
-          
-          if (slackIdentity?.identity_data?.user?.image_48) {
-            avatarUrl = slackIdentity.identity_data.user.image_48;
-            console.log('Found Slack avatar:', avatarUrl);
-          } else if (slackIdentity?.identity_data?.image_48) {
-            avatarUrl = slackIdentity.identity_data.image_48;
-            console.log('Found Slack avatar in identity_data root:', avatarUrl);
-          } else if (slackIdentity?.identity_data?.image_url) {
-            avatarUrl = slackIdentity.identity_data.image_url;
-            console.log('Found Slack image_url:', avatarUrl);
-          }
-          
-          // Check Google identity too
-          const googleIdentity = user.identities.find(id => id.provider === 'google');
-          
-          if (!avatarUrl && googleIdentity?.identity_data?.picture) {
-            avatarUrl = googleIdentity.identity_data.picture;
-            console.log('Found Google avatar in identity_data:', avatarUrl);
-          } else if (!avatarUrl && googleIdentity?.identity_data?.avatar_url) {
-            avatarUrl = googleIdentity.identity_data.avatar_url;
-            console.log('Found Google avatar_url in identity_data:', avatarUrl);
-          }
-        }
-        
-        // Set the avatar URL if found
         if (avatarUrl) {
-          console.log('Setting user avatar to:', avatarUrl);
           setUserAvatar(avatarUrl);
         } else {
-          console.log('No avatar found for user');
+          console.log('No avatar found in localStorage');
           
-          // Try to extract from localStorage as a last resort
-          try {
-            const supabaseItems = Object.keys(localStorage)
-              .filter(key => key.includes('supabase'))
-              .reduce((obj, key) => {
-                try {
-                  obj[key] = JSON.parse(localStorage.getItem(key));
-                } catch (e) {
-                  obj[key] = localStorage.getItem(key);
-                }
-                return obj;
-              }, {});
-            
-            console.log('Supabase items in localStorage:', supabaseItems);
-          } catch (e) {
-            console.error('Error checking localStorage:', e);
+          // Only if no avatar in localStorage, try to get it from user data
+          if (user?.user_metadata?.picture) {
+            const googlePicture = user.user_metadata.picture;
+            console.log('Found picture in user metadata:', googlePicture);
+            localStorage.setItem('avatar_url', googlePicture);
+            setUserAvatar(googlePicture);
+          } else if (user?.user_metadata?.avatar_url) {
+            const metadataAvatar = user.user_metadata.avatar_url;
+            console.log('Found avatar_url in user metadata:', metadataAvatar);
+            localStorage.setItem('avatar_url', metadataAvatar);
+            setUserAvatar(metadataAvatar);
+          } else if (user?.identities) {
+            // Check for Google identity
+            const googleIdentity = user.identities.find(id => id.provider === 'google');
+            if (googleIdentity?.identity_data?.picture) {
+              const googlePicture = googleIdentity.identity_data.picture;
+              console.log('Found Google picture in identity_data:', googlePicture);
+              localStorage.setItem('avatar_url', googlePicture);
+              setUserAvatar(googlePicture);
+            }
           }
         }
         
@@ -262,11 +239,11 @@ function Dashboard() {
                   <img 
                     src={userAvatar} 
                     alt="User Avatar" 
-                    className="w-7 h-7 rounded-full border-2 border-transparent"
+                    className="w-7 h-7 rounded-full border-2 border-transparent object-cover"
                   />
                 ) : (
-                  <div className="relative">
-                    <FiUser className="w-5 h-5 mr-1" />
+                  <div className="relative w-7 h-7 flex items-center justify-center rounded-full bg-[#1A1E23] border border-gray-700/40">
+                    <FiUser className="w-4 h-4 text-emerald-400" />
                   </div>
                 )}
                 <span className="text-sm relative hidden sm:inline-block">
