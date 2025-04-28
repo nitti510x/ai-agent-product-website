@@ -10,11 +10,11 @@ function Logo({ className = "h-8" }) {
           className="h-10 w-auto"
         />
         <div className="ml-6 text-2xl flex items-center tracking-wide font-sans" style={{ transform: 'translateY(-2px)' }}>
-          {/* Combined MindBolt AI text with lightning bolt icon */}
+          {/* Combined MediaBolt AI text with lightning bolt icon */}
           <div className="flex items-center">
-            {/* Mind part with regular weight and cyan color */}
+            {/* Media part with regular weight and cyan color */}
             <span 
-              className="font-medium tracking-tight text-[#53D3FF]" 
+              className="font-bold tracking-tight text-[#53D3FF]" 
               style={{ 
                 letterSpacing: '0.02em',
                 textShadow: '0 0 8px rgba(83, 211, 255, 0.35)',
@@ -23,7 +23,7 @@ function Logo({ className = "h-8" }) {
                 WebkitTextFillColor: 'transparent'
               }}
             >
-              Mind
+              Media
             </span>
             
             {/* Lightning bolt icon - increased size by ~15% */}
@@ -33,7 +33,7 @@ function Logo({ className = "h-8" }) {
               viewBox="0 0 24 24" 
               fill="none" 
               xmlns="http://www.w3.org/2000/svg"
-              className="mx-1 transform translate-y-[1px]"
+              className="mx-0.5 transform translate-y-[1px]"
               style={{
                 filter: 'drop-shadow(0 0 3.5px rgba(83, 255, 203, 0.45))'
               }}

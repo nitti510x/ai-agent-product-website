@@ -126,7 +126,7 @@ const CampaignEditModal = ({ isOpen, campaign, onClose, onSave }) => {
       uuid: campaign ? campaign.uuid : crypto.randomUUID(),
       slack_channel_id: campaign ? campaign.slack_channel_id : `C04QWERTY${Math.floor(Math.random() * 1000)}`,
       user_org_id: campaign ? campaign.user_org_id : '550e8400-e29b-41d4-a716-446655440001',
-      user_email_id: campaign ? campaign.user_email_id : 'marketing@mindboltai.co',
+      user_email_id: campaign ? campaign.user_email_id : 'marketing@mediaboltai.co',
       posting_time_utc: `${formData.posting_time_utc}:00`,
       is_paused: campaign ? campaign.is_paused : false,
       deleted_at: null,

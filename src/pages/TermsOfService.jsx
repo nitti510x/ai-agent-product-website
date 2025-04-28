@@ -20,7 +20,7 @@ function TermsOfService() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">1. Acceptance of Terms</h2>
             <p className="text-text-muted mb-4">
-              By accessing or using MindBolt AI services, you agree to be bound by these Terms of Service. 
+              By accessing or using MediaBolt AI services, you agree to be bound by these Terms of Service. 
               If you do not agree with any part of these terms, you must not use our services.
             </p>
           </section>
@@ -28,7 +28,7 @@ function TermsOfService() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">2. Services Description</h2>
             <p className="text-text-muted mb-4">
-              MindBolt AI provides AI-powered marketing assistance through Slack. Our services include content creation, 
+              MediaBolt AI provides AI-powered marketing assistance through Slack. Our services include content creation, 
               analytics, and team collaboration features.
             </p>
           </section>
@@ -46,7 +46,7 @@ function TermsOfService() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">4. Intellectual Property</h2>
             <p className="text-text-muted mb-4">
-              All content, trademarks, and intellectual property rights in our services belong to MindBolt AI or its licensors. 
+              All content, trademarks, and intellectual property rights in our services belong to MediaBolt AI or its licensors. 
               You may not use our intellectual property without explicit permission.
             </p>
           </section>
@@ -54,7 +54,7 @@ function TermsOfService() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-6">5. Limitation of Liability</h2>
             <p className="text-text-muted mb-4">
-              MindBolt AI is not liable for any indirect, incidental, or consequential damages arising from the use of our services.
+              MediaBolt AI is not liable for any indirect, incidental, or consequential damages arising from the use of our services.
             </p>
           </section>
 
@@ -73,7 +73,7 @@ function TermsOfService() {
               If you have any questions about these Terms of Service, please contact us at:
             </p>
             <p className="text-text-muted">
-              support@mindboltai.com
+              support@mediaboltai.com
             </p>
           </section>
         </div>

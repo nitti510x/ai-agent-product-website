@@ -13,5 +13,5 @@ export const apiUrl = () => {
  * @returns {string} The base URL
  */
 export const baseUrl = () => {
-  return import.meta.env.VITE_SITE_URL || 'https://mindboltai.geniusos.co';
+  return import.meta.env.VITE_SITE_URL || 'https://mediaboltai.geniusos.co';
 };

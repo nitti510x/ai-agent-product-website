@@ -32,7 +32,7 @@ function Contact() {
               <FiMail className="w-8 h-8 text-primary mr-4" />
               <div>
                 <h3 className="text-xl font-bold mb-2">Email Support</h3>
-                <p className="text-text-muted">support@mindboltai.com</p>
+                <p className="text-text-muted">support@mediaboltai.com</p>
                 <p className="text-text-muted">Response within 24 hours</p>
               </div>
             </div>

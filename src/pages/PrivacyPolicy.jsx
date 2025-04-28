@@ -90,7 +90,7 @@ function PrivacyPolicy() {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p className="text-text-muted">
-              privacy@mindboltai.com
+              privacy@mediaboltai.com
             </p>
           </section>
         </div>
